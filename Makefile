@@ -12,7 +12,6 @@ run:
 	@sudo mkdir -p $(VOLUME)/mariadb
 	@echo "$(GREEN)** Compose Up ** $(RESET)"
 	@docker-compose --file=$(COMPOSE) up --build --detach
-	@sudo grep $(LOGIN).42.fr /etc/hosts || echo "127.0.0.1 $(LOGIN).42.fr" | sudo tee -a /etc/hosts
 
 up:
 	@echo "$(GREEN)** Compose Up ** $(RESET)"
