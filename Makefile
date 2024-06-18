@@ -44,7 +44,6 @@ clean: down
 fclean: clean
 	@echo "$(GREEN)** Removing data... **$(RESET)"
 	@sudo rm -rf $(VOLUME)
-	@sudo rm -rf /srcs/frontend/node_modules
 	@sudo rm -rf /srcs/data
 	@sudo rm -rf /srcs/backend/data
 

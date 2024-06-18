@@ -17,9 +17,9 @@ services:
     ports:
       - '8000:8000'
     volumes:
-      - /absolute/path/to/your/project/backend/djangoapp:/app/djangoapp
-      - /absolute/path/to/your/project/backend/data/web/static:/data/web/static
-      - /absolute/path/to/your/project/backend/data/web/media:/data/web/media
+      - /srcs/backend/djangoapp:/app/djangoapp
+      - /srcs/backend/data/web/static:/data/web/static
+      - /srcs/backend/data/web/media:/data/web/media
     env_file:
       - ./backend/dotenv_files/.env
     networks:
@@ -33,7 +33,7 @@ services:
     env_file:
       - ./backend/dotenv_files/.env
     volumes:
-      - /absolute/path/to/your/project/data/postgres/data:/var/lib/postgresql/data
+      - /srcs/data/postgres/data:/var/lib/postgresql/data
     networks:
       - app-network
 
