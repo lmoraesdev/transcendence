@@ -44,6 +44,9 @@ clean: down
 fclean: clean
 	@echo "$(GREEN)** Removing data... **$(RESET)"
 	@sudo rm -rf $(VOLUME)
+	@sudo rm -rf frontend/node_modules
+	@sudo rm -rf data/postgres/data
+	@sudo rm -rf backend/data
 
 re: fclean all
 	@echo "$(GREEN)** Restarting containers... **$(RESET)"
