@@ -1,14 +1,20 @@
-# Usando a imagem do Node.js 18.20.3
-FROM node:18.20.3
+# Use a imagem oficial do Node.js
+FROM node:latest
 
-# Definindo o diretório de trabalho
-WORKDIR /app/srcs
+# Define o diretório de trabalho dentro do contêiner
+WORKDIR /app
 
-# Inicializando um novo projeto Node.js e instalando o Bootstrap
-RUN npm init -y && npm install bootstrap
+# Copia os arquivos necessários para o contêiner
+COPY package*.json ./
 
-# Expondo a porta que o servidor frontend usará (ajuste conforme necessário)
+# Instala as dependências do projeto
+RUN npm install
+
+# Copia os demais arquivos para o contêiner
+COPY . .
+
+# Expõe a porta que a aplicação irá rodar
 EXPOSE 3000
 
-# Comando para manter o container em execução (opcional, dependendo do uso)
-CMD ["tail", "-f", "/dev/null"]
+# Comando para rodar a aplicação
+CMD ["npm", "start"]
