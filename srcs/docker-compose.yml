@@ -16,23 +16,24 @@ services:
     container_name: backend
     ports:
       - '8000:8000'
-    environment:
-      - DJANGO_SETTINGS_MODULE=backend.settings
-      - DATABASE_URL=postgres://postgres:password@db:5432/mydatabase
+    volumes:
+      - /absolute/path/to/your/project/backend/djangoapp:/app/djangoapp
+      - /absolute/path/to/your/project/backend/data/web/static:/data/web/static
+      - /absolute/path/to/your/project/backend/data/web/media:/data/web/media
+    env_file:
+      - ./backend/dotenv_files/.env
     networks:
       - app-network
     depends_on:
       - db
 
   db:
-    image: postgres
+    image: postgres:16.3-alpine3.20
     container_name: postgres
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: mydatabase
+    env_file:
+      - ./backend/dotenv_files/.env
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - /absolute/path/to/your/project/data/postgres/data:/var/lib/postgresql/data
     networks:
       - app-network
 
