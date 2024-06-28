@@ -1,0 +1,9 @@
+django>=3.2,<4.0
+djangorestframework
+psycopg2-binary>=2.8
+oauthlib
+requests
+requests-oauthlib
+django-oauth-toolkit==2.0.0
+drf-yasg==1.21.4
+django-allauth
