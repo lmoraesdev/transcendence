@@ -16,9 +16,14 @@ COPY requirements.txt /djangoapp/
 # Entra na pasta djangoapp no container
 WORKDIR /djangoapp
 
-# Instala as dependências
-RUN python -m venv /venv && \
-    /venv/bin/pip install --no-cache-dir -r requirements.txt
+# Crie o ambiente virtual
+RUN python -m venv /venv
+
+# Atualize o pip dentro do ambiente virtual
+RUN /venv/bin/pip install --upgrade pip
+
+# Instale as dependências a partir do requirements.txt
+RUN /venv/bin/pip install --no-cache-dir -r requirements.txt
 
 # Copia o restante do código para aplicação
 COPY . /djangoapp/

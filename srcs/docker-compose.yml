@@ -29,6 +29,21 @@ services:
     depends_on:
       - db 
 
+  server:
+    container_name: server
+    build: 
+      context: ./server
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ssl_certificates:/etc/ssl
+      - /srcs/frontend/static:/app/static
+      - /srcs/frontend/media:/app/media
+    depends_on:
+      - backend
+    restart: on-failure
+
   db:
       image: postgres:13
       container_name: postgres
@@ -46,3 +61,10 @@ networks:
 
 volumes:
   postgres-data:
+    driver: local
+  ssl_certificates:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/srcs/server/ssl
