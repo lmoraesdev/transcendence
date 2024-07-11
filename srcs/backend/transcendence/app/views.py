@@ -10,15 +10,3 @@ BASE_URL = config('BASE_URL')
 
 class HomeView(TemplateView):
     template_name = "index.html"
-
-class OAuthLoginView(APIView):
-    def get(self, request, *args, **kwargs):
-        if 'code' in request.GET:
-            response = OAuthCallback(request)
-        else:
-            redirect_uri = request.build_absolute_uri('/oauth/callback/')
-            response = OAuthLogin(redirect_uri)
-        
-        if isinstance(response, HttpResponse):
-            return Response(response.content, status=response.status_code)
-        return response

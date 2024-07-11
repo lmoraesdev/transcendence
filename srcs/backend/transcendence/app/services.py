@@ -5,7 +5,10 @@ from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
 from requests_oauthlib import OAuth2Session
 from decouple import config
+import logging
 import requests
+
+logger = logging.getLogger(__name__)
 
 BASE_URL = config('BASE_URL')
 CLIENT_ID = config('CLIENT_ID')
@@ -15,10 +18,11 @@ API_URL = 'https://api.intra.42.fr'
 def OAuthLogin(redirect_uri):
     try:            
         auth_url = f'{API_URL}/oauth/authorize'
+        # redirect_uri = f'{BASE_URL}/oauth/callback/'
+        redirect_uri = 'https://www.google.com/'
         params = {
             'client_id': CLIENT_ID,
-            # 'redirect_uri': redirect_uri,
-            'redirect_uri': 'https://www.google.com/',
+            'redirect_uri': redirect_uri,
             'response_type': 'code'
         }
         return redirect(f'{auth_url}?{urlencode(params)}')

@@ -21,10 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-h+)al3%kzus9ypkgu@n(2+c*+e35jdnmtts$rk36#z!t!5xcoo'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG')
 
 ALLOWED_HOSTS = ['*']
 
@@ -169,7 +169,7 @@ STATICFILES_DIRS = [
 
 # Diretórios adicionais de arquivos media
 MEDIAFILES_DIRS = [
-    '/data/web/media'  # diretório de arquivos estáticos do frontend
+    '/data/web/media/'  # diretório de arquivos media do frontend
 ]
 
 USE_X_FORWARDED_HOST = True
