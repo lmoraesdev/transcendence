@@ -45,14 +45,21 @@ RUN adduser --disabled-password --no-create-home duser && \
     mkdir -p /data/web/static && \
     mkdir -p /data/web/media && \
     mkdir -p /djangoapp/static && \
+    mkdir -p /djangoapp/staticfiles && \
+    mkdir -p /djangoapp/app/migrations && \
     chown -R duser:duser /djangoapp/static && \
+    chown -R duser:duser /djangoapp/staticfiles && \
     chown -R duser:duser /data/web/static && \
     chown -R duser:duser /data/web/media && \
+    chown -R duser:duser /djangoapp/app/migrations && \
     chmod -R 755 /djangoapp/static && \
+    chmod -R 755 /djangoapp/staticfiles && \
     chmod -R 755 /data/web/static && \
     chmod -R 755 /data/web/media && \
+    chmod -R 755 /djangoapp/app/migrations && \
     chmod -R +x /scripts && \
     chmod +x /scripts/commands.sh
+
 
 # Adiciona a pasta scripts e venv/bin no $PATH do container.
 ENV PATH="/scripts:/venv/bin:$PATH"

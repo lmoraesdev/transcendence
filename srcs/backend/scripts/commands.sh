@@ -19,7 +19,7 @@ python manage.py migrate --no-input
 
 # Iniciar Uvicorn com Gunicorn
 echo "🚀 Iniciando servidor Uvicorn com Gunicorn..."
-/venv/bin/gunicorn -w 4 -k uvicorn.workers.UvicornWorker transcendence.asgi:application --bind 0.0.0.0:8000
+/venv/bin/gunicorn -w 4 -k uvicorn.workers.UvicornWorker api.asgi:application --bind 0.0.0.0:8000
 
 # Ou se preferir, diretamente com Uvicorn sem Gunicorn
 # echo "🚀 Iniciando servidor Uvicorn..."

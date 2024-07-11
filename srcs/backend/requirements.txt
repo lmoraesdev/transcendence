@@ -4,6 +4,7 @@ psycopg2-binary>=2.9.9
 oauthlib
 requests==2.31.0
 requests-oauthlib
+python-decouple
 django-oauth-toolkit==2.0.0
 drf-yasg==1.21.4
 django-allauth
@@ -17,4 +18,4 @@ daphne==3.0.2
 Pillow==10.2.0
 uvicorn==0.27.0
 websockets==12.0
-pytz
+pytz>=2021.1

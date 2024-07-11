@@ -5,6 +5,9 @@ services:
     container_name: frontend
     build:
       context: ./frontend
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
     ports:
       - '3000:3000'
     networks:
@@ -20,8 +23,8 @@ services:
       - '8000:8000'
     volumes:
       - /srcs/backend/djangoapp:/app/djangoapp
-      - /srcs/backend/data/web/static:/data/web/static
-      - /srcs/backend/data/web/media:/data/web/media
+      - static_volume:/data/web/static
+      - media_volume:/data/web/media
     env_file:
       - ./backend/dotenv_files/.env
     networks:
@@ -33,15 +36,18 @@ services:
     container_name: server
     build: 
       context: ./server
+    networks:
+      - app_network
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - ssl_certificates:/etc/ssl
-      - /srcs/frontend/static:/app/static
-      - /srcs/frontend/media:/app/media
+      - static_volume:/nginx/frontend/static
+      - media_volume:/nginx/frontend/media
     depends_on:
       - backend
+      - frontend
     restart: on-failure
 
   db:
@@ -60,6 +66,10 @@ networks:
     driver: bridge
 
 volumes:
+  static_volume:
+    driver: local
+  media_volume:
+    driver: local
   postgres-data:
     driver: local
   ssl_certificates:
