@@ -1,45 +1,80 @@
+version: '3.3'
+
 services:
   frontend:
+    container_name: frontend
     build:
       context: ./frontend
-    container_name: frontend
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
     ports:
       - '3000:3000'
     networks:
-      - app-network
+      - app_network
     depends_on:
       - backend
 
   backend:
+    container_name: backend
     build:
       context: ./backend
-    container_name: backend
     ports:
       - '8000:8000'
     volumes:
       - /srcs/backend/djangoapp:/app/djangoapp
-      - /srcs/backend/data/web/static:/data/web/static
-      - /srcs/backend/data/web/media:/data/web/media
+      - static_volume:/data/web/static
+      - media_volume:/data/web/media
     env_file:
       - ./backend/dotenv_files/.env
     networks:
-      - app-network
+      - app_network
     depends_on:
-      - db
+      - db 
+
+  server:
+    container_name: server
+    build: 
+      context: ./server
+    networks:
+      - app_network
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ssl_certificates:/etc/ssl
+      - static_volume:/nginx/frontend/static
+      - media_volume:/nginx/frontend/media
+    depends_on:
+      - backend
+      - frontend
+    restart: on-failure
 
   db:
-    image: postgres:16.3-alpine3.20
-    container_name: postgres
-    env_file:
-      - ./backend/dotenv_files/.env
-    volumes:
-      - /srcs/data/postgres/data:/var/lib/postgresql/data
-    networks:
-      - app-network
+      image: postgres:13
+      container_name: postgres
+      restart: always
+      env_file:
+        - ./backend/dotenv_files/.env
+      volumes:
+        - /srcs/data/postgres/data:/var/lib/postgresql/data
+      networks:
+        - app_network
 
 networks:
-  app-network:
+  app_network:
     driver: bridge
 
 volumes:
+  static_volume:
+    driver: local
+  media_volume:
+    driver: local
   postgres-data:
+    driver: local
+  ssl_certificates:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/srcs/server/ssl
