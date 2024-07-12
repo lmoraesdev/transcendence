@@ -1,20 +1,18 @@
-# Use a imagem oficial do Node.js
-FROM node:latest
+FROM		debian:bullseye
 
-# Define o diretório de trabalho dentro do contêiner
-WORKDIR /app
+RUN			apt update -y && \
+			apt upgrade -y && \
+			apt install curl vim nano lsof -y && \
+			apt install nginx -y
 
-# Copia os arquivos necessários para o contêiner
-COPY package*.json ./
+COPY		./server/conf/nginx.conf /etc/nginx/sites-enabled/ft_transcendence.conf
 
-# Instala as dependências do projeto
-RUN npm install
+COPY		./server/ssl/certs/ft_transcendence.crt /etc/ssl/certs/ft_transcendence.crt
 
-# Copia os demais arquivos para o contêiner
-COPY . .
+COPY		./server/ssl/private/ft_transcendence.key /etc/ssl/private/ft_transcendence.key
 
-# Expõe a porta que a aplicação irá rodar
-EXPOSE 3000
+RUN			mkdir -p /var/www/ft_transcendence/
 
-# Comando para rodar a aplicação
-CMD ["npm", "start"]
+COPY		. /var/www/ft_transcendence/
+
+CMD			[ "nginx", "-g", "daemon off;" ]
