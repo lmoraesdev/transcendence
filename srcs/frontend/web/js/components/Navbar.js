@@ -1,4 +1,4 @@
-import router from "../utilities/router.js";
+import router from "../router/router.js";
 
 export default class Navbar extends HTMLElement {
   constructor() {

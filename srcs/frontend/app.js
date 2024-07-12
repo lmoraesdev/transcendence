@@ -1,5 +1,5 @@
 // Router
-import router from "./web/js/utilities/router.js";
+import router from "./web/js/router/router.js";
 
 // Pages
 import HomePage from "./web/js/pages/HomePage.js";
