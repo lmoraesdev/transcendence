@@ -1,0 +1,14 @@
+@import url("https://fonts.googleapis.com/css2?family=Koulen&family=Rubik+Mono+One&display=swap");
+@import "./root.css";
+
+/* Components */
+@import "./components/Stars.css";
+@import "./components/Footer.css";
+@import "./components/LoginButton.css";
+@import "./components/Navbar.css";
+@import "./components/PlayCard.css";
+
+/* Pages */
+@import "./pages/HomePage.css";
+@import "./pages/LoginPage.css";
+@import "./pages/NotfoundPage.css";

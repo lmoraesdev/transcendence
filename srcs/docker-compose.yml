@@ -1,80 +1,65 @@
 version: '3.3'
 
 services:
-  frontend:
-    container_name: frontend
-    build:
-      context: ./frontend
-    volumes:
-      - static_volume:/app/static
-      - media_volume:/app/media
-    ports:
-      - '3000:3000'
-    networks:
-      - app_network
-    depends_on:
-      - backend
-
-  backend:
-    container_name: backend
-    build:
-      context: ./backend
-    ports:
-      - '8000:8000'
-    volumes:
-      - /srcs/backend/djangoapp:/app/djangoapp
-      - static_volume:/data/web/static
-      - media_volume:/data/web/media
-    env_file:
-      - ./backend/dotenv_files/.env
-    networks:
-      - app_network
-    depends_on:
-      - db 
 
   server:
     container_name: server
     build: 
-      context: ./server
+      context: ./frontend/server
+    networks:
+      - app_network
+    volumes:
+      - ./frontend/server:/var/www/transcendence/:ro
+      - ./frontend/server/conf/:/etc/nginx/services/:ro
+    ports:
+      - 443:443
+    restart: on-failure
+
+  authentication:
+    container_name: authentication
+    build:
+      context: ./backend/services/authentication/
+    image: authentication
+    env_file:
+      - ./backend/dotenv_files/.env
+    volumes:
+      - ./backend/services/authentication:/services/authentication/:rw
     networks:
       - app_network
     ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ssl_certificates:/etc/ssl
-      - static_volume:/nginx/frontend/static
-      - media_volume:/nginx/frontend/media
+      - 8000:8000
     depends_on:
-      - backend
-      - frontend
+      - db
     restart: on-failure
 
   db:
-      image: postgres:13
-      container_name: postgres
-      restart: always
-      env_file:
-        - ./backend/dotenv_files/.env
-      volumes:
-        - /srcs/data/postgres/data:/var/lib/postgresql/data
-      networks:
-        - app_network
+    image: postgres:16.2
+    container_name: postgres-db
+    restart: unless-stopped
+    env_file:
+      - ./backend/dotenv_files/.env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app_network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4
+    env_file:
+      - ./backend/dotenv_files/.env
+    ports:
+      - "8080:80"
+    networks:
+      - app_network
+    restart: unless-stopped
+    depends_on:
+      - db
 
 networks:
   app_network:
     driver: bridge
 
 volumes:
-  static_volume:
+  pgdata:
     driver: local
-  media_volume:
-    driver: local
-  postgres-data:
-    driver: local
-  ssl_certificates:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${PWD}/srcs/server/ssl
