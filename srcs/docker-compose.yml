@@ -1,57 +1,9 @@
 version: '3.3'
 
 services:
-<<<<<<< HEAD
-  frontend:
-    container_name: frontend
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    volumes:
-      - ./frontend:/var/www/frontend/:ro
-      - ./frontend/server/conf/:nginx/sites-enabled/:ro
-    ports:
-      - '443:443'
-    networks:
-      - app_network
-    depends_on:
-      - backend
-
-  backend:
-    container_name: backend
-    build:
-      context: ./backend
-    ports:
-      - '8000:8000'
-    volumes:
-      - /srcs/backend/djangoapp:/app/djangoapp
-      - static_volume:/data/web/static
-      - media_volume:/data/web/media
-    env_file:
-      - ./backend/dotenv_files/.env
-    networks:
-      - app_network
-    depends_on:
-      - db
-
   server:
     container_name: server
     build:
-      context: ./server
-    networks:
-      - app_network
-    ports:
-      - '80:80'
-      - '443:443'
-    volumes:
-      - ssl_certificates:/etc/ssl
-      - static_volume:/nginx/frontend/static
-      - media_volume:/nginx/frontend/media
-=======
-
-  server:
-    container_name: server
-    build: 
       context: ./frontend/server
     networks:
       - app_network
@@ -75,23 +27,11 @@ services:
       - app_network
     ports:
       - 8000:8000
->>>>>>> refs/remotes/origin/main
     depends_on:
       - db
     restart: on-failure
 
   db:
-<<<<<<< HEAD
-    image: postgres:13
-    container_name: postgres
-    restart: always
-    env_file:
-      - ./backend/dotenv_files/.env
-    volumes:
-      - /srcs/data/postgres/data:/var/lib/postgresql/data
-    networks:
-      - app_network
-=======
     image: postgres:16.2
     container_name: postgres-db
     restart: unless-stopped
@@ -108,13 +48,12 @@ services:
     env_file:
       - ./backend/dotenv_files/.env
     ports:
-      - "8080:80"
+      - '8080:80'
     networks:
       - app_network
     restart: unless-stopped
     depends_on:
       - db
->>>>>>> refs/remotes/origin/main
 
 networks:
   app_network:
