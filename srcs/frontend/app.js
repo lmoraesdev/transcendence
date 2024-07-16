@@ -12,22 +12,25 @@ Object.defineProperty(window, "ft_transcendence_host", {
 });
 
 window.addEventListener("keydown", function (e) {
-  if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(e.code) > -1)
+  if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code))
     e.preventDefault();
 });
 
 const color = localStorage.getItem("colorizer");
 
+function setProperty(key, value) {
+  document.documentElement.style.setProperty(key, value);
+}
+
+localStorage.setItem("colorizer", color || "yellow");
 if (color === "blue") {
-  localStorage.setItem("colorizer", "blue");
-  document.documentElement.style.setProperty("--color-primary", "#2cacff30");
-  document.documentElement.style.setProperty("--color-primary-solid", "#0f3c5a");
-  document.documentElement.style.setProperty("--color-primary-light", "#2cacff");
+  setProperty("--color-primary", "#2cacff30");
+  setProperty("--color-primary-solid", "#0f3c5a");
+  setProperty("--color-primary-light", "#2cacff");
 } else {
-  localStorage.setItem("colorizer", "yellow");
-  document.documentElement.style.setProperty("--color-primary", "#f8ec9030");
-  document.documentElement.style.setProperty("--color-primary-solid", "#2e2c1d");
-  document.documentElement.style.setProperty("--color-primary-light", "#f8ec90");
+  setProperty("--color-primary", "#f8ec9030");
+  setProperty("--color-primary-solid", "#2e2c1d");
+  setProperty("--color-primary-light", "#f8ec90");
 }
 
 window.addEventListener("DOMContentLoaded", () => {
