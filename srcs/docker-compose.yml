@@ -5,11 +5,12 @@ services:
     container_name: frontend
     build:
       context: ./frontend
+      dockerfile: Dockerfile
     volumes:
-      - static_volume:/app/static
-      - media_volume:/app/media
+      - ./frontend:/var/www/frontend/:ro
+      - ./frontend/server/conf/:nginx/sites-enabled/:ro
     ports:
-      - '3000:3000'
+      - '443:443'
     networks:
       - app_network
     depends_on:
@@ -30,17 +31,17 @@ services:
     networks:
       - app_network
     depends_on:
-      - db 
+      - db
 
   server:
     container_name: server
-    build: 
+    build:
       context: ./server
     networks:
       - app_network
     ports:
-      - "80:80"
-      - "443:443"
+      - '80:80'
+      - '443:443'
     volumes:
       - ssl_certificates:/etc/ssl
       - static_volume:/nginx/frontend/static
@@ -51,15 +52,15 @@ services:
     restart: on-failure
 
   db:
-      image: postgres:13
-      container_name: postgres
-      restart: always
-      env_file:
-        - ./backend/dotenv_files/.env
-      volumes:
-        - /srcs/data/postgres/data:/var/lib/postgresql/data
-      networks:
-        - app_network
+    image: postgres:13
+    container_name: postgres
+    restart: always
+    env_file:
+      - ./backend/dotenv_files/.env
+    volumes:
+      - /srcs/data/postgres/data:/var/lib/postgresql/data
+    networks:
+      - app_network
 
 networks:
   app_network:
