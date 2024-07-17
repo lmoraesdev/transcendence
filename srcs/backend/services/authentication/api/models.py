@@ -14,12 +14,12 @@ class Player(AbstractBaseUser):
         (Status.INGAME.value, "INGAME"),
     ]
 
-    id = models.AutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True, auto_created=True)
     email = models.EmailField(max_length=50, blank=False, null=False, unique=True)
     username = models.CharField(max_length=20, blank=False, null=False)
     firstName = models.CharField(max_length=25, blank=False, null=False)
     lastName = models.CharField(max_length=25, blank=False, null=False)
-    avatar = models.URLField(blank=False, null=False)
+    avatar = models.URLField(blank=True, null=True)
     twoFactor = models.BooleanField(default=False)
     status = models.CharField(max_length=2, choices=STATUS_CHOICE, default=Status.OFFLINE.value)
     victory = models.IntegerField(default=0, null=False, blank=True)

@@ -14,12 +14,12 @@ class Player(AbstractBaseUser):
         (Status.INGAME.value, "INGAME"),
     ]
 
-    id = models.AutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True, auto_created=True)
     email = models.EmailField(max_length=50, blank=False, null=False, unique=True)
     username = models.CharField(max_length=20, blank=False, null=False)
     firstName = models.CharField(max_length=25, blank=False, null=False)
     lastName = models.CharField(max_length=25, blank=False, null=False)
-    avatar = models.URLField(blank=False, null=False)
+    avatar = models.URLField(blank=True, null=True)
     twoFactor = models.BooleanField(default=False)
     status = models.CharField(max_length=2, choices=STATUS_CHOICE, default=Status.OFFLINE.value)
     victory = models.IntegerField(default=0, null=False, blank=True)
@@ -40,7 +40,7 @@ class Friendship(models.Model):
         (Status.PENDING.value, "PENDING")
     ]
 
-    id = models.AutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True, auto_created=True)
     sender = models.ForeignKey('Player', on_delete=models.CASCADE, related_name='orderShipped')
     receiver = models.ForeignKey('Player', on_delete=models.CASCADE, related_name='requestReceived')
     status = models.CharField(max_length=2, choices=STATUS_CHOICE, default=Status.PENDING.value)
@@ -58,7 +58,7 @@ class Tournament(models.Model):
         def choices(cls):
             return [(choice.value, choice.name) for choice in cls]
 
-    id = models.AutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True, auto_created=True)
     name = models.CharField(max_length=20, blank=False, null=False, unique=False)
     round = models.IntegerField(default=1)
     status = models.CharField(max_length=2,
@@ -86,7 +86,7 @@ class Match(models.Model):
         def choices(cls):
             return [(choice.value, choice.name) for choice in cls]
 
-    id = models.AutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True, auto_created=True)
     game = models.CharField(max_length=2, choices=Game.choices(), null=False, blank=False, default=Game.PONG.value)
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, null=True, blank=False)
     round = models.IntegerField(default=1)
@@ -102,7 +102,7 @@ class PlayerMatch(models.Model):
         def choices(cls):
             return [(choice.value, choice.name) for choice in cls]
         
-    id = models.AutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True, auto_created=True)
     matchId = models.ForeignKey(Match, on_delete=models.CASCADE, null=False, blank=False)
     playerId = models.ForeignKey(Tournament, on_delete=models.CASCADE, null=False, blank=False)
     score = models.IntegerField(default=0, null=False, blank=False)
@@ -114,7 +114,7 @@ class PlayerMatch(models.Model):
         return f"Score: {self.score}"
 
 class PlayerTournament(models.Model):
-    id = models.AutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True, auto_created=True)
     playerId = models.ForeignKey(Player, on_delete=models.CASCADE, null=False, blank=False)
     tournamentId = models.ForeignKey(Tournament, on_delete=models.CASCADE, null=False, blank=False)
     finished = models.BooleanField(default=False, null=False, blank=False)
