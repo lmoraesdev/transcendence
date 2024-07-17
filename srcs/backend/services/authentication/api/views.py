@@ -15,8 +15,8 @@ from .services import decodeGooleToken, generateJwt, check2FACode, get2FACode, j
 
 @api_view(['GET'])
 def OAuthIntra(request):
-    # redirectUri = urlencode({"redirect_uri": f"{settings.PUBLIC_AUTHENTICATION_URL}intra/callback/"})
-    redirectUri = urlencode({"redirect_uri": "https://www.google.com/"})
+    redirectUri = urlencode({"redirect_uri": f"{settings.PUBLIC_AUTHENTICATION_URL}intra/callback/"})
+    # redirectUri = urlencode({"redirect_uri": "https://www.google.com/"})
     authorizationUrl = f"https://api.intra.42.fr/oauth/authorize?client_id={getenv('INTRA_CLIENT_ID')}&{redirectUri}&response_type=code"
     return redirect(authorizationUrl)
 
@@ -36,8 +36,8 @@ def intraCallbackOAuth(request):
         "client_id": getenv("INTRA_CLIENT_ID"),
         "client_secret": getenv("INTRA_CLIENT_SECRET"),
         "code": code,
-        "redirect_uri": "https://www.google.com/"
-        # "redirect_uri": f"{settings.PUBLIC_AUTHENTICATION_URL}intra/callback/",
+        # "redirect_uri": "https://www.google.com/"
+        "redirect_uri": f"{settings.PUBLIC_AUTHENTICATION_URL}intra/callback/",
     }
     # print("data: ", data)
     oAuthResponse = requests.post("https://api.intra.42.fr/oauth/token", data=data)
@@ -140,8 +140,8 @@ def googleCallbackOAuth(request):
 def qrCode2FA(request):
     token = request.COOKIES.get("jwt_token")
     decodedToken = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-    idPlayer = decodedToken['id']
-    qrCode = get2FACode(idPlayer)
+    playerId = decodedToken['id']
+    qrCode = get2FACode(playerId)
     image = make_qr_code_image(qrCode, QRCodeOptions(), True)
     return HttpResponse(image, content_type='image/svg+xml')
 
@@ -153,19 +153,19 @@ def verify2FA(request):
         decodedToken = jwt.decode(jwtToken, settings.SECRET_KEY, algorithms=["HS256"])
     except:
         return Response({"statusCode": 401, "error": "Invalid token"})
-    idPlayer = decodedToken['id']
+    playerId = decodedToken['id']
     twoFactor = decodedToken['twofa']
     if twoFactor is False:
-        if not check2FACode(idPlayer, code):
+        if not check2FACode(playerId, code):
             return Response({"statusCode": 401, "message": "Incorrect 2FA code."})
-        player = Player.objects.get(id=idPlayer)
+        player = Player.objects.get(id=playerId)
         player.twoFactor = True
         player.save()
         return Response({"statusCode": 200, "message": "Successfully verified"})
     else:
-        if not check2FACode(idPlayer, code):
+        if not check2FACode(playerId, code):
             return Response({"statusCode": 401, "message": "Incorrect 2FA code."})
-        jwtToken = generateJwt(idPlayer, False)
+        jwtToken = generateJwt(playerId, False)
         response = Response({"statusCode": 200, "message": "Successfully verified", "redirected": True})
         response.set_cookie("jwt_token", value=jwtToken, httponly=True, secure=True)
         return response

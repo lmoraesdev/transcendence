@@ -6,7 +6,7 @@ RUN     apt-get update -y && \
 
 RUN     mkdir -p /services/authentication/
 
-COPY    . /services/authentication
+COPY    . /services/authentication/
 
 COPY    ./ssl/certs/nginx.crt /etc/ssl/certs/nginx.crt
 
@@ -19,7 +19,5 @@ RUN     chmod +x ./tools/run_authentication.sh
 RUN     pip install --upgrade pip
 
 RUN     pip install -r ./tools/requirements.txt
-
-EXPOSE  8000
 
 CMD     [ "bash", "./tools/run_authentication.sh" ]

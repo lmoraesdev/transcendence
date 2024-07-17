@@ -22,8 +22,10 @@ class Player(AbstractBaseUser):
     avatar = models.URLField(blank=False, null=False)
     twoFactor = models.BooleanField(default=False)
     status = models.CharField(max_length=2, choices=STATUS_CHOICE, default=Status.OFFLINE.value)
+    victory = models.IntegerField(default=0, null=False, blank=True)
+    defeat = models.IntegerField(default=0, null=False, blank=True)
 
-    USERNAME_FIELD = 'username'
+    USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
 
     def __str__(self):
