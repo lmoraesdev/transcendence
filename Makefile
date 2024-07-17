@@ -60,11 +60,15 @@ logs:
 	@echo "$(GREEN)** Logs **$(RESET)"
 	@docker-compose --file=$(COMPOSE) logs
 
+ps:
+	@echo "$(GREEN)** Logs **$(RESET)"
+	@docker-compose --file=$(COMPOSE) ps
+
 exec:
 	@echo "$(GREEN)** Exec **$(RESET)"
 	@docker-compose --file=$(COMPOSE) exec $(SERVICE) $(COMMAND)
 
-.PHONY: all run up down start stop ls clean fclean re build restart logs exec help
+.PHONY: all run up down start stop ls clean fclean re build restart logs exec help ps
 help:
 	@echo "Available targets:"
 	@echo "  up       : Start the containers"

@@ -10,6 +10,7 @@ done
 
 echo "✅ Banco de Dados PostgreSQL Iniciado com Sucesso ($POSTGRES_HOST:$POSTGRES_PORT)"
 
+echo "Inicializando Authentication Service"
 python manage.py makemigrations
 python manage.py migrate --run-syncdb
 python manage.py collectstatic --noinput

@@ -1,5 +1,6 @@
 import datetime
 import jwt
+import logging
 from django.conf import settings
 from django.core.cache import cache
 from rest_framework.response import Response
@@ -7,6 +8,8 @@ from pyotp.totp import TOTP
 from base64 import b32encode
 from typing import Dict
 from .models import Player
+
+logger = logging.getLogger(__name__)
 
 def generateJwt(id: int, twoFactor: bool) -> str:
     payload = {
@@ -22,13 +25,13 @@ def decodeGooleToken(idToken: str) -> Dict[str, str]:
     decodeToken = jwt.decode(idToken, options={"verify_signature": False})
     return decodeToken
 
-def  get2FACode(idPlayer: int, code: int) -> bool:
-    idPlayerEnconde = str(idPlayer).encode("utf-8")
-    return TOTP(b32encode(idPlayerEnconde)).provisioning_uri(name="player", issuer_name="ft_transcendence")
+def  get2FACode(playerId: int, code: int) -> bool:
+    playerIdEnconde = str(playerId).encode("utf-8")
+    return TOTP(b32encode(playerIdEnconde)).provisioning_uri(name="player", issuer_name="ft_transcendence")
 
-def check2FACode(idPlayer: int, code: int) -> bool:
-    idPlayerEnconde = str(idPlayer).encode("utf-8")
-    return TOTP(b32encode(idPlayerEnconde)).verify(code)    
+def check2FACode(playerId: int, code: int) -> bool:
+    playerIdEnconde = str(playerId).encode("utf-8")
+    return TOTP(b32encode(playerIdEnconde)).verify(code)    
 
 def jwtCookieRequired(viewFunction):
     def wrappedView(request):
@@ -50,7 +53,7 @@ def jwtCookieRequired(viewFunction):
             return Response({"statusCode": 500, 'error': str(e)})
     return wrappedView
 
-def createPlayer(data: Dict[str, str]):
+def createPlayer(data: Dict[str, str]) -> Player:
     try:
         email = data['email']
         if Player.objects.filter(email=email).exists():
@@ -68,6 +71,8 @@ def createPlayer(data: Dict[str, str]):
             lastName = lastName,
             avatar = avatar
         )
+        logger.info(f"player return: {player}")
         return player
     except Exception as e:
-        return Response({"statusCode": 500, 'error': str(e)})
+        logger.error(f"Error creating player: {str(e)}")
+        return Response({"statusCode": 500, 'error': f"Error creating player: {str(e)}"})
