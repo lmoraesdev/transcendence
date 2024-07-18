@@ -20,6 +20,4 @@ RUN     pip install --upgrade pip
 
 RUN     pip install -r ./tools/requirements.txt
 
-EXPOSE  8000
-
 CMD     [ "bash", "./tools/run_pong.sh" ]

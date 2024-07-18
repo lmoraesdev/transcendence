@@ -11,15 +11,14 @@ const router = {
     });
 
     let pathname = location.pathname;
-    if (pathname === "/") pathname = "/home";
-
+    if (pathname === "/") pathname = "/home/";
     const ws = new WebSocket(`wss://${window.ft_transcendence_host}/authentication/ws/login/`);
     ws.onmessage = (event) => {
       const message = event.data;
       if (message === "Valid") {
-        if (pathname === "/login") pathname = "/home";
+        if (pathname === "/login/") pathname = "/home/";
       } else if (message === "Invalid") {
-        pathname = "/login";
+        pathname = "/login/";
       }
       router.go(pathname, location.search, "replace");
     };
@@ -31,12 +30,11 @@ const router = {
     else if (state === "replace") history.replaceState({ route, query }, "", route + query);
 
     let pageElement;
-    if (route === "/home" || route === "/login") {
-      pageElement = document.createElement(route.slice(1, -1) + "-page");
+    if (route === "/home/" || route === "/login/") {
+      pageElement = document.createElement(routes[route]);
     } else {
       pageElement = document.createElement("notfound-page");
     }
-
     const rootEl = document.querySelector("div#root");
     rootEl.innerHTML = "";
     rootEl.appendChild(pageElement);
