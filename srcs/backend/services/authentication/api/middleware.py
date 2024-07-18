@@ -29,7 +29,7 @@ class TokenAuthMW:
     
     async def decodeToken(self, tokenKey, scope):
         try:
-            payload = jwt.decode(tokenKey, settings.SECRET_KEY, algorithms=['HS256'])
+            payload = jwt.decode(tokenKey, settings.SECRET_KEY, algorithms="HS256")
             if payload['twofa']:
                 scope['status'] = "Twofa"
                 return

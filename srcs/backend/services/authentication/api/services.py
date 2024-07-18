@@ -9,7 +9,7 @@ from base64 import b32encode
 from typing import Dict
 from .models import Player
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('custom_logger')
 
 def generateJwt(id: int, twoFactor: bool) -> str:
     payload = {
@@ -18,7 +18,8 @@ def generateJwt(id: int, twoFactor: bool) -> str:
         'exp': datetime.datetime.now() + datetime.timedelta(days=1),
         'iat': datetime.datetime.now()
     }
-    jwtToken = jwt.encode(payload, settings.SECRET_KEY, algorithm=['HS256'])
+    logger.debug("key: %s", settings.SECRET_KEY)
+    jwtToken = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
     return jwtToken
 
 def decodeGooleToken(idToken: str) -> Dict[str, str]:
@@ -40,7 +41,7 @@ def jwtCookieRequired(viewFunction):
         token = request.COOKIES.get("jwt_token")
         try:
             request.token = token
-            decodedToken = jwt.decode(token, settings.SECRET_KEY, algorithm=['HS256'])
+            decodedToken = jwt.decode(token, settings.SECRET_KEY, algorithm="HS256")
             if decodedToken['twofa']:
                 return Response({"statusCode": 402, "error": "2FA required"})
             request.decoded_token = decodedToken
@@ -55,6 +56,7 @@ def jwtCookieRequired(viewFunction):
 
 def createPlayer(data: Dict[str, str]) -> Player:
     try:
+        logger.debug("PLayerData: %s", data)
         email = data['email']
         if Player.objects.filter(email=email).exists():
             player = Player.objects.get(email=email)
@@ -62,7 +64,7 @@ def createPlayer(data: Dict[str, str]) -> Player:
         username = data['username']
         firstName = data['firstName']
         lastName = data['lastName']
-        avatar = data['avatar']
+        avatar = data.get('avatar')
         
         player = Player.objects.create(
             email = email,
@@ -71,8 +73,9 @@ def createPlayer(data: Dict[str, str]) -> Player:
             lastName = lastName,
             avatar = avatar
         )
-        logger.info(f"player return: {player}")
-        return player
+
+        logger.debug("PLayer: %s", player)
+        return Player.objects.get(email=email)
     except Exception as e:
         logger.error(f"Error creating player: {str(e)}")
         return Response({"statusCode": 500, 'error': f"Error creating player: {str(e)}"})

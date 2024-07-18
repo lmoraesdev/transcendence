@@ -1,5 +1,6 @@
 import requests
 import jwt
+import logging
 from os import getenv
 from django.conf import settings
 from django.core.cache import cache
@@ -13,10 +14,11 @@ from qr_code.qrcode.utils import QRCodeOptions
 from .models import Player
 from .services import decodeGooleToken, generateJwt, check2FACode, get2FACode, jwtCookieRequired, createPlayer
 
+logger = logging.getLogger('custom_logger')
+
 @api_view(['GET'])
 def OAuthIntra(request):
     redirectUri = urlencode({"redirect_uri": f"{settings.PUBLIC_AUTHENTICATION_URL}intra/callback/"})
-    # redirectUri = urlencode({"redirect_uri": "https://www.google.com/"})
     authorizationUrl = f"https://api.intra.42.fr/oauth/authorize?client_id={getenv('INTRA_CLIENT_ID')}&{redirectUri}&response_type=code"
     return redirect(authorizationUrl)
 
@@ -24,19 +26,20 @@ def OAuthIntra(request):
 def intraCallbackOAuth(request):
     code = request.GET.get("code")
     errorMessage = request.GET.get("error")
+    logger.debug("Request: %s", request)
+    logger.debug("Request user: %s", request.user)    
+    logger.debug("Request user logado: %s", request.user.is_authenticated)
     if errorMessage is not None:
         return Response({"statusCode": 401, "error": errorMessage})
     if code is None:
         return Response({"statusCode": 402, "error": "code is required"})
     if request.user.is_authenticated:
         return Response({"statusCode": 200, "message": "Already logged in"})
-    # print("indo pra data callback")
     data = {
         "grant_type": "authorization_code",
         "client_id": getenv("INTRA_CLIENT_ID"),
         "client_secret": getenv("INTRA_CLIENT_SECRET"),
         "code": code,
-        # "redirect_uri": "https://www.google.com/"
         "redirect_uri": f"{settings.PUBLIC_AUTHENTICATION_URL}intra/callback/",
     }
     # print("data: ", data)
@@ -58,6 +61,7 @@ def intraCallbackOAuth(request):
         "avatar": userToken.json()['image']['link'],
     }
     player = createPlayer(playerData)
+    logger.debug("Return Player: %s", player)
     if player is None:
         return redirect(f"https://{settings.BASE_URL}/login/", permanent=True)
     jwtToken = generateJwt(player.id, player.twoFactor)

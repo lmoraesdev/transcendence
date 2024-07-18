@@ -46,11 +46,11 @@ LOGGING = {
         },
     },
     'handlers': {
-        'file': {
+        'custom_file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': path.join(AUTH_DIR, 'logs/debug.log'),
-            'formatter': 'verbose'
+            'filename': path.join(AUTH_DIR, 'logs/print.log'),
+            'formatter': 'verbose',
         },
         'console': {
             'level': 'DEBUG',
@@ -59,10 +59,10 @@ LOGGING = {
         },
     },
     'loggers': {
-        'django': {
-            'handlers': ['file', 'console'],
+        'custom_logger': {
+            'handlers': ['custom_file'],
             'level': 'DEBUG',
-            'propagate': True,
+            'propagate': False,
         },
     },
 }
