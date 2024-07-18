@@ -1,5 +1,3 @@
-version: '3.3'
-
 services:
   server:
     container_name: server
@@ -38,6 +36,21 @@ services:
       - ./backend/dotenv_files/.env
     volumes:
       - ./backend/services/player/:/services/player/:rw
+    networks:
+      - app_network
+    depends_on:
+      - db
+    restart: on-failure
+
+  pong:
+    container_name: pong
+    build:
+      context: ./backend/services/pong/
+    image: pong
+    env_file:
+      - ./backend/dotenv_files/.env
+    volumes:
+      - ./backend/services/pong:/services/pong/:rw
     networks:
       - app_network
     depends_on:
