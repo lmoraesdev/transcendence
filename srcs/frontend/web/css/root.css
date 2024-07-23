@@ -26,7 +26,7 @@
 
 #root {
   min-height: 100vh;
-  /* background: linear-gradient(var(--color-font-white) 75%, var(--color-primary)); */
+  /* background: linear-gradient(var(--color-font-white) 1%, var(--color-primary)); */
 }
 
 .my-page {

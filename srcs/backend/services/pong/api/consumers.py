@@ -135,9 +135,9 @@ def walk_over(room_id, match_id, pos, capacity):
 def get_match(match_id):
     if not match_id:
         return Match.objects.create(game='PO',
-                                    state=Match.State.PLAYED.value)
+                                    status=Match.State.PLAYED.value)
     match = Match.objects.get(id=match_id)
-    match.state = Match.State.PLAYED.value
+    match.status = Match.State.PLAYED.value
     match.save()
     return match
 

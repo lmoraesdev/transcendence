@@ -90,7 +90,7 @@ class Match(models.Model):
     game = models.CharField(max_length=2, choices=Game.choices(), null=False, blank=False, default=Game.PONG.value)
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, null=True, blank=False)
     round = models.IntegerField(default=1)
-    state = models.CharField(max_length=2, choices=Status.choices(), null=False, blank=False, default=Status.NOT_PLAYING.value)
+    status = models.CharField(max_length=2, choices=Status.choices(), null=False, blank=False, default=Status.NOT_PLAYING.value)
 
 
 class PlayerMatch(models.Model):
@@ -117,7 +117,7 @@ class PlayerTournament(models.Model):
     id = models.BigAutoField(primary_key=True, auto_created=True)
     playerId = models.ForeignKey(Player, on_delete=models.CASCADE, null=False, blank=False)
     tournamentId = models.ForeignKey(Tournament, on_delete=models.CASCADE, null=False, blank=False)
-    finished = models.BooleanField(default=False, null=False, blank=False)
+    creator = models.BooleanField(default=False, null=False, blank=False)
 
     def __str__(self):
-        return f'{self.tournamentId} -> {self.finished}'
+        return f'{self.tournamentId} -> {self.creator}'
