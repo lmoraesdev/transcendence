@@ -17,5 +17,7 @@ class PlayerInfoSerializer(serializers.ModelSerializer):
             "lastName",
             "avatar",
             "twoFactor",
-            "status"
+            "status",
+            "victory",
+            "defeat",
         ]
