@@ -1,16 +1,25 @@
 import fetching from "./fetching.js";
+import { wsTwo } from "./pongTwo.js";
+import { wsFour } from "./pongFour.js"; 
 
 const routes = {
+  "/game/": "game-page",
   "/home/": "home-page",
   "/login/": "login-page",
+  "/twofa/": "twofa-page",
   "/profile/": "profile-page",
-  "/settings/": "setting-page",
+  "/setting/": "setting-page",
+  "/tournaments/": "tournament-page",
 };
 
 const router = {
   init: () => {
+    console.log("start")
     addEventListener("popstate", (event) => {
-      console.log("back");
+      if (wsTwo)
+        wsTwo.close(1000);
+      if (wsFour)
+        wsFour.close(1000);
       router.go(event.state.route, event.state.query, "navigation");
     });
 
@@ -21,36 +30,49 @@ const router = {
     console.log('ws', ws);
     ws.onmessage = (event) => {
       const message = event.data;
-      console.log("message: ", message);
       if (message === "Valid") {
-        if (pathname === "/login/") pathname = "/home/";
+        if (pathname == "/login/" || pathname == "/twofa/") pathname = "/home/";
+      } else if (message === "Twofa") {
+        if (
+          pathname == "/game/" ||
+          pathname == "/home/" ||
+          pathname == "/login/" ||
+          pathname == "/profile/" ||
+          pathname == "/setting/" ||
+          pathname == "/tournaments/"
+        )
+          pathname = "/twofa/";
       } else if (message === "Invalid") {
-        pathname = "/login/";
+        if (
+          pathname == "/game/" ||
+          pathname == "/home/" ||
+          pathname == "/twofa/" ||
+          pathname == "/profile/" ||
+          pathname == "/setting/" ||
+          pathname == "/tournaments/"
+        )
+          pathname = "/login/";
       }
-      console.log("values: ", pathname, location.search, "replace");
-      router.go(pathname, location.search, "replace");
+      router.go(pathname, window.location.search, "replace");
     };
   },
 
   go: (route, query, state) => {
     if (state === "add" && location.pathname !== route)
       history.pushState({ route, query }, "", route + query);
-    else if (state === "replace") history.replaceState({ route, query }, "", route + query);
+    else if (state === "replace")
+      history.replaceState({ route, query }, "", route + query);
 
     let pageElement;
-    console.log("routes:", routes)
-    console.log("route:", route)
     if (routes.hasOwnProperty(route)) {
       pageElement = document.createElement(routes[route]);
     } else {
       pageElement = document.createElement("notfound-page");
     }
-    console.log("page:", pageElement);
     const rootEl = document.querySelector("div#root");
     rootEl.innerHTML = "";
     rootEl.appendChild(document.createElement("stars-overlay"));
     rootEl.appendChild(pageElement);
-    console.log('roote1: ', rootEl);
     scrollTo(0, 0);
   },
 };

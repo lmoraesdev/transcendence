@@ -1,4 +1,4 @@
-import fetching from "../router/fetching.js"
+import fetching from "../router/fetching.js";
 
 export default class TwofaInput extends HTMLElement {
   constructor() {

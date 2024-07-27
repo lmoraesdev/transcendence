@@ -24,6 +24,7 @@ class Player(AbstractBaseUser):
     status = models.CharField(max_length=2, choices=STATUS_CHOICE, default=Status.OFFLINE.value)
     victory = models.IntegerField(default=0, null=False, blank=True)
     defeat = models.IntegerField(default=0, null=False, blank=True)
+    champion = models.IntegerField(default=0, null=False, blank=True)
 
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'

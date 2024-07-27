@@ -25,7 +25,6 @@ class Tournament(models.Model):
 class Match(models.Model):
     class Game(Enum):
         PONG = "PG"
-        TICTACTOE = "TC"
 
         @classmethod
         def choices(cls):

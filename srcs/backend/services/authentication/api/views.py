@@ -50,6 +50,8 @@ def intraCallbackOAuth(request):
     )
     if not userToken.ok:
         return Response({"statusCode": 401, "detail": "No access token in the token response"})
+    
+    logger.debug("playerData -> %s", userToken.json())
     playerData = {
         "email": userToken.json()['email'],
         "username": userToken.json()['login'],

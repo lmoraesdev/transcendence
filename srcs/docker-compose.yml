@@ -32,20 +32,20 @@ services:
       - db
     restart: on-failure
 
-  # tournament:
-  #   container_name: tournament
-  #   build:
-  #     context: ./backend/services/tournament/
-  #   image: tournament
-  #   env_file:
-  #     - ./backend/dotenv_files/.env
-  #   volumes:
-  #     - ./backend/services/tournament/:/services/tournament/:rw
-  #   networks:
-  #     - app_network
-  #   depends_on:
-  #     - db
-  #   restart: on-failure
+  tournament:
+    container_name: tournament
+    build:
+      context: ./backend/services/tournament/
+    image: tournament
+    env_file:
+      - ./backend/dotenv_files/.env
+    volumes:
+      - ./backend/services/tournament/:/services/tournament/:rw
+    networks:
+      - app_network
+    depends_on:
+      - db
+    restart: on-failure
 
   matchmaking:
     container_name: matchmaking

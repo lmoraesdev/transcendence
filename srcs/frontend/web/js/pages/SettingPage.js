@@ -15,10 +15,10 @@ export default class SettingPage extends HTMLElement {
     const input_avatar = this.querySelector("#input-avatar");
     const input_username = this.querySelector(".input-username");
     const button_username = this.querySelector(".button-username");
-    const input_firstName = this.querySelector(".input-first-name");
-    const button_firstName = this.querySelector(".button-first-name");
-    const input_lastName = this.querySelector(".input-last-name");
-    const button_lastName = this.querySelector(".button-last-name");
+    const input_first_name = this.querySelector(".input-first-name");
+    const button_first_name = this.querySelector(".button-first-name");
+    const input_last_name = this.querySelector(".input-last-name");
+    const button_last_name = this.querySelector(".button-last-name");
     const checkbox_twofa = this.querySelector(".setting-twofa input[type=checkbox]");
     const popup_twofa = this.querySelector(".popup-twofa");
     const popup_twofa_qrcode = this.querySelector(".popup-twofa-qrcode");
@@ -27,9 +27,9 @@ export default class SettingPage extends HTMLElement {
     fetching(`https://${window.ft_transcendence_host}/player/`).then((res) => {
       avatar.src = res.player.avatar;
       input_username.placeholder = res.player.username;
-      input_firstName.placeholder = res.player.firstName;
-      input_lastName.placeholder = res.player.lastName;
-      checkbox_twofa.checked = res.player.twoFactor;
+      input_first_name.placeholder = res.player.first_name;
+      input_last_name.placeholder = res.player.last_name;
+      checkbox_twofa.checked = res.player.two_factor;
     });
 
     input_avatar.onchange = function () {
@@ -42,11 +42,11 @@ export default class SettingPage extends HTMLElement {
     button_username.onclick = (event) => {
       player_post_changes("username", input_username);
     };
-    button_firstName.onclick = (event) => {
-      player_post_changes("firstName", input_firstName);
+    button_first_name.onclick = (event) => {
+      player_post_changes("first_name", input_first_name);
     };
-    button_lastName.onclick = (event) => {
-      player_post_changes("lastName", input_lastName);
+    button_last_name.onclick = (event) => {
+      player_post_changes("last_name", input_last_name);
     };
     checkbox_twofa.onchange = (event) => {
       if (checkbox_twofa.checked) {
@@ -54,7 +54,7 @@ export default class SettingPage extends HTMLElement {
           .then((res) => res.blob())
           .then((blob) => set_qrcode(blob));
       } else {
-        player_post_changes("twoFactor", checkbox_twofa);
+        player_post_changes("two_factor", checkbox_twofa);
       }
     };
 
@@ -67,7 +67,7 @@ export default class SettingPage extends HTMLElement {
 
     function player_post_changes(field, input_elem) {
       let value;
-      if (field === "twoFactor") {
+      if (field === "two_factor") {
         value = input_elem.checked;
       } else {
         value = input_elem.value;

@@ -24,6 +24,7 @@ class Player(AbstractBaseUser):
     status = models.CharField(max_length=2, choices=STATUS_CHOICE, default=Status.OFFLINE.value)
     victory = models.IntegerField(default=0, null=False, blank=True)
     defeat = models.IntegerField(default=0, null=False, blank=True)
+    champion = models.IntegerField(default=0, null=False, blank=True)
     
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
@@ -55,7 +56,6 @@ class Tournament(models.Model):
 class Match(models.Model):
     class Game(Enum):
         PONG = "PG"
-        TICTACTOE = "TC"
 
         @classmethod
         def choices(cls):
@@ -77,20 +77,10 @@ class Match(models.Model):
 
 
 class PlayerMatch(models.Model):
-    class Language(Enum):
-        C = "CC"
-        CPP = "CP"
-
-        @classmethod
-        def choices(cls):
-            return [(choice.value, choice.name) for choice in cls]
-        
     id = models.BigAutoField(primary_key=True, auto_created=True)
     matchId = models.ForeignKey(Match, on_delete=models.CASCADE, null=False, blank=False)
     playerId = models.ForeignKey(Tournament, on_delete=models.CASCADE, null=False, blank=False)
     score = models.IntegerField(default=0, null=False, blank=False)
-    language = models.CharField(max_length=255, null=True, blank=False)
-    execPath = models.CharField(max_length=255, null=True, blank=False)
     matchFinished = models.BooleanField(default=False, null=False, blank=False)
 
     def __str__(self):

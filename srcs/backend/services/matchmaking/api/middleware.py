@@ -16,7 +16,7 @@ class TokenAuthMW:
             match = re.search("jwt_token=(.*)", cookies)
             if match is not None:
                 token_key = match.group(1)
-                scope['payload'] = self.decode_token(token_key)
+                scope['payload'] = self.decodeToken(token_key)
                 if scope['payload'] is not None:
                     return await self.inner(scope, receive, send)
         return
