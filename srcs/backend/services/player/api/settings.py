@@ -27,7 +27,7 @@ SECRET_KEY = getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["player"]
+ALLOWED_HOSTS = ["*"]
 
 LOGGING = {
     'version': 1,

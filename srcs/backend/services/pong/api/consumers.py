@@ -1,4 +1,5 @@
 import logging
+from pprint import pformat
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from channels.layers import get_channel_layer
@@ -65,11 +66,11 @@ def walk_over_two(room_id, match_id, pos):
     match = get_match(match_id)
     winner, loser = (player_left_db, player_right_db) if pos == 'right' else (player_right_db, player_left_db)
 
-    winner_match, _ = PlayerMatch.objects.get_or_create(match_id=match, player_id=winner)
-    loser_match, _ = PlayerMatch.objects.get_or_create(match_id=match, player_id=loser)
+    winner_match, _ = PlayerMatch.objects.get_or_create(matchId=match, playerId=winner)
+    loser_match, _ = PlayerMatch.objects.get_or_create(matchId=match, playerId=loser)
 
-    winner_match.score, winner_match.won = 2, True
-    loser_match.score, loser_match.won = 0, False
+    winner_match.score, winner_match.winner = 2, True
+    loser_match.score, loser_match.winner = 0, False
 
     winner_match.save()
     loser_match.save()
@@ -93,8 +94,8 @@ def walk_over_four(room_id, match_id, pos):
 
 def get_match(match_id):
     logger.debug(f"get_match called with match_id: {match_id}")
-    match = Match.objects.create(game='PO', state=Match.State.PLAYED.value) if not match_id else Match.objects.get(id=match_id)
-    match.state = Match.State.PLAYED.value
+    match = Match.objects.create(game='PG', status=Match.Status.PLAYING.value) if not match_id else Match.objects.get(id=match_id)
+    match.status = Match.Status.PLAYING.value
     match.save()
     return match
 
@@ -111,12 +112,12 @@ def set_db_four_player(room_id, match_id, winner):
 
         match = get_match(match_id)
         players = {pos: Player.objects.get(id=player['user_id']) for pos, player in player_pos_map.items()}
-        player_matches = {pos: PlayerMatch.objects.get_or_create(match_id=match, player_id=player)[0] for pos, player in players.items()}
+        player_matches = {pos: PlayerMatch.objects.get_or_create(matchId=match, playerId=player)[0] for pos, player in players.items()}
 
         for pos in players:
-            player_matches[pos].score, player_matches[pos].won = (1, True) if pos == winner else (0, False)
-            players[pos].wins += 1 if pos == winner else 0
-            players[pos].losses += 1 if pos != winner else 0
+            player_matches[pos].score, player_matches[pos].winner = (1, True) if pos == winner else (0, False)
+            players[pos].victory += 1 if pos == winner else 0
+            players[pos].defeat += 1 if pos != winner else 0
 
             player_matches[pos].save()
             players[pos].save()
@@ -133,40 +134,43 @@ def set_db_two_player(room_id, match_id):
         player_left = rooms[room_id]['padd_left']
         player_right = rooms[room_id]['padd_right']
 
+        logger.debug(f"playerLeft {pformat(player_left)}\nplayerRight {pformat(player_right)}")
         match = get_match(match_id)
+        logger.debug(f"match {match}")
         player_left_db = Player.objects.get(id=player_left['user_id'])
         player_right_db = Player.objects.get(id=player_right['user_id'])
 
-        player_match_left, _ = PlayerMatch.objects.get_or_create(match_id=match, player_id=player_left_db)
-        player_match_right, _ = PlayerMatch.objects.get_or_create(match_id=match, player_id=player_right_db)
+        player_match_left, _ = PlayerMatch.objects.get_or_create(matchId=match, playerId=player_left_db)
+        player_match_right, _ = PlayerMatch.objects.get_or_create(matchId=match, playerId=player_right_db)
 
         player_match_left.score = player_left['info']['score']
         player_match_right.score = player_right['info']['score']
 
-        player_match_left.won = player_left['info']['score'] == 7
-        player_match_right.won = player_right['info']['score'] == 7
+        player_match_left.winner = player_left['info']['score'] == 7
+        player_match_right.winner = player_right['info']['score'] == 7
 
         player_match_left.save()
         player_match_right.save()
 
         if player_left['info']['score'] == 7:
-            player_left_db.wins += 1
-            player_right_db.losses += 1
+            player_left_db.victory += 1
+            player_right_db.defeat += 1
         else:
-            player_left_db.losses += 1
-            player_right_db.wins += 1
+            player_left_db.defeat += 1
+            player_right_db.victory += 1
 
         player_left_db.save()
         player_right_db.save()
 
         winner = player_left_db if player_left['info']['score'] == 7 else player_right_db
-        return f"{winner.username} won"
+        return f"{winner.username} winner"
     except Exception as e:
         logger.error(f"Error in set_db_two_player: {e}")
         print(e, flush=True)
 
 def ballDirection(capacity):
-    logger.debug(f"ballDirection called with capacity: {capacity}")
+    # logger.debug(f"ballDirection called with capacity: {capacity}")
+    logger.debug("entrou na 'ballDirection'")
     speed = {
         'X': 0,
         'Y': 0
@@ -182,26 +186,20 @@ def ballDirection(capacity):
     )
     speed['X'] = speedX
     speed['Y'] = speedY
+    logger.debug(f"saiu da 'ballDirection' e retornou {speed}")
+    return speed
 
 def addSpeedBall(room_id):
-    logger.debug("ball -> %s", rooms[room_id])
+    logger.debug("entrou na 'addSpeedball'")
     rooms[room_id]['ball']['positionX'] += rooms[room_id]['ball']['speedX']
     rooms[room_id]['ball']['positionY'] += rooms[room_id]['ball']['speedY']
+    logger.debug("saiu da 'addSpeedBall'")
+
 
 class Pong(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
-        room_id_json = self.scope['url_route']['kwargs']['room_id']
-        try:
-            room_id_dict = json.loads(room_id_json)
-            room_id = room_id_dict.get("room_id")
-        except json.JSONDecodeError:
-            await self.close()
-            return
-
-        if not isinstance(room_id, str):
-            await self.close()
-            return
+        room_id = self.getRoomId()
 
         self.capacity = int(self.scope['url_route']['kwargs']['capacity'])
         self.match_id = self.scope['url_route']['kwargs'].get('match_id')
@@ -239,18 +237,19 @@ class Pong(AsyncWebsocketConsumer):
 
     async def gameStart(self, room_id):
         self.prepareGame(room_id)
+        logger.debug("chamada gameStart")
         addSpeedBall(room_id)
         await self.channel_layer.group_send(
             room_id,
             {
                 'type': 'pong.message',
-                'message': 'game start',
+                'message': 'ball',
             }
         )
         if (room_id in rooms):
             asyncio.create_task(self.gameLoop(room_id))
 
-    async def prepareGame(self, room_id):
+    def prepareGame(self, room_id):
         #define size with canvas
         rooms[room_id]['canvas_width'] = 1300 if self.capacity == 4 else 1920
         rooms[room_id]['canvas_height'] = 1300 if self.capacity == 4 else 1080
@@ -273,6 +272,8 @@ class Pong(AsyncWebsocketConsumer):
             rooms[room_id]['padd_down']['info']['positionY'] = rooms[room_id]['canvas_height'] - 100
 
         valueSpeed = ballDirection(self.capacity)
+        # logger.debug(f"Value Speed\n{pformat(valueSpeed)}")
+
         speed = {
             'speedX': valueSpeed["X"],
             'speedY': valueSpeed["Y"],
@@ -281,13 +282,15 @@ class Pong(AsyncWebsocketConsumer):
             'size': 20
         }
         rooms[room_id]['ball'] = speed
-
-
+        # logger.debug(f"minhas rooms\n {pformat(rooms)}\ne RoomID: {room_id}\n{pformat(rooms[room_id])}")
 
     async def gameLoop(self, room_id):
+        logger.debug("start gameLoop")
         await asyncio.sleep(2)
+        logger.debug("start looping")
         while True:
-            if (room_id in rooms):
+            if (room_id not in rooms):
+                logger.debug(f"Closed Game {room_id} now")
                 print(f"Closed Game {room_id} now")
                 break
             addSpeedBall(room_id)
@@ -296,7 +299,9 @@ class Pong(AsyncWebsocketConsumer):
                 await self.paddleCollision(room_id)
                 await self.BallPaddleCollision(room_id)
                 if self.capacity == 4 and rooms[room_id]['elimination_count'] > 2:
+                    logger.debug("if result")
                     result = await check_win(room_id, self.match_id)
+                    logger.debug(f"vai enviar o resultado: {result}")
                     await self.channel_layer.group_send(
                         room_id,
                         {
@@ -313,12 +318,14 @@ class Pong(AsyncWebsocketConsumer):
                     }
                 )
             except Exception as e:
+                logger.debug(f"deu exception: {e}")
                 print(e, flush=True)
             rooms[room_id]['ball']['speedX'] += 0.01 if rooms[room_id]['ball']['speedX'] > 0 else -0.01
             rooms[room_id]['ball']['speedY'] += 0.01 if rooms[room_id]['ball']['speedY'] > 0 else -0.01
             await asyncio.sleep(0.015)
 
-    def get_padd_center(self, room_id, side):
+    def getPaddCenter(self, room_id, side):
+        logger.debug("entrou na 'getPaddCenter'")
         padd_info = rooms[room_id][f'padd_{side[:-1]}']['info']
         size_x, size_y = padd_info['sizeX'], padd_info['sizeY']
         position = padd_info[f'position{side[-1]}'] 
@@ -330,10 +337,12 @@ class Pong(AsyncWebsocketConsumer):
             if side == 'upY':
                 center_offset = -center_offset
 
+        logger.debug(f"saiu da 'getPaddCenter' e retornou {position + center_offset}")
         return position + center_offset
 
 
     async def BallPaddleCollision(self, room_id):
+        logger.debug("entrou na 'BallPaddleCollision'")
         ball = rooms[room_id]['ball']
         ball_size = ball['size']
         paddles = {
@@ -349,17 +358,20 @@ class Pong(AsyncWebsocketConsumer):
 
         for paddle, (cx, cy, px, py, pkey, speed_key) in paddles.items():
             size = rooms[room_id][pkey]['info']['sizeX'] if 'up' in pkey or 'down' in pkey else rooms[room_id][pkey]['info']['sizeY']
-            center_x = self.get_padd_center(room_id, cx)
-            center_y = self.get_padd_center(room_id, cy)
+            center_x = self.getPaddCenter(room_id, cx)
+            center_y = self.getPaddCenter(room_id, cy)
             dx = abs(ball['positionX'] - center_x)
             dy = abs(ball['positionY'] - center_y)
             if not rooms[room_id][pkey]['info']['eliminated'] and (dx <= ball_size + size / 2 and dy <= ball_size + size / 2):
                 if (ball['positionX'] >= center_x and ball[speed_key] > 0) or (ball['positionX'] <= center_x and ball[speed_key] < 0):
                     return
                 ball[speed_key] *= -1
+        logger.debug("saiu da 'BallPaddleCollision'")
+        
 
 
     async def paddleCollision(self, room_id):
+        logger.debug("entrou na 'paddleCollision'")
         paddles = ['padd_right', 'padd_left']
         for paddle in paddles:
             if not rooms[room_id][paddle]['info']['eliminated']:
@@ -376,9 +388,12 @@ class Pong(AsyncWebsocketConsumer):
                     pos = rooms[room_id][paddle]['info']['positionX']
                     canvas_width = rooms[room_id]['canvas_width']
                     rooms[room_id][paddle]['info']['positionX'] = max(0, min(pos, canvas_width - size))
+        logger.debug("saiu da 'paddleCollision'")
+        
 
 
     async def ballCollision(self, room_id):
+        logger.debug("entrou na 'ballCollision'")
         ballPositionX = rooms[room_id]['ball']['positionX']
         ballPositionY = rooms[room_id]['ball']['positionY']
         ballSize = rooms[room_id]['ball']['size']
@@ -400,16 +415,23 @@ class Pong(AsyncWebsocketConsumer):
                     await self.resetGame(room_id, False)
             else:
                 rooms[room_id]['ball']['speedY'] *= -1
+        logger.debug("saiu da 'ballCollision'")
+
 
     async def resetGame(self, room_id, eliminated):
+        logger.debug(f"entrou na 'resetGame' eliminated = {eliminated}")
         speed = ballDirection(self.capacity)
+        logger.debug(f"salas: {pformat(rooms[room_id])}")
         if (eliminated):
-            padd = "padd_right" if rooms[room_id]['ball']['speedX'] > 0 else padd_left
+            padd = "padd_right" if rooms[room_id]['ball']['speedX'] > 0 else "padd_left"
+            logger.debug(f"padd = {padd}")
+            logger.debug(f"sala atual: {pformat(rooms[room_id][padd])}")
             if self.capacity == 4:
                 rooms[room_id][padd]['info']['eliminated'] = True
                 rooms[room_id]['elimination_count'] += 1
             else:
                 rooms[room_id][padd]['info']['score'] += 1
+
                 if rooms[room_id][padd]['info']['score'] == 7:
                     result = await set_db_two_player(room_id, self.match_id)
                     await self.channel_layer.group_send(
@@ -435,6 +457,8 @@ class Pong(AsyncWebsocketConsumer):
         if self.capacity == 4:
             rooms[room_id]['padd_up']['info']['positionX'] = rooms[room_id]['canvas_width'] / 2 - 100
             rooms[room_id]['padd_down']['info']['positionX'] = rooms[room_id]['canvas_width'] / 2 - 100
+        logger.debug("saiu da 'resetGame'")
+        
 
             
 
@@ -457,44 +481,59 @@ class Pong(AsyncWebsocketConsumer):
 #         'message': rooms[room_id],
 #     }
 # )
+    def movePaddle(self, paddle, room_id, neg):
+        if self.channel_name in rooms[room_id][paddle]['player']:
+            rooms[room_id][paddle]['info']['positionY'] += (rooms[room_id][paddle]['info']['speed'] * neg)
 
     async def receive(self, text_data):
-        logger.debug(f"receive called with text_data: {text_data}")
-        data = json.loads(text_data)
-        if data['type'] == 'score_update':
-            rooms[self.room_id]['padd_left']['info']['score'] = data['score']['left']
-            rooms[self.room_id]['padd_right']['info']['score'] = data['score']['right']
-            if self.capacity == 4:
-                rooms[self.room_id]['padd_up']['info']['score'] = data['score']['up']
-                rooms[self.room_id]['padd_down']['info']['score'] = data['score']['down']
-            await self.channel_layer.group_send(
-                self.room_id, {
-                    'type': 'score_update',
-                    'message': data['score'],
-                }
-            )
-        elif data['type'] == 'end_game':
-            result = await set_db_two_player(self.room_id, self.match_id) if self.capacity == 2 else await set_db_four_player(self.room_id, self.match_id, data['winner'])
-            await self.send(text_data=json.dumps({'type': 'end_game', 'result': result}))
-        elif data['type'] == 'position_update':
-            rooms[self.room_id][f'padd_{data["player"]}']['info']['positionX'] = data['positionX']
-            rooms[self.room_id][f'padd_{data["player"]}']['info']['positionY'] = data['positionY']
-            await self.channel_layer.group_send(
-                self.room_id, {
-                    'type': 'position_update',
-                    'player': data['player'],
-                    'positionX': data['positionX'],
-                    'positionY': data['positionY'],
-                }
-            )
-        elif data['type'] == 'ball_update':
-            rooms[self.room_id]['ballDirection'] = data['ballDirection']
-            await self.channel_layer.group_send(
-                self.room_id, {
-                    'type': 'ball_update',
-                    'ballDirection': data['ballDirection'],
-                }
-            )
+        # logger.debug(f"receive called with text_data: {text_data}") #retornou s
+        room_id = self.getRoomId()
+        if (text_data in ['up', 'down', 'left', 'right', 'w', 's', 'a', 'd']):
+            for paddle in ['padd_left', 'padd_right', 'padd_up', 'padd_down']:
+                if (self.channel_name in rooms[room_id][paddle]['player']):
+                    if (text_data in ['up', 'left', 'w', 'a',]):
+                        self.movePaddle(paddle, room_id, -1)
+                    else:
+                        self.movePaddle(paddle, room_id, 1)
+                    break
+        await self.paddleCollision(room_id)             
+
+# Part do receive retirada
+# data = json.loads(text_data)
+# if data['type'] == 'score_update':
+#     rooms[room_id]['padd_left']['info']['score'] = data['score']['left']
+#     rooms[room_id]['padd_right']['info']['score'] = data['score']['right']
+#     if self.capacity == 4:
+#         rooms[room_id]['padd_up']['info']['score'] = data['score']['up']
+#         rooms[room_id]['padd_down']['info']['score'] = data['score']['down']
+#     await self.channel_layer.group_send(
+#         room_id, {
+#             'type': 'score_update',
+#             'message': data['score'],
+#         }
+#     )
+# elif data['type'] == 'end_game':
+#     result = await set_db_two_player(room_id, self.match_id) if self.capacity == 2 else await set_db_four_player(room_id, self.match_id, data['winner'])
+#     await self.send(text_data=json.dumps({'type': 'end_game', 'result': result}))
+# elif data['type'] == 'position_update':
+#     rooms[room_id][f'padd_{data["player"]}']['info']['positionX'] = data['positionX']
+#     rooms[room_id][f'padd_{data["player"]}']['info']['positionY'] = data['positionY']
+#     await self.channel_layer.group_send(
+#         room_id, {
+#             'type': 'position_update',
+#             'player': data['player'],
+#             'positionX': data['positionX'],
+#             'positionY': data['positionY'],
+#         }
+#     )
+# elif data['type'] == 'ball_update':
+#     rooms[room_id]['ballDirection'] = data['ballDirection']
+#     await self.channel_layer.group_send(
+#         room_id, {
+#             'type': 'ball_update',
+#             'ballDirection': data['ballDirection'],
+#         }
+#     )
 
     async def new_player(self, event):
         logger.debug(f"new_player called with event: {event}")
@@ -526,6 +565,68 @@ class Pong(AsyncWebsocketConsumer):
             'ballDirection': event['ballDirection'],
         }))
 
+    async def pong_message(self, event):
+        logger.debug("Pong messageeeeeeeeeeeeeeee")
+        # logger.debug(f"event[message] = {event['message']}\n que porra é essa alek {pformat(self.scope)}")
+        if (event['message'] == 'ball'
+                and self.getRoomId() in rooms):
+            logger.debug(f"ta enviado o dentro do if ({self.getRoomId()})")
+            await self.send(text_data=json.dumps(
+                rooms[self.getRoomId()]
+            ))
+        else:
+            await self.send(text_data=json.dumps(
+                event['message']
+            ))
+
     async def disconnect(self, close_code):
-        logger.debug(f"disconnect called with close_code: {close_code}")
-        await self.channel_layer.group_discard(self.room_id, self.channel_name)
+        logger.debug(f"disconnect called with close_code: {close_code}\nself: {pformat(self)}")
+        logger.debug(f"url_route: {pformat(self.scope['url_route'])}")
+        message = None
+        room_id = self.getRoomId()
+        if (room_id):
+            await self.channel_layer.group_discard(room_id, self.channel_name)
+        else:
+            logger.error("room_id could not be extracted or is invalid")
+
+        if (room_id in rooms):
+            positions = ['padd_left', 'padd_right', 'padd_up', 'padd_down']
+            for position in positions:
+                if self.channel_name == rooms[room_id][position]['player'] and close_code is not None:
+                    message = await walk_over(room_id, self.match_id, position.split('_')[1], self.capacity)
+                    break
+            if message is not None:
+                await self.channel_layer.group_send(
+                    room_id,
+                    {
+                        'type': 'pong.message',
+                        'message': message
+                    }
+                )
+                del rooms[room_id]
+            if self.capacity == 2 and room_id in rooms:
+                del rooms[room_id]
+        
+    def getRoomId(self):
+        try:
+            url_route_kwargs = self.scope['url_route']['kwargs']
+            # logger.debug(f"url_route kwargs: {pformat(url_route_kwargs)}")
+            
+            room_id_data = url_route_kwargs.get('room_id')
+            if isinstance(room_id_data, str):
+                room_id_dict = json.loads(room_id_data)
+                return room_id_dict.get('room_id')
+            elif isinstance(room_id_data, dict):
+                return room_id_data.get('room_id')
+            else:
+                logger.error(f"Unexpected format for room_id: {room_id_data}")
+                return None
+        except KeyError:
+            logger.error("room_id not found in self.scope['url_route']['kwargs']")
+            return None
+        except json.JSONDecodeError:
+            logger.error("Error decoding room_id from JSON string")
+            return None
+        except Exception as e:
+            logger.error(f"Unexpected error extracting room_id: {e}")
+            return None
