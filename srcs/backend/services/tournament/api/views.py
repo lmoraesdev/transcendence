@@ -16,12 +16,12 @@ def updateTournament(tournamentId):
     if (all(match.status == Match.Status.PLAYING.value for match in currentMatch)):
         if (tournament.round == 3):
             tournament.status = Tournament.StatusChoices.FINISHED.value
-            winner = PlayerMatch.objects.get(matchId__in=currentMatch, matchFinished=True)
+            winner = PlayerMatch.objects.get(matchId__in=currentMatch, winner=True)
             winner.playerId.champion += 1
             tournament.save()
             winner.playerId.save()
             return
-        playerWinners = list(PlayerMatch.objects.filter(matchId__in=currentMatch, matchFinished=True))
+        playerWinners = list(PlayerMatch.objects.filter(matchId__in=currentMatch, winner=True))
         if (playerWinners):
             tournament.round += 1
             tournament.save()

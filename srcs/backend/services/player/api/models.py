@@ -96,9 +96,9 @@ class Match(models.Model):
 class PlayerMatch(models.Model):
     id = models.BigAutoField(primary_key=True, auto_created=True)
     matchId = models.ForeignKey(Match, on_delete=models.CASCADE, null=False, blank=False)
-    playerId = models.ForeignKey(Tournament, on_delete=models.CASCADE, null=False, blank=False)
+    playerId = models.ForeignKey(Player, on_delete=models.CASCADE, null=False, blank=False)
     score = models.IntegerField(default=0, null=False, blank=False)
-    matchFinished = models.BooleanField(default=False, null=False, blank=False)
+    winner = models.BooleanField(default=False, null=False, blank=False)
 
     def __str__(self):
         return f"Score: {self.score}"

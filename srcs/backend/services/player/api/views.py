@@ -271,7 +271,7 @@ class MatchesHistory(APIView):
                         "username": playerMatch.playerId.username,
                         "avatar": playerMatch.playerId.avatar,
                         "score": playerMatch.score,
-                        "won": playerMatch.matchFinished,
+                        "won": playerMatch.winner,
                     })
                 matchesData.append({
                     "id": match.matchId.id,
