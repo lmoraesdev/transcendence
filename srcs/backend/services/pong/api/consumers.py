@@ -460,27 +460,6 @@ class Pong(AsyncWebsocketConsumer):
         logger.debug("saiu da 'resetGame'")
         
 
-            
-
-
-# algo do start
-# rooms[room_id]['ballDirection'] = ballDirection(self.capacity)
-# logger.debug("passou da bola -> %s", rooms)
-# await self.send(text_data=json.dumps({
-#     'type': 'init_game_state',
-#     'capacity': self.capacity,
-#     **{pos: {
-#         'username': rooms[room_id][pos]['username'],
-#         'avatar': rooms[room_id][pos]['avatar']
-#     } for pos in rooms[room_id] if pos != 'ballDirection'}
-# }))
-# self.room_id = room_id
-# await self.channel_layer.group_send(
-#     room_id, {
-#         'type': 'new_player',
-#         'message': rooms[room_id],
-#     }
-# )
     def movePaddle(self, paddle, room_id, neg):
         if self.channel_name in rooms[room_id][paddle]['player']:
             rooms[room_id][paddle]['info']['positionY'] += (rooms[room_id][paddle]['info']['speed'] * neg)
@@ -497,43 +476,6 @@ class Pong(AsyncWebsocketConsumer):
                         self.movePaddle(paddle, room_id, 1)
                     break
         await self.paddleCollision(room_id)             
-
-# Part do receive retirada
-# data = json.loads(text_data)
-# if data['type'] == 'score_update':
-#     rooms[room_id]['padd_left']['info']['score'] = data['score']['left']
-#     rooms[room_id]['padd_right']['info']['score'] = data['score']['right']
-#     if self.capacity == 4:
-#         rooms[room_id]['padd_up']['info']['score'] = data['score']['up']
-#         rooms[room_id]['padd_down']['info']['score'] = data['score']['down']
-#     await self.channel_layer.group_send(
-#         room_id, {
-#             'type': 'score_update',
-#             'message': data['score'],
-#         }
-#     )
-# elif data['type'] == 'end_game':
-#     result = await set_db_two_player(room_id, self.match_id) if self.capacity == 2 else await set_db_four_player(room_id, self.match_id, data['winner'])
-#     await self.send(text_data=json.dumps({'type': 'end_game', 'result': result}))
-# elif data['type'] == 'position_update':
-#     rooms[room_id][f'padd_{data["player"]}']['info']['positionX'] = data['positionX']
-#     rooms[room_id][f'padd_{data["player"]}']['info']['positionY'] = data['positionY']
-#     await self.channel_layer.group_send(
-#         room_id, {
-#             'type': 'position_update',
-#             'player': data['player'],
-#             'positionX': data['positionX'],
-#             'positionY': data['positionY'],
-#         }
-#     )
-# elif data['type'] == 'ball_update':
-#     rooms[room_id]['ballDirection'] = data['ballDirection']
-#     await self.channel_layer.group_send(
-#         room_id, {
-#             'type': 'ball_update',
-#             'ballDirection': data['ballDirection'],
-#         }
-#     )
 
     async def new_player(self, event):
         logger.debug(f"new_player called with event: {event}")
