@@ -1,15 +1,23 @@
-export default class Footer extends HTMLElement {
-  constructor() {
-    super();
+const Footer = () => {
+  const templateHTML = `
+    <template id="footer-template">
+      <div class="footer">
+        <p>Copyright © 2024 🎮 All rights reserved</p>
+      </div>
+    </template>
+  `;
+
+  if (!document.querySelector('#footer-template')) {
+    const templateContainer = document.createElement('div');
+    templateContainer.innerHTML = templateHTML;
+    document.body.appendChild(templateContainer);
   }
 
-  connectedCallback() {
-    const template = document.getElementById("my-footer");
-    const component = template.content.cloneNode(true);
-    this.appendChild(component);
-    this.classList.add("d-flex", "justify-content-center", "align-items-center");
-    this.style.fontFamily = "Koulen";
-  }
-}
+  const template = document.getElementById("footer-template");
+  const component = template.content.cloneNode(true);
 
-customElements.define("my-footer", Footer);
+  const root = document.querySelector('#root');
+  root.appendChild(component);
+};
+
+export default Footer;

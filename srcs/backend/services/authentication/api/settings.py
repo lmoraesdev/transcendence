@@ -15,6 +15,10 @@ from pathlib import Path
 import logging
 import logging.config
 
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent
@@ -46,12 +50,6 @@ LOGGING = {
         },
     },
     'handlers': {
-        'custom_file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': path.join(AUTH_DIR, 'logs/print.log'),
-            'formatter': 'verbose',
-        },
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
@@ -59,10 +57,10 @@ LOGGING = {
         },
     },
     'loggers': {
-        'custom_logger': {
-            'handlers': ['custom_file'],
+        'django': {
+            'handlers': ['console'],
             'level': 'DEBUG',
-            'propagate': False,
+            'propagate': True,
         },
     },
 }
@@ -176,6 +174,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Add Player model to AUTH_USER_MODEL
 AUTH_USER_MODEL = "api.Player"
 
-BASE_URL = getenv('BASE_URL')
+#BASE_URL = getenv('BASE_URL')
+BASE_URL = os.getenv('BASE_URL')
 
-PUBLIC_AUTHENTICATION_URL = getenv('PUBLIC_AUTHENTICATION_URL').replace("BASE_URL", BASE_URL)
+# PUBLIC_AUTHENTICATION_URL = getenv('PUBLIC_AUTHENTICATION_URL').replace("BASE_URL", BASE_URL)
+PUBLIC_AUTHENTICATION_URL = os.getenv('PUBLIC_AUTHENTICATION_URL').replace("BASE_URL", os.getenv('BASE_URL'))
+
+print(f"BASE_URL: {BASE_URL}")
+print(f"PUBLIC_AUTHENTICATION_URL: {PUBLIC_AUTHENTICATION_URL}")
+
+if BASE_URL and PUBLIC_AUTHENTICATION_URL:
+    PUBLIC_AUTHENTICATION_URL = PUBLIC_AUTHENTICATION_URL.replace("BASE_URL", BASE_URL)
+else:
+    raise ValueError("Ambas as variáveis de ambiente 'BASE_URL' e 'PUBLIC_AUTHENTICATION_URL' devem estar definidas")

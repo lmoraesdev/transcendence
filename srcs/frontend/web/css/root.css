@@ -27,6 +27,11 @@
 #root {
   min-height: 100vh;
   /* background: linear-gradient(var(--color-font-white) 75%, var(--color-primary)); */
+  background: black !important;
+}
+
+.background {
+  z-index: 2;
 }
 
 .my-page {

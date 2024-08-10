@@ -1,0 +1,70 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+}
+
+#logo {
+    width: 60%;
+    /*margin-bottom: 30px;*/
+}
+
+.image-container #bg-logo img {
+    width: 100%;
+    top: 0;
+  }
+
+.image-container img {
+    object-fit: cover;
+    margin-bottom: 40px;
+    margin-top: 30%;
+    padding: 5%;
+}
+
+.btn-container {
+    margin-bottom: 20px;
+}
+
+#btn {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    /*padding: 15px;*/
+    border-radius: 50px;
+    border: none;
+    background: transparent;
+}
+
+#btn:hover {
+    border-bottom: 8px solid #e1c52a;
+    border-radius: unset;
+}
+
+.box-1 {
+    width: 200px;
+    height: 200px;
+    background: white;
+    transform: skew(45deg);
+}
+
+.clicked {
+    background-color: rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+.fade-in {
+    animation: upDown 3s linear infinite;
+}
+
+#fade-in.image-container {
+  width: inherit;
+
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}

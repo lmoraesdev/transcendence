@@ -13,9 +13,9 @@ class PlayerInfoSerializer(serializers.ModelSerializer):
             "id",
             "email",
             "username",
-            "firstName",
-            "lastName",
+            "first_name",
+            "last_name",
             "avatar",
-            "twoFactor",
+            "two_factor",
             "status"
         ]

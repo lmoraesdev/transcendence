@@ -60,26 +60,26 @@ class PlayerInfo(APIView):
                     })
                 player.username = username
                 changed = True
-            if "firstName" in playerData:
-                firstName = ' '.join(playerData['firstName'].split())
-                if not firstName or len(firstName) > 20 :
+            if "first_name" in playerData:
+                first_name = ' '.join(playerData['first_name'].split())
+                if not first_name or len(first_name) > 20 :
                     return Response({
                         "status": 400,
                         "message": "Invali first name",
                     })
-                player.firstName = firstName
+                player.first_name = first_name
                 changed = True
-            if "lastName" in playerData:
-                lastName = ' '.join(playerData['lastName'].split())
-                if not lastName or len(lastName) > 20 :
+            if "last_name" in playerData:
+                last_name = ' '.join(playerData['last_name'].split())
+                if not last_name or len(last_name) > 20 :
                     return Response({
                         "status": 400,
                         "message": "Invalid last name",
                     })
-                player.lastName = lastName
+                player.last_name = last_name
                 changed = True
-            if "twoFactor" in playerData and playerData['twoFactor'] is False:
-                player.twoFactor = playerData['twoFactor']
+            if "two_factor" in playerData and playerData['two_factor'] is False:
+                player.two_factor = playerData['two_factor']
                 changed = True
             player.save()
             message = "User updated successfully" if changed else "No changes detected"

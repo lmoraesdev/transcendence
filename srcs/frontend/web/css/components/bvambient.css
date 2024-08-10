@@ -1,0 +1,11 @@
+.bvambient_particle {
+	position: absolute;
+	pointer-events: none;
+	transition: top linear, left linear;
+	z-index: 1;
+
+}
+
+#root {
+	background: black !important;
+}

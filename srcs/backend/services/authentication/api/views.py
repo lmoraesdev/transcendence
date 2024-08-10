@@ -1,5 +1,6 @@
 import requests
 import jwt
+import json 
 import logging
 from os import getenv
 from django.conf import settings
@@ -13,6 +14,7 @@ from qr_code.qrcode.maker import make_qr_code_image
 from qr_code.qrcode.utils import QRCodeOptions
 from .models import Player
 from .services import decodeGooleToken, generateJwt, check2FACode, get2FACode, jwtCookieRequired, createPlayer
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 
 logger = logging.getLogger('custom_logger')
 
@@ -56,16 +58,15 @@ def intraCallbackOAuth(request):
     playerData = {
         "email": userToken.json()['email'],
         "username": userToken.json()['login'],
-        "firstName": userToken.json()['first_name'],
-        "lastName": userToken.json()['last_name'],
+        "last_name": userToken.json()['last_name'],
         "avatar": userToken.json()['image']['link'],
     }
     player = createPlayer(playerData)
     logger.debug("Return Player: %s", player)
     if player is None:
         return redirect(f"https://{settings.BASE_URL}/login/", permanent=True)
-    jwtToken = generateJwt(player.id, player.twoFactor)
-    response = redirect(f"https://{settings.BASE_URL}/{'twofa' if player.twoFactor else 'home'}/", permanent=True)
+    jwtToken = generateJwt(player.id, player.two_factor)
+    response = redirect(f"https://{settings.BASE_URL}/{'twofa' if player.two_factor else 'home'}/", permanent=True)
     response.set_cookie("jwt_token", value=jwtToken, httponly=True, secure=True)
     return response
 
@@ -105,10 +106,12 @@ def OAuthGoogle(request):
 def googleCallbackOAuth(request):
     code = request.GET.get("code")
     error = request.GET.get("error")
-    if error is not None:
+    if error:
         return Response({"statusCode": 401, "error": error})
-    if code is None:
-        return Response({"statusCode": 401, "error": "User Not Autorized"})
+
+    if not code:
+        return Response({"statusCode": 401, "error": "User Not Authorized"})
+
     data = {
         "code": code,
         "client_id": getenv("GOOGLE_CLIENT_ID"),
@@ -116,27 +119,58 @@ def googleCallbackOAuth(request):
         "redirect_uri": f'{settings.PUBLIC_AUTHENTICATION_URL}google/callback/',
         "grant_type": "authorization_code",
     }
-    auth_response = requests.post("https://oauth2.googleapis.com/token", data=data)
-    if not auth_response.ok:
-        return Response({"statusCode": 401, "error": "Failed to obtain access token from Google."})
-    tokens = auth_response.json()
-    if tokens["access_token"] is None:
-        return Response({"statusCode": 401, "error": "AccessToken is invalid"})
-    token = tokens["id_token"]
-    tokenDecoded = decodeGooleToken(token)
+
+    try:
+        auth_response = requests.post("https://oauth2.googleapis.com/token", data=data)
+        auth_response.raise_for_status()  # Lança um erro se o status não for 200
+        tokens = auth_response.json()
+    except requests.RequestException:
+        return Response({"statusCode": 401, "error": "Failed to obtain access token from Google."})  
+        
+    access_token = tokens.get("access_token")
+    id_token = tokens.get("id_token")
+
+    if not access_token or not id_token:
+        return Response({"statusCode": 401, "error": "Invalid token response from Google"})
+
+    tokenDecoded = decodeGooleToken(id_token)
+
+    if tokenDecoded is None:
+        return Response({"statusCode": 401, "error": "Failed to decode ID token"})
+
     playerData = {
         "email": tokenDecoded['email'],
         "username": tokenDecoded['name'],
-        "firstName": tokenDecoded['given_name'],
-        "lastName": tokenDecoded['family_name'],
+        "first_name": tokenDecoded['given_name'],
+        "last_name": tokenDecoded['family_name'],
         "avatar": tokenDecoded['picture'],
     }
+
     player = createPlayer(playerData)
+
     if player is None:
-        return redirect(f"https://{settings.BASE_URL}/login/", permanent=True)
-    jwtToken = generateJwt(player.id, player.twoFactor)
-    response = redirect(f"https://{settings.BASE_URL}/{'twofa' if player.twoFactor else 'home'}/", permanent=True)
-    response.set_cookie("jwt_token", value=jwtToken, httponly=True, secure=True)
+        return Response({"statusCode": 401, "error": "Failed to create player"})
+
+    jwtToken = generateJwt(player.id, player.two_factor)
+
+    response_html = f"""
+    <html>
+        <head></head>
+        <body mt=40>
+            <p id="popup">Authentication successful. You can close this window.</p>
+        </body>
+    </html>
+    """
+
+    response = HttpResponse(response_html)
+    response.set_cookie(
+        'authToken',
+        jwtToken,
+        httponly=True,
+        secure=True,
+        samesite='Strict'
+    )
+
     return response
 
 @api_view(['GET'])
@@ -158,12 +192,12 @@ def verify2FA(request):
     except:
         return Response({"statusCode": 401, "error": "Invalid token"})
     playerId = decodedToken['id']
-    twoFactor = decodedToken['twofa']
-    if twoFactor is False:
+    two_factor = decodedToken['twofa']
+    if two_factor is False:
         if not check2FACode(playerId, code):
             return Response({"statusCode": 401, "message": "Incorrect 2FA code."})
         player = Player.objects.get(id=playerId)
-        player.twoFactor = True
+        player.two_factor = True
         player.save()
         return Response({"statusCode": 200, "message": "Successfully verified"})
     else:
@@ -173,3 +207,17 @@ def verify2FA(request):
         response = Response({"statusCode": 200, "message": "Successfully verified", "redirected": True})
         response.set_cookie("jwt_token", value=jwtToken, httponly=True, secure=True)
         return response
+    
+@api_view(['GET'])
+def verifyToken(request):
+    auth_token = request.COOKIES.get('authToken')
+    if not auth_token:
+        return Response({"valid": False, "message": "Token not found"}, status=400)
+
+    try:
+        payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms=['HS256'])
+        return Response({"valid": True, "message": "Token is valid"})
+    except ExpiredSignatureError:
+        return Response({"valid": False, "message": "Token has expired"}, status=401)
+    except InvalidTokenError:
+        return Response({"valid": False, "message": "Invalid token"}, status=401)

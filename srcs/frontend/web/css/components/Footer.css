@@ -1,7 +1,14 @@
-my-footer {
-  color: var(--color-font-white);
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: auto;
+  margin-bottom: 15px;
+  z-index: 1;
 }
 
-my-footer a {
-  color: var(--color-primary-light);
+.footer p {
+  margin: 0;
+  text-align: center;
+  color: white;
 }

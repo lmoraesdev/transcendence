@@ -1,10 +1,4 @@
-// Router
 import router from "./web/js/router/router.js";
-
-// Pages
-import HomePage from "./web/js/pages/HomePage.js";
-import LoginPage from "./web/js/pages/LoginPage.js";
-import NotfoundPage from "./web/js/pages/NotfoundPage.js";
 
 Object.defineProperty(window, "ft_transcendence_host", {
   value: "localhost",

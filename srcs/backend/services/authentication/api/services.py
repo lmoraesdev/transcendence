@@ -11,11 +11,11 @@ from .models import Player
 
 logger = logging.getLogger('custom_logger')
 
-def generateJwt(id: int, twoFactor: bool) -> str:
+def generateJwt(id: int, two_factor: bool) -> str:
     payload = {
         'id': id,
-        'twofa': twoFactor,
-        'exp': datetime.datetime.now() + datetime.timedelta(days=1),
+        'twofa': two_factor,
+        'exp': datetime.datetime.now() + datetime.timedelta(minutes=15),
         'iat': datetime.datetime.now()
     }
     logger.debug("key: %s", settings.SECRET_KEY)
@@ -55,27 +55,35 @@ def jwtCookieRequired(viewFunction):
     return wrappedView
 
 def createPlayer(data: Dict[str, str]) -> Player:
+    logger.debug("Dados do jogador recebidos: %s", data)
     try:
-        logger.debug("PLayerData: %s", data)
+
         email = data['email']
-        if Player.objects.filter(email=email).exists():
-            player = Player.objects.get(email=email)
-            return player
         username = data['username']
-        firstName = data['firstName']
-        lastName = data['lastName']
+        first_name = data['first_name']
+        last_name = data['last_name']
         avatar = data.get('avatar')
         
+        logger.debug("Verificando se o jogador já existe...")
+        if Player.objects.filter(email=email).exists():
+            logger.debug("Jogador encontrado com o email: %s", email)
+            player = Player.objects.get(email=email)
+            return player
+        
+        logger.debug("Criando novo jogador com o email: %s", email)
         player = Player.objects.create(
             email = email,
             username = username,
-            firstName = firstName,
-            lastName = lastName,
+            first_name = first_name,
+            last_name = last_name,
             avatar = avatar
         )
-
-        logger.debug("PLayer: %s", player)
-        return Player.objects.get(email=email)
+        logger.debug("Novo jogador criado: %s", player)
+        #logger.debug("PLayer: %s", player)
+        #return Player.objects.get(email=email)
+        return player
     except Exception as e:
         logger.error(f"Error creating player: {str(e)}")
-        return Response({"statusCode": 500, 'error': f"Error creating player: {str(e)}"})
+        #return Response({"statusCode": 500, 'error': f"Error creating player: {str(e)}"})
+        raise
+        #return None

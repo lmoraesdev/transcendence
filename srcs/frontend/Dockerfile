@@ -12,9 +12,14 @@ COPY ./server/ssl/certs/nginx.crt /etc/ssl/certs/nginx.crt
 COPY ./server/ssl/private/nginx.key /etc/ssl/private/nginx.key
 
 # Criando o diretório onde os arquivos do frontend serão servidos
-RUN mkdir -p /var/www/transcendence
+RUN mkdir -p /var/www/transcendence/
 
 # Copiando todo o conteúdo do frontend para o diretório criado
 COPY . /var/www/transcendence/
+
+# Ajuste as permissões dos arquivos
+RUN chown -R www-data:www-data /var/www/transcendence \
+    && find /var/www/transcendence -type d -exec chmod 755 {} \; \
+    && find /var/www/transcendence -type f -exec chmod 644 {} \;
 
 CMD ["nginx", "-g", "daemon off;"]
