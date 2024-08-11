@@ -46,6 +46,7 @@ fclean: clean
 	@sudo rm -rf $(VOLUME)
 	@sudo rm -rf /srcs/data
 	@sudo rm -rf /srcs/backend/data
+	docker system prune --all --force --volumes
 
 re: fclean all
 	@echo "$(GREEN)** Restarting containers... **$(RESET)"

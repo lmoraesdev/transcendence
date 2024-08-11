@@ -18,4 +18,6 @@ class PlayerInfoSerializer(serializers.ModelSerializer):
             "avatar",
             "two_factor",
             "status"
+            "victory",
+            "defeat",
         ]

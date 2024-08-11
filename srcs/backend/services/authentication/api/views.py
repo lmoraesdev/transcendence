@@ -28,9 +28,6 @@ def OAuthIntra(request):
 def intraCallbackOAuth(request):
     code = request.GET.get("code")
     errorMessage = request.GET.get("error")
-    logger.debug("Request: %s", request)
-    logger.debug("Request user: %s", request.user)    
-    logger.debug("Request user logado: %s", request.user.is_authenticated)
     if errorMessage is not None:
         return Response({"statusCode": 401, "error": errorMessage})
     if code is None:
@@ -55,6 +52,8 @@ def intraCallbackOAuth(request):
     )
     if not userToken.ok:
         return Response({"statusCode": 401, "detail": "No access token in the token response"})
+    
+    logger.debug("playerData -> %s", userToken.json())
     playerData = {
         "email": userToken.json()['email'],
         "username": userToken.json()['login'],
@@ -62,7 +61,6 @@ def intraCallbackOAuth(request):
         "avatar": userToken.json()['image']['link'],
     }
     player = createPlayer(playerData)
-    logger.debug("Return Player: %s", player)
     if player is None:
         return redirect(f"https://{settings.BASE_URL}/login/", permanent=True)
     jwtToken = generateJwt(player.id, player.two_factor)
@@ -98,7 +96,7 @@ def OAuthGoogle(request):
         "prompt": "select_account",
     }
     queryParams = urlencode(params)
-    GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/auth"
+    GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
     authorizationUrl = f"{GOOGLE_AUTH_URL}?{queryParams}"
     return redirect(authorizationUrl)
 

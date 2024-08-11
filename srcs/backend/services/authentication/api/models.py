@@ -22,10 +22,12 @@ class Player(AbstractBaseUser):
     avatar = models.URLField(blank=True, null=True)
     two_factor = models.BooleanField(default=False)
     status = models.CharField(max_length=2, choices=STATUS_CHOICE, default=Status.OFFLINE.value)
-    champions = models.IntegerField(default=0, null=False, blank=True)
-    wins = models.IntegerField(default=0, null=False, blank=True)
-    losses = models.IntegerField(default=0, null=False, blank=True)
+    #wins = models.IntegerField(default=0, null=False, blank=True)
+    #losses = models.IntegerField(default=0, null=False, blank=True)
     #defeat = models.IntegerField(default=0, null=False, blank=True)
+    victory = models.IntegerField(default=0, null=False, blank=True)
+    defeat = models.IntegerField(default=0, null=False, blank=True)
+    champion = models.IntegerField(default=0, null=False, blank=True)
 
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'

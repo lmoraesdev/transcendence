@@ -22,11 +22,14 @@ class Player(AbstractBaseUser):
     avatar = models.URLField(blank=True, null=True)
     two_factor = models.BooleanField(default=False)
     status = models.CharField(max_length=2, choices=STATUS_CHOICE, default=Status.OFFLINE.value)
-    champions = models.IntegerField(default=0, null=False, blank=True)
-    wins = models.IntegerField(default=0, null=False, blank=True)
-    losses = models.IntegerField(default=0, null=False, blank=True)
+    #champions = models.IntegerField(default=0, null=False, blank=True)
+    #wins = models.IntegerField(default=0, null=False, blank=True)
+    #losses = models.IntegerField(default=0, null=False, blank=True)
     #defeat = models.IntegerField(default=0, null=False, blank=True)
-    
+    victory = models.IntegerField(default=0, null=False, blank=True)
+    defeat = models.IntegerField(default=0, null=False, blank=True)
+    champion = models.IntegerField(default=0, null=False, blank=True)
+   
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
 
@@ -74,7 +77,6 @@ class Tournament(models.Model):
 class Match(models.Model):
     class Game(Enum):
         PONG = "PG"
-        TICTACTOE = "TC"
 
         @classmethod
         def choices(cls):
@@ -92,25 +94,15 @@ class Match(models.Model):
     game = models.CharField(max_length=2, choices=Game.choices(), null=False, blank=False, default=Game.PONG.value)
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, null=True, blank=False)
     round = models.IntegerField(default=1)
-    state = models.CharField(max_length=2, choices=Status.choices(), null=False, blank=False, default=Status.NOT_PLAYING.value)
+    status = models.CharField(max_length=2, choices=Status.choices(), null=False, blank=False, default=Status.NOT_PLAYING.value)
 
 
 class PlayerMatch(models.Model):
-    class Language(Enum):
-        C = "CC"
-        CPP = "CP"
-
-        @classmethod
-        def choices(cls):
-            return [(choice.value, choice.name) for choice in cls]
-        
     id = models.BigAutoField(primary_key=True, auto_created=True)
     matchId = models.ForeignKey(Match, on_delete=models.CASCADE, null=False, blank=False)
-    playerId = models.ForeignKey(Tournament, on_delete=models.CASCADE, null=False, blank=False)
+    playerId = models.ForeignKey(Player, on_delete=models.CASCADE, null=False, blank=False)
     score = models.IntegerField(default=0, null=False, blank=False)
-    language = models.CharField(max_length=255, null=True, blank=False)
-    execPath = models.CharField(max_length=255, null=True, blank=False)
-    matchFinished = models.BooleanField(default=False, null=False, blank=False)
+    winner = models.BooleanField(default=False, null=False, blank=False)
 
     def __str__(self):
         return f"Score: {self.score}"
@@ -119,7 +111,7 @@ class PlayerTournament(models.Model):
     id = models.BigAutoField(primary_key=True, auto_created=True)
     playerId = models.ForeignKey(Player, on_delete=models.CASCADE, null=False, blank=False)
     tournamentId = models.ForeignKey(Tournament, on_delete=models.CASCADE, null=False, blank=False)
-    finished = models.BooleanField(default=False, null=False, blank=False)
+    creator = models.BooleanField(default=False, null=False, blank=False)
 
     def __str__(self):
-        return f'{self.tournamentId} -> {self.finished}'
+        return f'{self.tournamentId} -> {self.creator}'

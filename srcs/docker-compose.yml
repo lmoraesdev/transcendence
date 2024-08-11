@@ -1,3 +1,5 @@
+version: '3.3'
+
 services:
   server:
     container_name: server
@@ -11,6 +13,9 @@ services:
     ports:
       - 443:443
     restart: on-failure
+    depends_on:
+      - authentication
+      - player
 
   authentication:
     container_name: authentication
@@ -21,6 +26,36 @@ services:
       - ./backend/dotenv_files/.env
     volumes:
       - ./backend/services/authentication/:/services/authentication/:rw
+    networks:
+      - app_network
+    depends_on:
+      - db
+    restart: on-failure
+
+  tournament:
+    container_name: tournament
+    build:
+      context: ./backend/services/tournament/
+    image: tournament
+    env_file:
+      - ./backend/dotenv_files/.env
+    volumes:
+      - ./backend/services/tournament/:/services/tournament/:rw
+    networks:
+      - app_network
+    depends_on:
+      - db
+    restart: on-failure
+
+  matchmaking:
+    container_name: matchmaking
+    build:
+      context: ./backend/services/matchmaking/
+    image: matchmaking
+    env_file:
+      - ./backend/dotenv_files/.env
+    volumes:
+      - ./backend/services/matchmaking/:/services/matchmaking/:rw
     networks:
       - app_network
     depends_on:
@@ -59,7 +94,7 @@ services:
 
   db:
     image: postgres:16.2
-    container_name: postgres-db
+    container_name: postgres
     restart: unless-stopped
     env_file:
       - ./backend/dotenv_files/.env
@@ -74,7 +109,7 @@ services:
     env_file:
       - ./backend/dotenv_files/.env
     ports:
-      - '8080:80'
+      - 8080:80
     networks:
       - app_network
     restart: unless-stopped

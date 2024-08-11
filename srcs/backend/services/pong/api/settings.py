@@ -11,8 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-from os import getenv
-from os import getenv
+from os import getenv, path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent
@@ -29,6 +28,41 @@ SECRET_KEY = getenv('DJANGO_SECRET_KEY')
 DEBUG = getenv("STAGE") == "Development"
 
 ALLOWED_HOSTS = ['*']
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'custom_file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': path.join(PONG_DIR, 'logs/print.log'),
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+    },
+    'loggers': {
+        'custom_logger': {
+            'handlers': ['custom_file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
 
 
 # Application definition
@@ -82,12 +116,12 @@ ASGI_APPLICATION = 'api.asgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': getenv("POSTGRES_DB"),
-        'USER': getenv("POSTGRES_USER"),
-        'PASSWORD': getenv("POSTGRES_PASSWORD"),
-        'HOST': getenv("POSTGRES_HOST"),
-        'PORT': getenv("POSTGRES_PORT"),
+        'ENGINE': getenv('DB_ENGINE'),
+        'NAME': getenv('POSTGRES_DB'),
+        'USER': getenv('POSTGRES_USER'),
+        'PASSWORD': getenv('POSTGRES_PASSWORD'),
+        'HOST': getenv('POSTGRES_HOST'),
+        'PORT': getenv('POSTGRES_PORT'),
     }
 }
 
