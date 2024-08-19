@@ -1,15 +1,17 @@
 import os
+import jwt
 import urllib.parse
 from .serializers import PlayerInfoSerializer
 from .models import  Friendship, Player, PlayerMatch, PlayerTournament 
 from .decorators import jwtCookieRequired
+from django.http import JsonResponse
 from django.db.models import Q
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-from django.utils.decorators import method_decorator
-from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.utils.decorators import method_decorator
 
 class PlayerInfo(APIView):
 
@@ -60,26 +62,26 @@ class PlayerInfo(APIView):
                     })
                 player.username = username
                 changed = True
-            if "first_name" in playerData:
-                first_name = ' '.join(playerData['first_name'].split())
-                if not first_name or len(first_name) > 20 :
+            if "firstName" in playerData:
+                firstName = ' '.join(playerData['firstName'].split())
+                if not firstName or len(firstName) > 20 :
                     return Response({
                         "status": 400,
                         "message": "Invali first name",
                     })
-                player.first_name = first_name
+                player.firstName = firstName
                 changed = True
-            if "last_name" in playerData:
-                last_name = ' '.join(playerData['last_name'].split())
-                if not last_name or len(last_name) > 20 :
+            if "lastName" in playerData:
+                lastName = ' '.join(playerData['lastName'].split())
+                if not lastName or len(lastName) > 20 :
                     return Response({
                         "status": 400,
                         "message": "Invalid last name",
                     })
-                player.last_name = last_name
+                player.lastName = lastName
                 changed = True
-            if "two_factor" in playerData and playerData['two_factor'] is False:
-                player.two_factor = playerData['two_factor']
+            if "twoFactor" in playerData and playerData['twoFactor'] is False:
+                player.twoFactor = playerData['twoFactor']
                 changed = True
             player.save()
             message = "User updated successfully" if changed else "No changes detected"
@@ -97,7 +99,6 @@ class PlayerInfo(APIView):
                 "status": 500,
                 "message": str(e),
             })
-
 
 class PlayerAvatarUpload(APIView):
 

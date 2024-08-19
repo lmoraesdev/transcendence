@@ -1,33 +1,47 @@
-export default class PlayerCard extends HTMLElement {
-  constructor() {
-    super();
+const PlayerCard = () => {
+  const PlayerCardHTML = `
+    <template id="player-card">
+      <div class="d-flex flex-column justify-content-center align-items-center m-0 p-2 gap-1 rounded-4">
+        <img class="avatar border border-1 border-white rounded-4" alt="avatar" referrerpolicy="no-referrer">
+        <h6 class="username text-center m-0 rounded-4 fw-bold">ana</h6>
+      </div>
+      <h3 class="score fw-bold text-center m-0 p-1 rounded-bottom-4">10</h3>
+      </div>
+    </template> 
+  `;
+
+  if (!document.querySelector('#player-card')) {
+    const templateContainer = document.createElement('div');
+    templateContainer.innerHTML = PlayerCardHTML;
+    document.body.appendChild(templateContainer);
   }
 
-  connectedCallback() {
-    const template = document.getElementById("player-card");
-    const component = template.content.cloneNode(true);
-    this.appendChild(component);
-    this.classList.add(
-      "d-flex",
-      "flex-column",
-      "justify-content-center",
-      "align-items-center",
-      "py-2",
-      "rounded-5",
-    );
+  const template = document.getElementById("player-card");
+  const component = template.content.cloneNode(true);
 
-    const avatar_elem = this.querySelector(".avatar");
-    const username_elem = this.querySelector(".username");
-    const score_elem = this.querySelector(".score");
+  const playerCard = document.querySelector('player-card');
+  playerCard.appendChild(component);
+  playerCard.classList.add(
+    "d-flex",
+    "flex-column",
+    "justify-content-center",
+    "align-items-center",
+    "py-2",
+    "rounded-5",
+  );
 
-    const avatar = this.getAttribute("avatar");
-    const username = this.getAttribute("username");
-    const score = this.getAttribute("score");
+  const avatar_elem = playerCard.querySelector(".avatar");
+  const username_elem = playerCard.querySelector(".username");
+  const score_elem = playerCard.querySelector(".score");
 
-    avatar_elem.src = avatar;
-    username_elem.textContent = username;
-    score_elem.textContent = score;
-  }
-}
+  const avatar = playerCard.getAttribute("avatar");
+  const username = playerCard.getAttribute("username");
+  const score = playerCard.getAttribute("score");
 
-customElements.define("player-card", PlayerCard);
+  avatar_elem.src = avatar;
+  username_elem.textContent = username;
+  score_elem.textContent = score;
+
+};
+
+export default PlayerCard;

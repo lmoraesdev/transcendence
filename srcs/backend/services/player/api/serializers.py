@@ -13,11 +13,11 @@ class PlayerInfoSerializer(serializers.ModelSerializer):
             "id",
             "email",
             "username",
-            "first_name",
-            "last_name",
+            "firstName",
+            "lastName",
             "avatar",
-            "two_factor",
-            "status"
+            "twoFactor",
+            "status",
             "victory",
             "defeat",
         ]

@@ -14,10 +14,15 @@ COPY    ./ssl/private/nginx.key /etc/ssl/private/nginx.key
 
 WORKDIR /services/player/
 
+# Realizei ajustes nas permissões do diretório de logs
+RUN mkdir -p /services/player/logs && \
+    touch /services/player/logs/print.log && \
+    chmod -R 755 /services/player/logs && \
+    chmod 644 /services/player/logs/print.log
+
 RUN     chmod +x ./tools/run_player.sh
 
 RUN     pip install --upgrade pip
-
 RUN     pip install -r ./tools/requirements.txt
 
 CMD     [ "bash", "./tools/run_player.sh" ]

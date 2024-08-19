@@ -1,58 +1,98 @@
-import fetching from "../router/fetching.js";
+import fetching from "../helpers/fetching.js";
 
-export default class FriendsList extends HTMLElement {
-  constructor() {
-    super();
+const FriendsList = () => {
+  const friendsListHTML = `
+    <template id="friends-list">
+      <nav class="friends-tabs">
+        <ul class="d-flex justify-content-center align-items-center flex-wrap p-0 m-0 gap-1">
+          <li>
+            <button class="btn btn-lg fw-bold friends-btn active">Friends</button>
+          </li>
+          <li>
+            <button class="btn btn-lg fw-bold requests-btn">Requests</button>
+          </li>
+          <li>
+            <button 
+              class="btn btn-lg fw-bold invites-btn"
+            >
+              Invites
+            </button>
+          </li>
+          <li>
+            <button 
+              class="btn btn-lg fw-bold search-btn"
+            >
+              Search
+            </button>
+          </li>
+        </ul>
+      </nav>
+      <div class="friend-cards"></div>
+    </template>
+  `;
+
+  if (!document.querySelector('#friends-list')) {
+    const templateContainer     = document.createElement('div');
+    templateContainer.innerHTML = friendsListHTML;
+    document.body.appendChild(templateContainer);
   }
+  
+  const template  = document.getElementById("friends-list");
+  const component = template.content.cloneNode(true);
 
-  connectedCallback() {
-    const template = document.getElementById("friends-list");
-    const component = template.content.cloneNode(true);
-    this.appendChild(component);
-    this.classList.add("d-flex", "justify-content-center", "flex-column", "gap-2");
+  const friendsList = document.querySelector('#friendsList');
+  friendsList.appendChild(component);
+  friendsList.classList.add(
+    "d-flex", 
+    "justify-content-center", 
+    "flex-column", 
+    "gap-2"
+  );
 
-    const nav = this.querySelector("nav");
-    const friends_btn = nav.querySelector(".friends-btn");
-    const requests_btn = nav.querySelector(".requests-btn");
-    const invites_btn = nav.querySelector(".invites-btn");
-    const search_btn = this.querySelector(".search-btn");
-    const friend_cards = this.querySelector(".friend-cards");
+  const nav          = friendsList.querySelector("nav");
+  const friends_btn  = nav.querySelector(".friends-btn");
+  const requests_btn = nav.querySelector(".requests-btn");
+  const invites_btn  = nav.querySelector(".invites-btn");
+  const search_btn   = friendsList.querySelector(".search-btn");
+  const friend_cards = friendsList.querySelector(".friend-cards");
 
-    this.showCards("friends");
+  showCards("friends");
 
-    friend_cards.classList.add("d-flex", "flex-wrap", "gap-1");
-    friends_btn.addEventListener("click", () => {
-      friends_btn.classList.add("active");
-      requests_btn.classList.remove("active");
-      invites_btn.classList.remove("active");
-      search_btn.classList.remove("active");
-      this.showCards("friends");
-    });
-    requests_btn.addEventListener("click", () => {
-      friends_btn.classList.remove("active");
-      requests_btn.classList.add("active");
-      invites_btn.classList.remove("active");
-      search_btn.classList.remove("active");
-      this.showCards("requests");
-    });
-    invites_btn.addEventListener("click", () => {
-      friends_btn.classList.remove("active");
-      requests_btn.classList.remove("active");
-      invites_btn.classList.add("active");
-      search_btn.classList.remove("active");
-      this.showCards("invites");
-    });
-    search_btn.addEventListener("click", () => {
-      friends_btn.classList.remove("active");
-      requests_btn.classList.remove("active");
-      invites_btn.classList.remove("active");
-      search_btn.classList.add("active");
-      this.showCards("search");
-    });
-  }
+  friend_cards.classList.add("d-flex", "flex-wrap", "gap-1");
+  friends_btn.addEventListener("click", () => {
+    friends_btn.classList.add("active");
+    requests_btn.classList.remove("active");
+    invites_btn.classList.remove("active");
+    search_btn.classList.remove("active");
+    showCards("friends");
+  });
 
-  showCards(friend_card_type) {
-    const friend_cards = this.querySelector(".friend-cards");
+  requests_btn.addEventListener("click", () => {
+    friends_btn.classList.remove("active");
+    requests_btn.classList.add("active");
+    invites_btn.classList.remove("active");
+    search_btn.classList.remove("active");
+    showCards("requests");
+  });
+
+  invites_btn.addEventListener("click", () => {
+    friends_btn.classList.remove("active");
+    requests_btn.classList.remove("active");
+    invites_btn.classList.add("active");
+    search_btn.classList.remove("active");
+    showCards("invites");
+  });
+
+  search_btn.addEventListener("click", () => {
+    friends_btn.classList.remove("active");
+    requests_btn.classList.remove("active");
+    invites_btn.classList.remove("active");
+    search_btn.classList.add("active");
+    showCards("search");
+  });
+
+  const showCards = (friend_card_type) => {
+    const friend_cards = friendsList.querySelector(".friend-cards");
     friend_cards.innerHTML = "";
 
     if (friend_card_type === "search") {
@@ -77,6 +117,6 @@ export default class FriendsList extends HTMLElement {
       }
     });
   }
-}
+};
 
-customElements.define("friends-list", FriendsList);
+export default FriendsList;

@@ -2,6 +2,7 @@ import requests
 import jwt
 import json 
 import logging
+import io
 from os import getenv
 from django.conf import settings
 from django.core.cache import cache
@@ -13,7 +14,8 @@ from rest_framework.response import Response
 from qr_code.qrcode.maker import make_qr_code_image
 from qr_code.qrcode.utils import QRCodeOptions
 from .models import Player
-from .services import decodeGooleToken, generateJwt, check2FACode, get2FACode, jwtCookieRequired, createPlayer
+from .services import decodeGooleToken, generateJwt, check2FACode, get2FACode, jwtCookieRequired, createPlayer, refresh_access_token, validate_access_token
+
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 
 logger = logging.getLogger('custom_logger')
@@ -63,8 +65,8 @@ def intraCallbackOAuth(request):
     player = createPlayer(playerData)
     if player is None:
         return redirect(f"https://{settings.BASE_URL}/login/", permanent=True)
-    jwtToken = generateJwt(player.id, player.two_factor)
-    response = redirect(f"https://{settings.BASE_URL}/{'twofa' if player.two_factor else 'home'}/", permanent=True)
+    jwtToken = generateJwt(player.id, player.twoFactor)
+    response = redirect(f"https://{settings.BASE_URL}/{'twofa' if player.twoFactor else 'home'}/", permanent=True)
     response.set_cookie("jwt_token", value=jwtToken, httponly=True, secure=True)
     return response
 
@@ -139,7 +141,7 @@ def googleCallbackOAuth(request):
     playerData = {
         "email": tokenDecoded['email'],
         "username": tokenDecoded['name'],
-        "first_name": tokenDecoded['given_name'],
+        "firstName": tokenDecoded['given_name'],
         "last_name": tokenDecoded['family_name'],
         "avatar": tokenDecoded['picture'],
     }
@@ -147,22 +149,12 @@ def googleCallbackOAuth(request):
     player = createPlayer(playerData)
 
     if player is None:
-        return Response({"statusCode": 401, "error": "Failed to create player"})
+        return redirect(f"https://{settings.BASE_URL}/login/", permanent=True)
 
-    jwtToken = generateJwt(player.id, player.two_factor)
-
-    response_html = f"""
-    <html>
-        <head></head>
-        <body mt=40>
-            <p id="popup">Authentication successful. You can close this window.</p>
-        </body>
-    </html>
-    """
-
-    response = HttpResponse(response_html)
+    jwtToken = generateJwt(player.id, player.twoFactor)
+    response = redirect(f"https://{settings.BASE_URL}/{'twofa' if player.twoFactor else 'home'}/", permanent=True)
     response.set_cookie(
-        'authToken',
+        'jwt_token',
         jwtToken,
         httponly=True,
         secure=True,
@@ -174,13 +166,39 @@ def googleCallbackOAuth(request):
 @api_view(['GET'])
 @jwtCookieRequired
 def qrCode2FA(request):
-    token = request.COOKIES.get("jwt_token")
-    decodedToken = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-    playerId = decodedToken['id']
-    qrCode = get2FACode(playerId)
-    image = make_qr_code_image(qrCode, QRCodeOptions(), True)
-    return HttpResponse(image, content_type='image/svg+xml')
+    try:
+        token = request.COOKIES.get("jwt_token")
+        if not token:
+            return Response({"statusCode": 401, "error": "JWT token missing"})
 
+        decodedToken = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+        playerId = decodedToken.get('id')
+        
+        # Log para verificar o token decodificado e o playerId
+        print(f"Decoded Token: {decodedToken}")
+        print(f"Player ID: {playerId}")
+        
+        if not playerId:
+            return Response({"statusCode": 401, "error": "Invalid JWT token"})
+
+        provisioning_uri = get2FACode(playerId)
+        print(f"Provisioning URI: {provisioning_uri}")
+
+        if not provisioning_uri:
+            return Response({"statusCode": 402, "error": "2FA required"})
+
+        qr_code_image = make_qr_code_image(provisioning_uri, QRCodeOptions())
+        image_stream = io.BytesIO()
+        qr_code_image.save(image_stream, format="PNG")
+        image_stream.seek(0)
+
+        # Retornando a imagem SVG
+        return HttpResponse(image_stream.getvalue(), content_type="image/png")
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return Response({"statusCode": 500, "error": "Internal Server Error"})
+    
 @api_view(["POST"])
 def verify2FA(request):
     code = request.data.get("code")
@@ -190,12 +208,12 @@ def verify2FA(request):
     except:
         return Response({"statusCode": 401, "error": "Invalid token"})
     playerId = decodedToken['id']
-    two_factor = decodedToken['twofa']
-    if two_factor is False:
+    twoFactor = decodedToken['twofa']
+    if twoFactor is False:
         if not check2FACode(playerId, code):
             return Response({"statusCode": 401, "message": "Incorrect 2FA code."})
         player = Player.objects.get(id=playerId)
-        player.two_factor = True
+        player.twoFactor = True
         player.save()
         return Response({"statusCode": 200, "message": "Successfully verified"})
     else:
@@ -206,16 +224,26 @@ def verify2FA(request):
         response.set_cookie("jwt_token", value=jwtToken, httponly=True, secure=True)
         return response
     
-@api_view(['GET'])
-def verifyToken(request):
-    auth_token = request.COOKIES.get('authToken')
-    if not auth_token:
-        return Response({"valid": False, "message": "Token not found"}, status=400)
-
+@api_view(['POST'])
+def refreshToken(request):
+    refresh_token = request.COOKIES.get('jwt_token')
+    if refresh_token is None:
+        return Response({"statusCode": 401, "error": "Refresh token missing"})
+    
     try:
-        payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms=['HS256'])
-        return Response({"valid": True, "message": "Token is valid"})
-    except ExpiredSignatureError:
-        return Response({"valid": False, "message": "Token has expired"}, status=401)
-    except InvalidTokenError:
-        return Response({"valid": False, "message": "Invalid token"}, status=401)
+        new_access_token = refresh_access_token(refresh_token)
+        return Response({"access_token": new_access_token})
+    except Exception as e:
+        return Response({"statusCode": 403, "error": str(e)})
+
+@api_view(['POST'])
+def checkToken(request):
+    access_token = request.COOKIES.get('jwt_token')
+    if access_token is None:
+        return Response({"statusCode": 401, "error": "Access token missing"})
+    
+    try:
+        validate_access_token(access_token)
+        return Response({"statusCode": 200, "message": "Token is valid"})
+    except Exception as e:
+        return Response({"statusCode": 401, "error": "Invalid token", "details": str(e)})

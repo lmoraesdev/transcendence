@@ -1,31 +1,43 @@
-export default class TournamentCard extends HTMLElement {
-  constructor() {
-    super();
+const TournamentCard = () => {
+
+  const tournamentCardHTML = `
+    <template id="tournament-card">
+      <h3 class="tournament-name">
+        </h1>
+        <h4 class="size">8 / 1</h2>
+    </template>
+  `;
+
+  if (!document.querySelector('#tournament-card')) {
+    const templateContainer     = document.createElement('div');
+    templateContainer.innerHTML = tournamentCardHTML;
+    document.body.appendChild(templateContainer);
   }
 
-  connectedCallback() {
-    const template = document.getElementById("tournament-card");
-    const component = template.content.cloneNode(true);
-    this.appendChild(component);
-    this.classList.add(
-      "d-flex",
-      "flex-column",
-      "justify-content-center",
-      "align-items-center",
-      "flex-wrap",
-      "rounded-4",
-      "p-2",
-    );
+  const template = document.getElementById("tournament-card");
+  const component = template.content.cloneNode(true);
 
-    const tournament_name_elem = this.querySelector(".tournament-name");
-    const size_elem = this.querySelector(".size");
+  const tournamentCard = document.querySelector('#tournamentCard');
+  tournamentCard.appendChild(component);
+  tournamentCard.classList.add(
+    "d-flex",
+    "flex-column",
+    "justify-content-center",
+    "align-items-center",
+    "flex-wrap",
+    "rounded-4",
+    "p-2",
+  );
 
-    const tournament_name = this.attributes["tournament-name"].value;
-    const size = this.attributes["size"].value;
+  const tournament_name_elem = tournamentCard.querySelector(".tournament-name");
+  const size_elem = tournamentCard.querySelector(".size");
 
-    tournament_name_elem.textContent = tournament_name;
-    size_elem.textContent = `${size} / 8`;
-  }
-}
+  const tournament_name = tournamentCard.attributes["tournament-name"].value;
+  const size = tournamentCard.attributes["size"].value;
 
-customElements.define("tournament-card", TournamentCard);
+  tournament_name_elem.textContent = tournament_name;
+  size_elem.textContent = `${size} / 8`;
+
+};
+
+export default TournamentCard;

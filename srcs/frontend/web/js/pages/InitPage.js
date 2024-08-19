@@ -1,130 +1,83 @@
 import Footer from '../components/Footer.js';
-import Modal from '../components/Modal.js';
-import LoginPage from '../pages/LoginPage.js';
-import helpers from '../helpers/helpers.js';
+import helpers from '../helpers/helpers.js'
 
-const { executeSequentially } = helpers;
+const { createTemplate, animateSVGElements  } = helpers;
 
-const InitPage = () => {
-
-    const templateHTML = `
-        <template id="init-template">
-            <div class="container">
-                <div class="image-container" id="fade-in">
-                    <!-- <img id="animated-image" src="https://i.ibb.co/kKDfBQc/image-3.png" alt="Logo"> -->
-                    <svg id="logo" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                        viewBox="0 0 300 210" xml:space="preserve">
-                        <style type="text/css">
-                            .st0{fill:#010101;}
-                            .st1{fill:#FFFFFF;}
-                        </style>
-                        <rect x="16.32" y="99.93" class="st0" width="267.44" height="98.28"/>
-                        <path class="st1" d="M157.57,149.43c0,22.74-17.13,40.47-41.53,40.47c-23.59,0-41.54-18.43-41.54-41.17
-                            c0-22.74,17.87-41.45,40.66-41.45S157.57,123.15,157.57,149.43z M116.15,123.51c-13.71,0-25.23,11.21-25.23,25.38
-                            c0,14.17,11.52,25.94,25.23,25.94c13.71,0,26.17-11.08,26.17-25.25C142.32,135.41,129.86,123.51,116.15,123.51z"/>
-                        <path class="st1" d="M267.44,187.4v-40.37h-23.67v14.88h7.32v11.97c-11.55,0-20.89-14.16-21.08-24.06
-                            c-0.25-12.7,9.64-25.63,25.44-25.94c6.38,0,8.65,1.55,11.87,2.72v-17.14c-4.8-1.94-10.54-2.2-12.69-2.2
-                            c-8.02,0-14.36,2.22-20.52,5.82c-12.37,7.25-20.33,19.28-20.33,35.06c0,21.87,17.23,41.28,39.96,41.28
-                            C259.42,189.41,264.6,188.5,267.44,187.4z"/>
-                        <path class="st1" d="M185.17,108.63c-15.57,0-27.61,10.03-27.61,24.67v55.16h16.46v-53.13c0-5.44,4.89-10.09,11.75-10.09
-                            c8.53,0,11.8,5.29,11.8,10.09v53.13h16.46V133.3C214.04,118.66,199.5,108.63,185.17,108.63z"/>
-                        <path class="st1" d="M76.05,134.69c0,16.24-12.99,25.39-24.83,25.39h-9.06v30.2h-16v-80.13h24.07
-                            C63.03,110.15,76.05,119.15,76.05,134.69z M60.22,135.18c0-10.19-9.51-10.53-9.51-10.53h-8.84v20.26h9.05
-                            C50.92,144.91,60.22,144.46,60.22,135.18z"/>
-                        <g>
-                            <path class="st1" d="M275.32,111.72c0.18,0.07,0.33,0.18,0.46,0.32c0.1,0.12,0.19,0.25,0.25,0.39c0.06,0.14,0.09,0.3,0.09,0.48
-                                c0,0.22-0.06,0.43-0.18,0.65c-0.12,0.21-0.31,0.36-0.58,0.45c0.23,0.09,0.39,0.21,0.48,0.36c0.09,0.16,0.14,0.4,0.14,0.72v0.31
-                                c0,0.21,0.01,0.35,0.03,0.43c0.03,0.12,0.09,0.21,0.19,0.26v0.12h-1.13c-0.03-0.1-0.05-0.18-0.07-0.25
-                                c-0.03-0.13-0.04-0.26-0.04-0.4l-0.01-0.43c0-0.29-0.06-0.49-0.16-0.59c-0.1-0.1-0.3-0.15-0.59-0.15h-1v1.81h-1v-4.61h2.35
-                                C274.88,111.61,275.14,111.65,275.32,111.72z M273.2,112.4v1.24h1.11c0.22,0,0.38-0.03,0.49-0.08c0.19-0.09,0.29-0.26,0.29-0.52
-                                c0-0.28-0.09-0.47-0.28-0.56c-0.11-0.05-0.26-0.08-0.48-0.08H273.2z"/>
-                        </g>
-                        <path class="st1" d="M274.1,109.21c-2.83,0-5.12,2.15-5.12,4.8s2.29,4.8,5.12,4.8s5.12-2.15,5.12-4.8S276.93,109.21,274.1,109.21z
-                            M274.1,117.76c-2.2,0-3.99-1.67-3.99-3.74c0-2.06,1.78-3.74,3.99-3.74c2.2,0,3.99,1.67,3.99,3.74
-                            C278.09,116.08,276.3,117.76,274.1,117.76z"/>
-                    </svg>
-                </div>
-                <div class="btn-container">
-                    <button id="btn" class="btn btn-primary">Click to init ></button>
-                </div>
-            </div>
-        </template>
-    `;
-
-    let templateContainer = "";
-    if (!document.querySelector('#init-template')) {
-        templateContainer = document.createElement('div');
-        templateContainer.innerHTML = templateHTML;
-        document.body.appendChild(templateContainer);
-    }
-
-    const template = document.getElementById("init-template");
-    const component = template.content.cloneNode(true);
-
-    const root = document.querySelector('#root');
-
-    root.innerHTML = "";
-    root.appendChild(component);
-    root.classList.add("my-page");
-
-    const btn = root.querySelector('#btn');
-    btn.animate(
-        [
-            { 
-                transform: 'translateY(0%)',
-                boxShadow: '0px 0px 5px rgba(0, 0, 0, 0.5)',
-                textShadow: '0px 0px 5px rgba(0, 0, 0, 0.5)',
-            },
-            { 
-                transform: 'translateY(-10%)',
-                boxShadow: '0px 0px 15px rgba(0, 0, 0, 0.7)',
-                textShadow: '0px 0px 5px rgba(0, 0, 0, 0.7)'
-            },
-            { 
-                transform: 'translateY(0%)',
-                boxShadow: '0px 0px 5px rgba(0, 0, 0, 0.5)', 
-                textShadow: '0px 0px 5px rgba(0, 0, 0, 0.5)'
+const InitPage = async () => {
+  const templateHTML = `
+    <template id="init-template">
+      <figure class="logo-content">
+        <svg id="logo" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+          x="0px" y="0px" viewBox="0 0 300 210" xml:space="preserve">
+          <style type="text/css">
+            .st0 { fill: #010101; }
+            .st1 { fill: #FFFFFF; }
+            .animate {
+                animation: svgAnimation 8s ease-in-out infinite;
             }
-        ],
-        {
-            duration: 3000,
-            iterations: Infinity,
-            easing: 'linear'
-        }
-    );
-    
-    btn.addEventListener('click', () => {
-        //const modal = new bootstrap.Modal(document.getElementById('modal'));
-        //modal.show();
-        executeSequentially(LoginPage());
-    });
+          </style>
+          <rect x="16.32" y="99.93" class="st0" width="267.44" height="98.28"/>
+          <path class="st1 animate" d="M157.57,149.43c0,22.74-17.13,40.47-41.53,40.47c-23.59,0-41.54-18.43-41.54-41.17
+            c0-22.74,17.87-41.45,40.66-41.45S157.57,123.15,157.57,149.43z M116.15,123.51c-13.71,0-25.23,11.21-25.23,25.38
+            c0,14.17,11.52,25.94,25.23,25.94c13.71,0,26.17-11.08,26.17-25.25C142.32,135.41,129.86,123.51,116.15,123.51z"/>
+          <path class="st1 animate" d="M267.44,187.4v-40.37h-23.67v14.88h7.32v11.97c-11.55,0-20.89-14.16-21.08-24.06
+            c-0.25-12.7,9.64-25.63,25.44-25.94c6.38,0,8.65,1.55,11.87,2.72v-17.14c-4.8-1.94-10.54-2.2-12.69-2.2
+            c-8.02,0-14.36,2.22-20.52,5.82c-12.37,7.25-20.33,19.28-20.33,35.06c0,21.87,17.23,41.28,39.96,41.28
+            C259.42,189.41,264.6,188.5,267.44,187.4z"/>
+          <path class="st1 animate" d="M185.17,108.63c-15.57,0-27.61,10.03-27.61,24.67v55.16h16.46v-53.13c0-5.44,4.89-10.09,11.75-10.09
+            c8.53,0,11.8,5.29,11.8,10.09v53.13h16.46V133.3C214.04,118.66,199.5,108.63,185.17,108.63z"/>
+          <path class="st1 animate" d="M76.05,134.69c0,16.24-12.99,25.39-24.83,25.39h-9.06v30.2h-16v-80.13h24.07
+            C63.03,110.15,76.05,119.15,76.05,134.69z M60.22,135.18c0-10.19-9.51-10.53-9.51-10.53h-8.84v20.26h9.05
+            C50.92,144.91,60.22,144.46,60.22,135.18z"/>
+        </svg>
+      </figure>
+      <div class="wrapper">
+        <a class="cta-init hidden" href=${`https://${window.ft_transcendence_host}/login/`}>
+          <span class="animation-init">
+            <svg width="66px" height="43px" viewBox="0 0 66 43" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+              <g id="arrow" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <path class="one" d="M40.1543933,3.89485454 L43.9763149,0.139296592 C44.1708311,-0.0518420739 44.4826329,-0.0518571125 44.6771675,0.139262789 L65.6916134,20.7848311 C66.0855801,21.1718824 66.0911863,21.8050225 65.704135,22.1989893 C65.7000188,22.2031791 65.6958657,22.2073326 65.6916762,22.2114492 L44.677098,42.8607841 C44.4825957,43.0519059 44.1708242,43.0519358 43.9762853,42.8608513 L40.1545186,39.1069479 C39.9575152,38.9134427 39.9546793,38.5968729 40.1481845,38.3998695 C40.1502893,38.3977268 40.1524132,38.395603 40.1545562,38.3934985 L56.9937789,21.8567812 C57.1908028,21.6632968 57.193672,21.3467273 57.0001876,21.1497035 C56.9980647,21.1475418 56.9959223,21.1453995 56.9937605,21.1432767 L40.1545208,4.60825197 C39.9574869,4.41477773 39.9546013,4.09820839 40.1480756,3.90117456 C40.1501626,3.89904911 40.1522686,3.89694235 40.1543933,3.89485454 Z" fill="#FFFFFF"></path>
+                <path class="two" d="M20.1543933,3.89485454 L23.9763149,0.139296592 C24.1708311,-0.0518420739 24.4826329,-0.0518571125 24.6771675,0.139262789 L45.6916134,20.7848311 C46.0855801,21.1718824 46.0911863,21.8050225 45.704135,22.1989893 C45.7000188,22.2031791 45.6958657,22.2073326 45.6916762,22.2114492 L24.677098,42.8607841 C24.4825957,43.0519059 24.1708242,43.0519358 23.9762853,42.8608513 L20.1545186,39.1069479 C19.9575152,38.9134427 19.9546793,38.5968729 20.1481845,38.3998695 C20.1502893,38.3977268 20.1524132,38.395603 20.1545562,38.3934985 L36.9937789,21.8567812 C37.1908028,21.6632968 37.193672,21.3467273 37.0001876,21.1497035 C36.9980647,21.1475418 36.9959223,21.1453995 36.9937605,21.1432767 L20.1545208,4.60825197 C19.9574869,4.41477773 19.9546013,4.09820839 20.1480756,3.90117456 C20.1501626,3.89904911 20.1522686,3.89694235 20.1543933,3.89485454 Z" fill="#FFFFFF"></path>
+                <path class="three" d="M0.154393339,3.89485454 L3.97631488,0.139296592 C4.17083111,-0.0518420739 4.48263286,-0.0518571125 4.67716753,0.139262789 L25.6916134,20.7848311 C26.0855801,21.1718824 26.0911863,21.8050225 25.704135,22.1989893 C25.7000188,22.2031791 25.6958657,22.2073326 25.6916762,22.2114492 L4.67709797,42.8607841 C4.48259567,43.0519059 4.17082418,43.0519358 3.97628526,42.8608513 L0.154518591,39.1069479 C-0.0424848215,38.9134427 -0.0453206733,38.5968729 0.148184538,38.3998695 C0.150289256,38.3977268 0.152413239,38.395603 0.154556228,38.3934985 L16.9937789,21.8567812 C17.1908028,21.6632968 17.193672,21.3467273 17.0001876,21.1497035 C16.9980647,21.1475418 16.9959223,21.1453995 16.9937605,21.1432767 L0.15452076,4.60825197 C-0.0425130651,4.41477773 -0.0453986756,4.09820839 0.148075568,3.90117456 C0.150162624,3.89904911 0.152268631,3.89694235 0.154393339,3.89485454 Z" fill="#FFFFFF"></path>
+              </g>
+            </svg>
+          </span> 
+          <span class="animation-init">LOGIN</span>
+        </a>
+      </div>
+    </template>
+  `;
 
-    //Modal();
-    Footer();
-    // root.addEventListener('click', AddNewElement);
+  if (!document.querySelector('#init-template')) {
+    const templateContainer = createTemplate(templateHTML);
+    document.body.appendChild(templateContainer);
+  }
+
+  const template = document.getElementById("init-template");
+  const component = template.content.cloneNode(true);
+  const root = document.querySelector('#root');
+  
+  root.innerHTML = "";
+  root.appendChild(component);
+  root.classList.add("my-page");
+
+  animateSVGElements("#logo path");
+
+  const btn = document.querySelector('.cta-init');
+
+  setTimeout(() => {
+    btn.classList.remove('hidden');
+    btn.classList.add('transition-step-1');
+  }, 3000); 
+
+  btn.addEventListener('transitionend', () => {
+    if (btn.classList.contains('transition-step-1')) {
+      btn.classList.remove('transition-step-1');
+      btn.classList.add('transition-step-2');
+    }
+  });
+
+  Footer();
 }
 
-// const AddNewElement = () => {
-//     const root = document.querySelector('#root');
-//     const actionMenu = root.querySelector('#action-menu');
-
-//     if (actionMenu.innerHTML.trim() !== '') {
-//         return;
-//     }
-
-//     actionMenu.innerHTML = `
-//         <ul>
-//             <li>New Game</li>
-//             <li>Settings</li>
-//         </ul>
-//     `;
-
-//     const title = root.querySelector('#title');
-//     if (title) {
-//         title.remove();
-//     }
-
-// }
-
 export default InitPage;
-

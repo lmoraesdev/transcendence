@@ -1,13 +1,24 @@
-export default class Stars extends HTMLElement {
-  constructor() {
-    super();
+const Stars = () => {
+  const starsHTML = `
+    <template id="stars-overlay">
+      <div id="stars1"></div>
+      <div id="stars2"></div>
+      <div id="stars3"></div>
+      <div id="stars4"></div>
+    </template>
+  `;
+
+  if (!document.querySelector('#stars-overlay')) {
+    const templateContainer = document.createElement('div');
+    templateContainer.innerHTML = starsHTML;
+    document.body.appendChild(templateContainer);
   }
 
-  connectedCallback() {
-    const template = document.getElementById("stars-overlay");
-    const component = template.content.cloneNode(true);
-    this.appendChild(component);
-  }
+  const template = document.getElementById("stars-overlay");
+  const component = template.content.cloneNode(true);
+
+  const stars = document.querySelector('stars-overlay');
+  stars.appendChild(component);
 }
 
-customElements.define("stars-overlay", Stars);
+export default Stars;

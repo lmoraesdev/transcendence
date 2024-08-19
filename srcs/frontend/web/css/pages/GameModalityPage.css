@@ -1,0 +1,65 @@
+.game-mode-buttons {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    padding: 30px;
+}
+
+.game-mode-button {
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    border: none;
+    cursor: pointer;
+
+    filter: grayscale(100%);
+    opacity: 0.5;
+    transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+.game-mode-button:hover {
+    border: 2px solid black;
+    filter: grayscale(0%);
+    opacity: 1; 
+}
+
+.game-mode-text {
+    font-weight: normal;
+    text-align: center;
+    margin-top: 10px;
+    font-size: 1.2rem;
+}
+
+.game-mode-button:hover + .game-mode-text {
+    font-weight: bold;
+}
+
+.game-mode-1,
+.game-mode-2,
+.game-mode-3 {
+    margin: 0px 10px;
+    border: 1px solid black;
+}
+
+.game-mode-button:hover {
+    border: 2px solid black;
+}
+
+.game-mode-1 {
+    background-image: url('https://i.pinimg.com/originals/95/bf/ae/95bfae2de987bf5694a00092142a3dd6.gif');
+    background-repeat: no-repeat;
+}
+
+.game-mode-2 {
+    background-image: url('https://i.pinimg.com/originals/d5/23/32/d5233277d2ca91e1b8e10410c4182efc.gif');
+    background-repeat: no-repeat;
+}
+
+.game-mode-3 {
+    background-image: url('https://i.pinimg.com/originals/8c/4d/7e/8c4d7e2964e77e0162cb2675fbdedb7b.gif');
+    background-repeat: no-repeat;
+}
+
+/*Efeitos do botão*/

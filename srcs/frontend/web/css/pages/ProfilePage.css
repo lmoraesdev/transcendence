@@ -47,6 +47,15 @@ profile-page .friend-cards {
   grid-template-columns: repeat(auto-fit, 100px);
 }
 
+main.profile-container {
+  background: white;
+  border-radius: 5px;
+  margin: 0px 20px;
+  padding: -20px;
+  width: auto;
+  z-index: 2;
+}
+
 .friend-cards img {
   width: 50px;
   height: 50px;

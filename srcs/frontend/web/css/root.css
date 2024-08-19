@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&display=swap');
+
 * {
   margin: 0;
   padding: 0;
@@ -26,8 +28,11 @@
 
 #root {
   min-height: 100vh;
-  /* background: linear-gradient(var(--color-font-white) 75%, var(--color-primary)); */
-  background: black !important;
+  font-family: "Audiowide", sans-serif;
+}
+
+.my-page {
+  background: radial-gradient(circle,#E4CF16, #D4AF37, #E5B76E, #FFD700);
 }
 
 .background {

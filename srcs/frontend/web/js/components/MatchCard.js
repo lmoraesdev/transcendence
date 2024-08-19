@@ -1,36 +1,42 @@
-export default class MatchCard extends HTMLElement {
-  constructor() {
-    super();
+const MatchCard = () => {
+  const matchCardHTML = `
+    <template id="match-card"></template>
+  `;
+
+  if (!document.querySelector('#match-card')) {
+    const templateContainer = document.createElement('div');
+    templateContainer.innerHTML = matchCardHTML;
+    document.body.appendChild(templateContainer);
   }
 
-  connectedCallback() {
-    const template = document.getElementById("match-card");
-    const component = template.content.cloneNode(true);
-    this.appendChild(component);
-    this.classList.add(
-      "d-flex",
-      "flex-wrap",
-      "justify-content-around",
-      "align-items-center",
-      "p-2",
-      "gap-1",
-      "rounded-5",
-    );
+  const template = document.getElementById("match-card");
+  const component = template.content.cloneNode(true);
 
-    const match = JSON.parse(this.getAttribute("match"));
+  const matchCard = document.querySelector('match-card');
+  matchCard.appendChild(component);
+  matchCard.classList.add(
+    "d-flex",
+    "flex-wrap",
+    "justify-content-around",
+    "align-items-center",
+    "p-2",
+    "gap-1",
+    "rounded-5",
+  );
 
-    if (match.game === "PO")
-      this.style.backgroundImage = `url('/web/images/pong_super_glass.svg')`;
-    this.style.backgroundSize = "cover";
+  const match = JSON.parse(matchCard.getAttribute("match"));
 
-    for (const player of match.players) {
-      const player_card_elem = document.createElement("player-card");
-      player_card_elem.setAttribute("avatar", player.avatar);
-      player_card_elem.setAttribute("username", player.username);
-      player_card_elem.setAttribute("score", player.score);
-      this.appendChild(player_card_elem);
-    }
+  if (match.game === "PO")
+    matchCard.style.backgroundImage = `url('/web/images/pong_super_glass.svg')`;
+  matchCard.style.backgroundSize = "cover";
+
+  for (const player of match.players) {
+    const player_card_elem = document.createElement("player-card");
+    player_card_elem.setAttribute("avatar", player.avatar);
+    player_card_elem.setAttribute("username", player.username);
+    player_card_elem.setAttribute("score", player.score);
+    matchCard.appendChild(player_card_elem);
   }
-}
+};
 
-customElements.define("match-card", MatchCard);
+export default MatchCard;

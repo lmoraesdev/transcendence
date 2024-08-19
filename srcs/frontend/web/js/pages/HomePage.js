@@ -1,43 +1,39 @@
+import Navbar from '../components/Navbar.js';
 import Footer from '../components/Footer.js';
 
 const HomePage = () => {
-  function getCookieValue(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
+
+  const templateHTML = `
+    <template id="home-template">
+      <div id="my-navbar"></div>
+      <main class="container-fluid d-flex flex-column justify-content-center gap-5 my-5">
+        <section class="d-flex flex-wrap justify-content-center align-items-center gap-5 w-100">
+          <play-card game="PG" wallpaper="/web/images/pong_glass.svg"></play-card>
+        </section>
+      </main>
+    </template>
+  `;
+
+  let templateContainer = "";
+  if (!document.querySelector('#home-template')) {
+    templateContainer = document.createElement('div');
+    templateContainer.innerHTML = templateHTML;
+    document.body.appendChild(templateContainer);
   }
 
-  // Exemplo de uso para obter o valor do cookie 'authToken'
-  const authToken = getCookieValue('authToken');
-  console.log(authToken);
+  const template = document.getElementById("home-template");
+  const component = template.content.cloneNode(true);
 
-    const templateHTML = `
-        <template id="home-template">
-            <div class="container">
-              <p>Welcome to the Home Page</p>
-            </div>
-        </template>
-    `;
+  const root = document.querySelector('#root');
 
-    let templateContainer = "";
-    if (!document.querySelector('#home-template')) {
-        templateContainer = document.createElement('div');
-        templateContainer.innerHTML = templateHTML;
-        document.body.appendChild(templateContainer);
-    }
+  root.innerHTML = "";
+  root.appendChild(component);
+  root.classList.add("my-page");
 
-    const template = document.getElementById("home-template");
-    const component = template.content.cloneNode(true);
-
-    const root = document.querySelector('#root');
-
-    root.innerHTML = "";
-    root.appendChild(component);
-    root.classList.add("my-page");
-    
-    Footer();
+  Navbar();
+  Footer();
 }
 
 export default HomePage;
-
+// Colocar indicadores no main de acordo com o figma
 

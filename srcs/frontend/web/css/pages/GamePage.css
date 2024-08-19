@@ -13,11 +13,85 @@ game-page button.btn:active {
   color: var(--color-font-white) !important;
 }
 
+.container-fluid.logo-game-container {
+  width: 20%;
+}
+
 #canvas-pong {
-  width: 50%;
-  height: 50%;
-  background-color: var(--color-primary);
-  border-top: 2px solid var(--color-primary);
-  border-bottom: 2px solid var(--color-primary);
+  width: 90%;
+  height: 60vh;
+  background-color: black;
+  border-top: 2px solid white;
+  border-bottom: 2px solid white;
   border-radius: 2rem;
+  /*box-shadow: 10px 10px 70px -5px rgba(55, 55, 55, 0.8);*/
+}
+
+/*div.border-box {
+  border: 2rem solid;
+  border-color: #566A89 #37446E #A9C8DB #37446E;
+  border-radius: 0.2rem;
+}*/
+ 
+/**/
+.button {
+  position:relative;
+  display:inline-block;
+  margin:20px;
+}
+  
+a.btn-game {
+  color:white;
+  font-weight:bold;
+  font-size:12px;
+  text-align: center;
+  text-decoration:none;
+  background-color:#FFA12B;
+  display:block;
+  position:relative;
+  padding:20px;
+  
+  /*-webkit-tap-highlight-color: rgba(0, 0, 0, 0);*/
+  text-shadow: 0px 1px 0px #000;
+  filter: dropshadow(color=#000, offx=0px, offy=1px);
+  
+  /*-webkit-box-shadow:inset 0 1px 0 #FFE5C4, 0 10px 0 #915100;
+  -moz-box-shadow:inset 0 1px 0 #FFE5C4, 0 10px 0 #915100;
+  box-shadow:inset 0 1px 0 #FFE5C4, 0 10px 0 #915100;*/
+  
+  /*-webkit-border-radius: 5px;
+  -moz-border-radius: 5px;*/
+  border-radius: 5px;
+
+  /*transform: skewX(-35deg);*/
+  box-shadow: 6px 6px 0 black;
+  border: 2rem solid;
+
+  border-bottom-color: #DDA155;
+  border-right-color: #915100;
+  border-style: solid;
+  border-width: 0 10px 20px 0;
+}
+  
+.button a:active {
+  top:10px;
+  background-color:#F78900;
+  /*-webkit-box-shadow:inset 0 1px 0 #FFE5C4, inset 0 -3px 0 #915100;
+  -moz-box-shadow:inset 0 1px 0 #FFE5C4, inset 0 -3pxpx 0 #915100;*/
+  box-shadow:inset 0 1px 0 #FFE5C4, inset 0 -3px 0 #915100;
+}
+  
+.button:after {
+  content:"";
+  height:100%;
+  width:100%;
+  padding:4px;
+  position: absolute;
+  bottom:-15px;
+  left:-4px;
+  z-index:-1;
+  background-color:#2B1800;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
 }

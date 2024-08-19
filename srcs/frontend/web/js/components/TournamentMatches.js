@@ -1,14 +1,38 @@
-export default class TournamentMatches extends HTMLElement {
-  constructor() {
-    super();
-  }
+const TournamentMatches = () => {
+  const tournamentMatchesHTML = `
+    <template id="tournament-matches">
+      <section class="tournament-quarterfinal d-flex flex-column justify-content-around align-items-center gap-3">
+        <tournament-match-card></tournament-match-card>
+        <tournament-match-card></tournament-match-card>
+        <tournament-match-card></tournament-match-card>
+        <tournament-match-card></tournament-match-card>
+      </section>
+      <section class="tournament-semifinal d-flex flex-column justify-content-around align-items-center gap-3">
+        <tournament-match-card></tournament-match-card>
+        <tournament-match-card></tournament-match-card>
+      </section>
+      <section class="tournament-final d-flex flex-column justify-content-around align-items-center gap-3">
+        <tournament-match-card></tournament-match-card>
+      </section>
+    </template>  
+  `;
 
-  connectedCallback() {
-    const template = document.getElementById("tournament-matches");
-    const component = template.content.cloneNode(true);
-    this.appendChild(component);
-    this.classList.add("d-none", "justify-content-center", "gap-1");
+  if (!document.querySelector('#tournament-matches')) {
+    const templateContainer = document.createElement('div');
+    templateContainer.innerHTML = tournamentMatchesHTML;
+    document.body.appendChild(templateContainer);
   }
-}
+      
+  const template = document.getElementById("tournament-matches");
+  const component = template.content.cloneNode(true);
 
-customElements.define("tournament-matches", TournamentMatches);
+  const tournamentMatches = document.querySelector('tournament-matches');
+  tournamentMatches.appendChild(component);
+  tournamentMatches.classList.add(
+    "d-none", 
+    "justify-content-center", 
+    "gap-1"
+  );
+};
+
+export default TournamentMatches;

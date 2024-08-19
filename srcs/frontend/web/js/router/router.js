@@ -1,28 +1,27 @@
-import initPage from '../pages/InitPage.js'
+import initPage from '../pages/InitPage.js';
 import HomePage from '../pages/HomePage.js';
 import LoginPage from '../pages/LoginPage.js';
+import ProfilePage from '../pages/ProfilePage.js';
+import GamePage from '../pages/GamePage.js';
+import TournamentPage from '../pages/TournamentPage.js';
+import GameModalityPage from '../pages/GameModalityPage.js';
+import SettingPage from '../pages/SettingPage.js';
+import NotfoundPage from '../pages/NotfoundPage.js';
 import helpers from '../helpers/helpers.js';
+import Leaderboard from '../pages/LeaderboardPage.js';
+import fetching from "../helpers/fetching.js";
+import { wsTwo } from "../game/pongTwo.js";
+import { wsFour } from "../game/pongFour.js";
+import { checkAndRefreshToken } from '../services/auth.js';
 
-import fetching from "./fetching.js";
-import { wsTwo } from "./pongTwo.js";
-import { wsFour } from "./pongFour.js";
 
 const { executeSequentially } = helpers;
 
-const routes = {
-  "/game/": "game-page",
-  "/home/": "home-page",
-  "/login/": "init-page",
-  //"/login/": "login-page",
-  "/twofa/": "twofa-page",
-  "/profile/": "profile-page",
-  "/setting/": "setting-page",
-  "/tournaments/": "tournament-page",
-};
-
 const router = {
-  init: () => {
-    console.log("start")
+  init: async () => {
+
+    await checkAndRefreshToken();
+
     addEventListener("popstate", (event) => {
       if (wsTwo)
         wsTwo.close(1000);
@@ -49,7 +48,7 @@ const router = {
       //HomePage();
     }*/
 
-    if (pathname === "/") pathname = "/home/";
+    //if (pathname === "/") pathname = "/home/";
     console.log("path: " + pathname, location);
 
     const wsUrl = `wss://${window.ft_transcendence_host}/authentication/ws/login/`;
@@ -63,21 +62,9 @@ const router = {
       console.error(`Error details:`, JSON.stringify(error, null, 2));
     };
 
-    /*
     ws.onmessage = (event) => {
       const message = event.data;
-      if (message === "Valid") {
-        console.log("valid", pathname);
-        //if (pathname === "/login") pathname = "/home";
-      } else if (message === "Invalid") {
-        pathname = "/login";
-        console.log("valid", pathname);
-      }
-}
-    */
-
-    ws.onmessage = (event) => {
-      const message = event.data;
+      console.log("message", message);
       if (message === "Valid") {
         if (pathname == "/login/" || pathname == "/twofa/") pathname = "/home/";
       } else if (message === "Twofa") {
@@ -99,38 +86,69 @@ const router = {
           pathname == "/setting/" ||
           pathname == "/tournaments/"
         )
-          pathname = "/login/";
+          pathname = "/";
+      } else if (message === "Invalid" && pathname == "/login/") {
+          pathname = "/";
       }
       router.go(pathname, window.location.search, "replace");
     };
     ws.onerror = (error) => console.error(`WebSocket error: ${error}`);
   },
 
-  go: (route, query, state) => {
-    console.log("route", route);
-    console.log("state", state);
+  go: async (route, query, state) => {
+    const root = document.querySelector("#root");
 
-    /*if (state === "add" && location.pathname !== route)
+    const loadingIndicator = "<h2>Carregando...</h2>";
+    const previousContent = root.innerHTML;
+    root.innerHTML = loadingIndicator;
+
+    await checkAndRefreshToken();
+
+    if (state === "add" && location.pathname !== route)
       history.pushState({ route, query }, "", route + query);
     else if (state === "replace")
       history.replaceState({ route, query }, "", route + query);
-*/
-   //let pageElement;
-    if (route === "/") {
-      executeSequentially(initPage());
-    } else if (route === "/login") {
-      executeSequentially(LoginPage());
-    } else if (route === "/home") {
-      executeSequentially(HomePage());
-    } else {
-      document.querySelector("#root").innerHTML = "<h1>Página não encontrada</h1>";
+
+    try {
+      if (route === "/") {
+        //executeSequentially(initPage()); A chamada conjunta tras um efeito js
+        initPage();
+      } else if (route === "/login/") {
+        //executeSequentially(LoginPage());
+        LoginPage();
+      } else if (route === "/home/") {
+        //executeSequentially(HomePage());
+        HomePage();
+      } else if (route === "/profile/") {
+        //executeSequentially(ProfilePage());
+        ProfilePage();
+      } else if (route === "/game/" || route === "/game") {
+        GamePage();
+      } else if (route === "/game-modality/") {
+        //executeSequentially(GameModalityPage());
+        GameModalityPage()
+      } else if (route === "/tournaments/") {
+        TournamentPage();
+      } else if (route === "/settings/") {
+        SettingPage(); 
+      } else if (route === "/twofa/") {
+        TwofaPage(); 
+      } else if (route === "/leaderboard/") {
+        Leaderboard(); 
+      } else {
+        NotfoundPage();
+        scrollTo(0, 0);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar a página:", error);
+      // Restaura o conteúdo anterior em caso de erro
+      root.innerHTML = previousContent;
     }
-    // const rootEl = document.querySelector("div#root");
-    // rootEl.classList.add("loading");
-    // rootEl.innerHTML = "";
-    // rootEl.appendChild(pageElement);
-    scrollTo(0, 0);
   },
 };
 
 export default router;
+
+//Ajustar caminho de tela para bloquear acesso direto
+//Ajustar diminuição do carregamento de tela
+
