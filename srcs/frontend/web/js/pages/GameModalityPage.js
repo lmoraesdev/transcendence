@@ -97,4 +97,4 @@ const GameModalityPage = () => {
 
 export default GameModalityPage;
 
-// Ajusar a tela com a chamada do modal e fazer os bloqueios necessarios.
+// Ajusar a tela com a chamada do modal e
