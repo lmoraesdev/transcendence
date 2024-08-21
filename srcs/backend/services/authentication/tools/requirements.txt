@@ -8,5 +8,3 @@ daphne==4.0.0
 channels==4.0.0
 psycopg==3.1.18
 Twisted[tls,http2]
-python-dotenv
-djangorestframework-simplejwt

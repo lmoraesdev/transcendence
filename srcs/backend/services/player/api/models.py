@@ -16,20 +16,16 @@ class Player(AbstractBaseUser):
 
     id = models.BigAutoField(primary_key=True, auto_created=True)
     email = models.EmailField(max_length=50, blank=False, null=False, unique=True)
-    username = models.CharField(max_length=60, blank=False, null=False)
+    username = models.CharField(max_length=20, blank=False, null=False)
     firstName = models.CharField(max_length=25, blank=False, null=False)
-    lastName = models.CharField(max_length=30, blank=False, null=False)
+    lastName = models.CharField(max_length=25, blank=False, null=False)
     avatar = models.URLField(blank=True, null=True)
     twoFactor = models.BooleanField(default=False)
     status = models.CharField(max_length=2, choices=STATUS_CHOICE, default=Status.OFFLINE.value)
-    #champions = models.IntegerField(default=0, null=False, blank=True)
-    #wins = models.IntegerField(default=0, null=False, blank=True)
-    #losses = models.IntegerField(default=0, null=False, blank=True)
-    #defeat = models.IntegerField(default=0, null=False, blank=True)
     victory = models.IntegerField(default=0, null=False, blank=True)
     defeat = models.IntegerField(default=0, null=False, blank=True)
     champion = models.IntegerField(default=0, null=False, blank=True)
-   
+    
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
 

@@ -1,17 +1,15 @@
 import os
-import jwt
 import urllib.parse
 from .serializers import PlayerInfoSerializer
 from .models import  Friendship, Player, PlayerMatch, PlayerTournament 
 from .decorators import jwtCookieRequired
-from django.http import JsonResponse
 from django.db.models import Q
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from django.utils.decorators import method_decorator
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 class PlayerInfo(APIView):
 
@@ -99,6 +97,7 @@ class PlayerInfo(APIView):
                 "status": 500,
                 "message": str(e),
             })
+
 
 class PlayerAvatarUpload(APIView):
 
