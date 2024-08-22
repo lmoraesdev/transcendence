@@ -1,4 +1,4 @@
-import fetching from "../helpers/fetching.js";
+import fetching from "../../helpers/fetching.js";
 
 const Navbar = async () => {
   const navbarHTML = `
@@ -16,9 +16,9 @@ const Navbar = async () => {
           <li><button class="navbar-button">Guilds</button></li>
         </ul>
       </div>
-      <div class="navbar-perfil">
+      <div class="navbar-perfil" role="button">
         <p>Nome</p>
-        <img src="./web/images/pngegg.png" alt="Foto do perfil" width="100px" height="100px"/>
+        <img src="./web/images/pngegg.png" alt="Foto do perfil" width="50px" height="50px"/>
       </div>
     </nav>
     </template>
