@@ -14,6 +14,7 @@
     <!-- CSS -->
     <link rel="stylesheet" href="/web/css/style.css" />
     <link rel="stylesheet" href="/web/css/components/bvambient.css" />
+    <link rel="stylesheet" href="./web/css/components/Navbar.css" />
     
     
     <!-- Vanilla JS -->
@@ -23,6 +24,24 @@
     <title>ft_transcendence</title>
   </head>
   <body>
+    <nav class="navbar">
+      <div>
+        <img src="./web/images/logo_pong.png" alt="logo pong"/>
+      </div>
+      <div class="navbar-items">
+        <ul class="navbar-items">
+          <li><button class="navbar-button">Home</button></li>
+          <li><button class="navbar-button">Statistics</button></li>
+          <li><button class="navbar-button">Leaderboard</button></li>
+          <li><button class="navbar-button">Tournament</button></li>
+          <li><button class="navbar-button">Guilds</button></li>
+        </ul>
+      </div>
+      <div class="navbar-perfil" role="button">
+        <p class="align-self: center">Nome</p>
+        <img src="./web/images/pngegg.png" alt="Foto do perfil" width="50px" height="50px"/>
+      </div>
+    </nav>
     <div id="root"></div>
     <script defer src="/web/js/components/bvambient.js" type="module"></script>
   </body>

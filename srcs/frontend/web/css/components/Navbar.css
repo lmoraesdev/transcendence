@@ -11,6 +11,49 @@
   }
 }
 
+nav div {
+  display: flex !important;
+}
+
+.navbar {
+  display: flex;
+  background-color: black;
+  color: white;
+  place-items: center;
+}
+
+.navbar-items li{
+  display: inline-block !important;
+  padding: 10px;
+  margin: 5px;
+  place-items: center;
+}
+
+.navbar-button{
+  padding:10px !important;
+  border: none;
+  color: white;
+  background-color: black;
+  font-weight: 600;
+}
+
+.navbar-button:hover{
+  border: none;
+  color: #F3C00C;
+  border-bottom: 2px solid #F3C00C;
+}
+
+.navbar-perfil{
+  display: flex;
+  gap: 20px;
+  place-items: center;
+  flex-wrap: wrap;
+  font-weight: 600;
+}
+
+.navbar-perfil p{
+  margin-bottom: 0px;
+}
 
 a.colorizer {
   color: var(--color-font-white) !important;
