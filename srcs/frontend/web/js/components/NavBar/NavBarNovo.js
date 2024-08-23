@@ -1,7 +1,10 @@
 import style from '../../../css/components/Navbar.css'
+import profile from '../../../images/profile.png'
 
 const NavBar = () => {
     const buttonSelected = false;
+
+    const windowWidth = window.innerWidth;
 
     return (<nav class={style.navbar}>
         <div>
@@ -16,20 +19,25 @@ const NavBar = () => {
             <li><button class={style.navbar-button}>Guilds</button></li>
           </ul>
         </div>
-        <div class="navbar-perfil" role="button" onClick= {() => {
+        {windowWidth >= 576 ? 
+        (<div class={style.navbar-perfil} role="button" onClick= {() => {
             buttonSelected = !buttonSelected;
         }}
             >
           <p>Nome</p><button></button>
-          <img src="./web/images/pngegg.png" alt="Foto do perfil" width="50px" height="50px"/>
-        {buttonSelected && (<div>
+          <img src={profile} alt="Foto do perfil" width="50px" height="50px"/>
+        {buttonSelected && (<div class={style.menu-suspended}>
             <ul>
-                <li>Profile</li>
-                <li>Settings</li>
-                <li>Exit</li>
+              <li><button class={style.menu-button}>Profile</button></li>
+              <li><button class={style.menu-button}>Settings</button></li>
+              <li><button class={style.menu-button}>
+                Exit
+              </button>
+              </li>
             </ul>
-        </div>)}
-        </div>
+          </div>)}
+        </div>) : null
+         }
       </nav>)
 }
 

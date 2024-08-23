@@ -7,18 +7,19 @@
     border-radius: 40px;
     margin-left: 20px;
     margin-right: 20px;
-
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
 }
 
 .profile-data {
     background-color: #D9D9D9;
-    width: 75%;
-    position: absolute;
-    justify-content: space-between;
+    width: 90%;
     display: flex;
     border-radius: 40px;
     padding: 20px;
-    margin-top: 20px;
+    margin: 10px;
+    justify-content: space-between;
 }
 
 .profile-data div {
@@ -41,8 +42,12 @@
 }
 
 .profile-statistcs {
-    width: 300px;
+    width: 80%;
     position: relative;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    gap: 20px !important;
+    margin: 20px !important;
 }
 
 .profile-number {
@@ -55,4 +60,15 @@
 .profile-text{
     margin-bottom: 0;
     font-size: 20px;
+}
+
+.profile-infos {
+    display: flex;
+    gap: 22px;
+    font-size: 18px;
+}
+
+.profile-option:checked {
+    color:#D0A50B;
+    border-bottom: 2px solid #D0A50B;
 }
