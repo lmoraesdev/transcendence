@@ -75,7 +75,8 @@ def walk_over_two(room_id, match_id, pos):
     winner_match.save()
     loser_match.save()
 
-    return f"{winner.username} left you win"
+    logger.debug("--------------------------Walk Over two--------------------------")
+    return f"{winner.username} you win"
 
 def walk_over_four(room_id, match_id, pos):
     logger.debug(f"walk_over_four called with room_id: {room_id}, match_id: {match_id}, pos: {pos}")
@@ -122,6 +123,7 @@ def set_db_four_player(room_id, match_id, winner):
             player_matches[pos].save()
             players[pos].save()
 
+        logger.debug("++++++++++++++++++++++++++++++++++SET DB TWO++++++++++++++++++++++++++++++++++")
         return f"{players[winner].username} is the winner"
     except Exception as e:
         logger.error(f"Error in set_db_four_player: {e}")
@@ -170,7 +172,7 @@ def set_db_two_player(room_id, match_id):
 
 def ballDirection(capacity):
     # logger.debug(f"ballDirection called with capacity: {capacity}")
-    logger.debug("entrou na 'ballDirection'")
+    # logger.debug("entrou na 'ballDirection'")
     speed = {
         'X': 0,
         'Y': 0
@@ -186,14 +188,14 @@ def ballDirection(capacity):
     )
     speed['X'] = speedX
     speed['Y'] = speedY
-    logger.debug(f"saiu da 'ballDirection' e retornou {speed}")
+    # logger.debug(f"saiu da 'ballDirection' e retornou {speed}")
     return speed
 
 def addSpeedBall(room_id):
-    logger.debug("entrou na 'addSpeedball'")
+    # logger.debug("entrou na 'addSpeedball'")
     rooms[room_id]['ball']['positionX'] += rooms[room_id]['ball']['speedX']
     rooms[room_id]['ball']['positionY'] += rooms[room_id]['ball']['speedY']
-    logger.debug("saiu da 'addSpeedBall'")
+    # logger.debug("saiu da 'addSpeedBall'")
 
 
 class Pong(AsyncWebsocketConsumer):
@@ -204,7 +206,8 @@ class Pong(AsyncWebsocketConsumer):
         self.capacity = int(self.scope['url_route']['kwargs']['capacity'])
         self.match_id = self.scope['url_route']['kwargs'].get('match_id')
         player_db = await database_sync_to_async(Player.objects.get)(id=self.scope['payload']['id'])
-
+   
+        # quando for puxar a segunda pt a room_id vem none
         await self.channel_layer.group_add(room_id, self.channel_name)
 
         if room_id not in rooms:
@@ -282,6 +285,7 @@ class Pong(AsyncWebsocketConsumer):
             'size': 20
         }
         rooms[room_id]['ball'] = speed
+
         # logger.debug(f"minhas rooms\n {pformat(rooms)}\ne RoomID: {room_id}\n{pformat(rooms[room_id])}")
 
     async def gameLoop(self, room_id):
@@ -289,13 +293,13 @@ class Pong(AsyncWebsocketConsumer):
         await asyncio.sleep(2)
         logger.debug("start looping")
         while True:
-            if (room_id not in rooms):
-                logger.debug(f"Closed Game {room_id} now")
-                print(f"Closed Game {room_id} now")
-                break
             addSpeedBall(room_id)
             try:
                 await self.ballCollision(room_id)
+                if (room_id not in rooms):
+                    logger.debug(f"Closed Game {room_id} now")
+                    print(f"Closed Game {room_id} now")
+                    break
                 await self.paddleCollision(room_id)
                 await self.BallPaddleCollision(room_id)
                 if self.capacity == 4 and rooms[room_id]['elimination_count'] > 2:
@@ -317,15 +321,15 @@ class Pong(AsyncWebsocketConsumer):
                         'message': 'ball',
                     }
                 )
+                rooms[room_id]['ball']['speedX'] += 0.01 if rooms[room_id]['ball']['speedX'] > 0 else -0.01
+                rooms[room_id]['ball']['speedY'] += 0.01 if rooms[room_id]['ball']['speedY'] > 0 else -0.01
             except Exception as e:
                 logger.debug(f"deu exception: {e}")
                 print(e, flush=True)
-            rooms[room_id]['ball']['speedX'] += 0.01 if rooms[room_id]['ball']['speedX'] > 0 else -0.01
-            rooms[room_id]['ball']['speedY'] += 0.01 if rooms[room_id]['ball']['speedY'] > 0 else -0.01
             await asyncio.sleep(0.015)
 
     def getPaddCenter(self, room_id, side):
-        logger.debug("entrou na 'getPaddCenter'")
+        # logger.debug("entrou na 'getPaddCenter'")
         padd_info = rooms[room_id][f'padd_{side[:-1]}']['info']
         size_x, size_y = padd_info['sizeX'], padd_info['sizeY']
         position = padd_info[f'position{side[-1]}'] 
@@ -337,12 +341,12 @@ class Pong(AsyncWebsocketConsumer):
             if side == 'upY':
                 center_offset = -center_offset
 
-        logger.debug(f"saiu da 'getPaddCenter' e retornou {position + center_offset}")
+        # logger.debug(f"saiu da 'getPaddCenter' e retornou {position + center_offset}")
         return position + center_offset
 
 
     async def BallPaddleCollision(self, room_id):
-        logger.debug("entrou na 'BallPaddleCollision'")
+        # logger.debug("entrou na 'BallPaddleCollision'")
         ball = rooms[room_id]['ball']
         ball_size = ball['size']
         paddles = {
@@ -366,12 +370,12 @@ class Pong(AsyncWebsocketConsumer):
                 if (ball['positionX'] >= center_x and ball[speed_key] > 0) or (ball['positionX'] <= center_x and ball[speed_key] < 0):
                     return
                 ball[speed_key] *= -1
-        logger.debug("saiu da 'BallPaddleCollision'")
+        # logger.debug("saiu da 'BallPaddleCollision'")
         
 
 
     async def paddleCollision(self, room_id):
-        logger.debug("entrou na 'paddleCollision'")
+        # logger.debug("entrou na 'paddleCollision'")
         paddles = ['padd_right', 'padd_left']
         for paddle in paddles:
             if not rooms[room_id][paddle]['info']['eliminated']:
@@ -388,12 +392,12 @@ class Pong(AsyncWebsocketConsumer):
                     pos = rooms[room_id][paddle]['info']['positionX']
                     canvas_width = rooms[room_id]['canvas_width']
                     rooms[room_id][paddle]['info']['positionX'] = max(0, min(pos, canvas_width - size))
-        logger.debug("saiu da 'paddleCollision'")
+        # logger.debug("saiu da 'paddleCollision'")
         
 
 
     async def ballCollision(self, room_id):
-        logger.debug("entrou na 'ballCollision'")
+        # logger.debug("entrou na 'ballCollision'")
         ballPositionX = rooms[room_id]['ball']['positionX']
         ballPositionY = rooms[room_id]['ball']['positionY']
         ballSize = rooms[room_id]['ball']['size']
@@ -415,7 +419,7 @@ class Pong(AsyncWebsocketConsumer):
                     await self.resetGame(room_id, False)
             else:
                 rooms[room_id]['ball']['speedY'] *= -1
-        logger.debug("saiu da 'ballCollision'")
+        # logger.debug("saiu da 'ballCollision'")
 
 
     async def resetGame(self, room_id, eliminated):
@@ -434,6 +438,7 @@ class Pong(AsyncWebsocketConsumer):
 
                 if rooms[room_id][padd]['info']['score'] == 7:
                     result = await set_db_two_player(room_id, self.match_id)
+                    logger.debug(f"resultado: {pformat(result)}")
                     await self.channel_layer.group_send(
                         room_id,
                         {
@@ -441,6 +446,11 @@ class Pong(AsyncWebsocketConsumer):
                             'message': result
                         }
                     )
+                    logger.debug(f"del Antes {room_id} = {pformat(rooms)}")
+                    del rooms[room_id]
+                    logger.debug(f"del Depois {room_id} = {pformat(rooms)}")
+                    logger.debug("saiu pos del da 'resetGame'")
+                    return
             rooms[room_id]['ball']['speedX'] = 10 * (1 if rooms[room_id]['ball']['speedX'] > 0 else -1)
         else:
             if rooms[room_id]['ball']['speedY'] > 0:
@@ -509,7 +519,7 @@ class Pong(AsyncWebsocketConsumer):
 
     async def pong_message(self, event):
         logger.debug("Pong messageeeeeeeeeeeeeeee")
-        # logger.debug(f"event[message] = {event['message']}\n que porra é essa alek {pformat(self.scope)}")
+        logger.debug(f"event[message] = {event['message']}\n que porra é essa alek {pformat(self.scope)}\nEvent: {pformat(event)}")
         if (event['message'] == 'ball'
                 and self.getRoomId() in rooms):
             logger.debug(f"ta enviado o dentro do if ({self.getRoomId()})")

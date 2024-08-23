@@ -1,9 +1,8 @@
 import requests
 import jwt
-import json 
 import logging
-import io
 from os import getenv
+from pprint import pformat
 from django.conf import settings
 from django.core.cache import cache
 from django.http import HttpResponse
@@ -14,9 +13,7 @@ from rest_framework.response import Response
 from qr_code.qrcode.maker import make_qr_code_image
 from qr_code.qrcode.utils import QRCodeOptions
 from .models import Player
-from .services import decodeGooleToken, generateJwt, check2FACode, get2FACode, jwtCookieRequired, createPlayer, refresh_access_token, validate_access_token
-
-from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
+from .services import decodeGooleToken, generateJwt, check2FACode, get2FACode, jwtCookieRequired, createPlayer
 
 logger = logging.getLogger('custom_logger')
 
@@ -55,11 +52,11 @@ def intraCallbackOAuth(request):
     if not userToken.ok:
         return Response({"statusCode": 401, "detail": "No access token in the token response"})
     
-    logger.debug("playerData -> %s", userToken.json())
     playerData = {
         "email": userToken.json()['email'],
         "username": userToken.json()['login'],
-        "last_name": userToken.json()['last_name'],
+        "firstName": userToken.json()['first_name'],
+        "lastName": userToken.json()['last_name'],
         "avatar": userToken.json()['image']['link'],
     }
     player = createPlayer(playerData)
@@ -106,12 +103,10 @@ def OAuthGoogle(request):
 def googleCallbackOAuth(request):
     code = request.GET.get("code")
     error = request.GET.get("error")
-    if error:
+    if error is not None:
         return Response({"statusCode": 401, "error": error})
-
-    if not code:
-        return Response({"statusCode": 401, "error": "User Not Authorized"})
-
+    if code is None:
+        return Response({"statusCode": 401, "error": "User Not Autorized"})
     data = {
         "code": code,
         "client_id": getenv("GOOGLE_CLIENT_ID"),
@@ -119,131 +114,116 @@ def googleCallbackOAuth(request):
         "redirect_uri": f'{settings.PUBLIC_AUTHENTICATION_URL}google/callback/',
         "grant_type": "authorization_code",
     }
-
-    try:
-        auth_response = requests.post("https://oauth2.googleapis.com/token", data=data)
-        auth_response.raise_for_status()  # Lança um erro se o status não for 200
-        tokens = auth_response.json()
-    except requests.RequestException:
-        return Response({"statusCode": 401, "error": "Failed to obtain access token from Google."})  
-        
-    access_token = tokens.get("access_token")
-    id_token = tokens.get("id_token")
-
-    if not access_token or not id_token:
-        return Response({"statusCode": 401, "error": "Invalid token response from Google"})
-
-    tokenDecoded = decodeGooleToken(id_token)
-
-    if tokenDecoded is None:
-        return Response({"statusCode": 401, "error": "Failed to decode ID token"})
-
+    auth_response = requests.post("https://oauth2.googleapis.com/token", data=data)
+    if not auth_response.ok:
+        return Response({"statusCode": 401, "error": "Failed to obtain access token from Google."})
+    tokens = auth_response.json()
+    if tokens["access_token"] is None:
+        return Response({"statusCode": 401, "error": "AccessToken is invalid"})
+    token = tokens["id_token"]
+    tokenDecoded = decodeGooleToken(token)
     playerData = {
         "email": tokenDecoded['email'],
         "username": tokenDecoded['name'],
         "firstName": tokenDecoded['given_name'],
-        "last_name": tokenDecoded['family_name'],
+        "lastName": tokenDecoded['family_name'],
         "avatar": tokenDecoded['picture'],
     }
-
     player = createPlayer(playerData)
-
     if player is None:
         return redirect(f"https://{settings.BASE_URL}/login/", permanent=True)
-
     jwtToken = generateJwt(player.id, player.twoFactor)
     response = redirect(f"https://{settings.BASE_URL}/{'twofa' if player.twoFactor else 'home'}/", permanent=True)
-    response.set_cookie(
-        'jwt_token',
-        jwtToken,
-        httponly=True,
-        secure=True,
-        samesite='Strict'
-    )
-
+    response.set_cookie("jwt_token", value=jwtToken, httponly=True, secure=True)
     return response
 
 @api_view(['GET'])
 @jwtCookieRequired
 def qrCode2FA(request):
-    try:
-        token = request.COOKIES.get("jwt_token")
-        if not token:
-            return Response({"statusCode": 401, "error": "JWT token missing"})
+    logger.debug(f"entrou no qrcode\nrequest = {pformat(request)}")
+    token = request.COOKIES.get("jwt_token")
+    logger.debug(f"token: {pformat(token)}")
+    decodedToken = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+    logger.debug(f"decodeToken: {pformat(decodedToken)}")
+    playerId = decodedToken['id']
+    logger.debug(f"playerId: {playerId}")
+    qrCode = get2FACode(playerId)
+    logger.debug(f"qrCode: {pformat(qrCode)}")
+    image = make_qr_code_image(qrCode, QRCodeOptions(), True)
+    logger.debug(f"imagem = {pformat(image)}")
+    return HttpResponse(image, content_type='image/svg+xml')
 
-        decodedToken = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-        playerId = decodedToken.get('id')
-        
-        # Log para verificar o token decodificado e o playerId
-        print(f"Decoded Token: {decodedToken}")
-        print(f"Player ID: {playerId}")
-        
-        if not playerId:
-            return Response({"statusCode": 401, "error": "Invalid JWT token"})
-
-        provisioning_uri = get2FACode(playerId)
-        print(f"Provisioning URI: {provisioning_uri}")
-
-        if not provisioning_uri:
-            return Response({"statusCode": 402, "error": "2FA required"})
-
-        qr_code_image = make_qr_code_image(provisioning_uri, QRCodeOptions())
-        image_stream = io.BytesIO()
-        qr_code_image.save(image_stream, format="PNG")
-        image_stream.seek(0)
-
-        # Retornando a imagem SVG
-        return HttpResponse(image_stream.getvalue(), content_type="image/png")
-
-    except Exception as e:
-        print(f"Error: {e}")
-        return Response({"statusCode": 500, "error": "Internal Server Error"})
-    
 @api_view(["POST"])
 def verify2FA(request):
+    logger.debug("Iniciando verificação 2FA")
+    
     code = request.data.get("code")
+    if not code:
+        logger.error("Código 2FA não fornecido na requisição.")
+        return Response({"statusCode": 400, "error": "2FA code not provided"})
+
+    logger.debug(f"Código 2FA recebido: {code}")
+    
     jwtToken = request.COOKIES.get("jwt_token")
+    if not jwtToken:
+        logger.error("Token JWT não encontrado nos cookies.")
+        return Response({"statusCode": 401, "error": "JWT token not found in cookies"})
+
+    logger.debug(f"Token JWT recebido: {jwtToken}")
+    
     try:
         decodedToken = jwt.decode(jwtToken, settings.SECRET_KEY, algorithms=["HS256"])
-    except:
+        logger.debug(f"Token JWT decodificado: {decodedToken}")
+    except jwt.ExpiredSignatureError:
+        logger.error("Token JWT expirado.")
+        return Response({"statusCode": 401, "error": "Token expired"})
+    except jwt.InvalidTokenError:
+        logger.error("Token JWT inválido.")
         return Response({"statusCode": 401, "error": "Invalid token"})
-    playerId = decodedToken['id']
-    twoFactor = decodedToken['twofa']
-    if twoFactor is False:
-        if not check2FACode(playerId, code):
-            return Response({"statusCode": 401, "message": "Incorrect 2FA code."})
-        player = Player.objects.get(id=playerId)
-        player.twoFactor = True
-        player.save()
-        return Response({"statusCode": 200, "message": "Successfully verified"})
-    else:
-        if not check2FACode(playerId, code):
-            return Response({"statusCode": 401, "message": "Incorrect 2FA code."})
-        jwtToken = generateJwt(playerId, False)
-        response = Response({"statusCode": 200, "message": "Successfully verified", "redirected": True})
-        response.set_cookie("jwt_token", value=jwtToken, httponly=True, secure=True)
-        return response
-    
-@api_view(['POST'])
-def refreshToken(request):
-    refresh_token = request.COOKIES.get('jwt_token')
-    if refresh_token is None:
-        return Response({"statusCode": 401, "error": "Refresh token missing"})
-    
-    try:
-        new_access_token = refresh_access_token(refresh_token)
-        return Response({"access_token": new_access_token})
     except Exception as e:
-        return Response({"statusCode": 403, "error": str(e)})
+        logger.error(f"Erro ao decodificar token JWT: {str(e)}")
+        return Response({"statusCode": 500, "error": "Internal server error"})
 
-@api_view(['POST'])
-def checkToken(request):
-    access_token = request.COOKIES.get('jwt_token')
-    if access_token is None:
-        return Response({"statusCode": 401, "error": "Access token missing"})
-    
-    try:
-        validate_access_token(access_token)
-        return Response({"statusCode": 200, "message": "Token is valid"})
-    except Exception as e:
-        return Response({"statusCode": 401, "error": "Invalid token", "details": str(e)})
+    playerId = decodedToken.get('id')
+    twoFactor = decodedToken.get('twofa')
+
+    if playerId is None or twoFactor is None:
+        logger.error(f"Dados inválidos no token JWT. playerId: {playerId}, twoFactor: {twoFactor}")
+        return Response({"statusCode": 401, "error": "Invalid token data"})
+
+    logger.debug(f"Player ID: {playerId}, Two Factor: {twoFactor}")
+
+    if twoFactor is False:
+        logger.debug("2FA não está habilitado, verificando o código 2FA.")
+        if not check2FACode(playerId, code):
+            logger.error("Código 2FA incorreto.")
+            return Response({"statusCode": 401, "message": "Incorrect 2FA code."})
+
+        try:
+            player = Player.objects.get(id=playerId)
+            player.twoFactor = True
+            player.save()
+            logger.debug(f"2FA habilitado com sucesso para o player ID: {playerId}")
+            return Response({"statusCode": 200, "message": "Successfully verified"})
+        except Player.DoesNotExist:
+            logger.error(f"Player com ID {playerId} não encontrado.")
+            return Response({"statusCode": 404, "error": "Player not found"})
+        except Exception as e:
+            logger.error(f"Erro ao atualizar o player: {str(e)}")
+            return Response({"statusCode": 500, "error": "Internal server error"})
+
+    else:
+        logger.debug("2FA já está habilitado, verificando o código 2FA.")
+        if not check2FACode(playerId, code):
+            logger.error("Código 2FA incorreto.")
+            return Response({"statusCode": 401, "message": "Incorrect 2FA code."})
+
+        try:
+            jwtToken = generateJwt(playerId, False)
+            response = Response({"statusCode": 200, "message": "Successfully verified", "redirected": True})
+            response.set_cookie("jwt_token", value=jwtToken, httponly=True, secure=True)
+            logger.debug(f"Token JWT renovado e cookie atualizado para o player ID: {playerId}")
+            return response
+        except Exception as e:
+            logger.error(f"Erro ao gerar novo token JWT: {str(e)}")
+            return Response({"statusCode": 500, "error": "Internal server error"})

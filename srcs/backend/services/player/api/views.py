@@ -1,17 +1,19 @@
 import os
-import jwt
+import logging
 import urllib.parse
+from pprint import pformat
 from .serializers import PlayerInfoSerializer
 from .models import  Friendship, Player, PlayerMatch, PlayerTournament 
 from .decorators import jwtCookieRequired
-from django.http import JsonResponse
 from django.db.models import Q
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from django.utils.decorators import method_decorator
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+logger = logging.getLogger('custom_logger')
 
 class PlayerInfo(APIView):
 
@@ -52,64 +54,108 @@ class PlayerInfo(APIView):
             changed = False
             id = request.decoded_token['id']
             playerData = request.data.get('player')
+
+            logger.info(f"Received request to update player with ID: {id}")
+            logger.debug(f"player data {pformat(playerData)}")
             player = Player.objects.get(id=id)
+            logger.info(f"Found player: {player}")
+
             if "username" in playerData:
                 username = ' '.join(playerData["username"].split())
-                if not username or len(playerData['username']) > 8 :
+                logger.debug(f"Username provided: {username}")
+
+                if not username or len(playerData['username']) > 8:
+                    logger.warning(f"Invalid username: {username}")
                     return Response({
                         "status": 400,
                         "message": "Invalid username",
                     })
+
                 player.username = username
                 changed = True
-            if "firstName" in playerData:
-                firstName = ' '.join(playerData['firstName'].split())
-                if not firstName or len(firstName) > 20 :
+
+            if "first_name" in playerData:
+                firstName = ' '.join(playerData['first_name'].split())
+                logger.debug(f"First name provided: {firstName}")
+
+                if not firstName or len(firstName) > 20:
+                    logger.warning(f"Invalid first name: {firstName}")
                     return Response({
                         "status": 400,
-                        "message": "Invali first name",
+                        "message": "Invalid first name",
                     })
+
                 player.firstName = firstName
                 changed = True
-            if "lastName" in playerData:
-                lastName = ' '.join(playerData['lastName'].split())
-                if not lastName or len(lastName) > 20 :
+
+            if "last_name" in playerData:
+                lastName = ' '.join(playerData['last_name'].split())
+                logger.debug(f"Last name provided: {lastName}")
+
+                if not lastName or len(lastName) > 20:
+                    logger.warning(f"Invalid last name: {lastName}")
                     return Response({
                         "status": 400,
                         "message": "Invalid last name",
                     })
+
                 player.lastName = lastName
                 changed = True
-            if "twoFactor" in playerData and playerData['twoFactor'] is False:
-                player.twoFactor = playerData['twoFactor']
+
+            if "two_factor" in playerData and playerData['two_factor'] is False:
+                logger.debug(f"Two-factor authentication setting: {playerData['two_factor']}")
+                player.twoFactor = playerData['two_factor']
                 changed = True
+
             player.save()
+            logger.info(f"Player updated successfully with ID: {id}")
             message = "User updated successfully" if changed else "No changes detected"
+
             return Response({
                 "status": 200,
                 "message": message,
             })
+
         except Player.DoesNotExist:
+            logger.error(f"Player with ID: {id} not found")
             return Response({
                 "status": 404,
                 "message": "User not found",
             })
+
         except Exception as e:
+            logger.exception("An unexpected error occurred")
             return Response({
                 "status": 500,
                 "message": str(e),
             })
+
 
 class PlayerAvatarUpload(APIView):
 
     @method_decorator(jwtCookieRequired)
     def post(self, request):
         try:
+            logger.debug(f"request: {pformat(request)}")
+            logger.debug(f"BASE_DIR: {settings.BASE_DIR}\nPLAYER_DIR: {settings.PLAYER_DIR}\nSERVICES_DIR: {settings.SERVICES_DIR}\nSTATIC_URL: {settings.STATIC_URL}\nSTATIC_ROOT: {settings.STATIC_ROOT}\nMEDIA_URL: {settings.MEDIA_URL}\nMEDIA_ROOT: {settings.MEDIA_ROOT}\n")
             id = request.decoded_token['id']
             file = request.FILES['avatar']
             filePath = os.path.join(settings.MEDIA_ROOT, file.name)
-            default_storage.save(filePath, ContentFile(file.read()))
+            logger.debug(f"file path |{filePath}|")
+            path = default_storage.save(filePath, ContentFile(file.read()))
+
+            if default_storage.exists(file.name):
+                logger.debug("File exists")
+                print("File exists")
+
+            else:
+                logger.debug("File does not exist")
+                print("File does not exist")
+
+            logger.debug(f"path salva |{path}|")
+            logger.debug(f"Public player api = {settings.PUBLIC_PLAYER_URL}\nMedia URL {settings.MEDIA_URL} | Media Root {settings.MEDIA_ROOT}\nfile {file.name}")
             fileUrl = urllib.parse.urljoin(settings.PUBLIC_PLAYER_URL, os.path.join(settings.MEDIA_URL, file.name))
+            logger.debug(f"file url {fileUrl}")
             player = Player.objects.get(id=id)
             player.avatar = fileUrl
             player.save()
