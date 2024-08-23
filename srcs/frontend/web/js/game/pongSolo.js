@@ -1,6 +1,5 @@
-import fetching from '../helpers/fetching.js'
-import { soundEnabled } from '../helpers/soundControl.js';
-
+import fetching from "../helpers/fetching.js";
+import { soundEnabled } from "../helpers/soundControl.js";
 
 let loopIdSolo;
 const KeyPressedSolo = [];
@@ -9,7 +8,7 @@ const keydown = 40;
 const KeyW = 87;
 const KeyS = 83;
 
-const getName = async () => { 
+const getName = async () => {
   try {
     const res = await fetching(`https://${window.ft_transcendence_host}/player/`);
     return `${res.player.firstName} Won!` || "You Win!";
@@ -17,45 +16,50 @@ const getName = async () => {
     console.error("Erro ao buscar o nome do jogador:", error);
     return "You Win!";
   }
-}
+};
 
 export function getSoundStatus() {
-  return localStorage.getItem('disableSound') === 'true';
+  return localStorage.getItem("disableSound") === "true";
 }
 
 export async function runPongSoloGame(canvas, ctx, ptsPlayer, pytsComputer) {
-  let scorePlayer   = 0 + ptsPlayer;
+  let scorePlayer = 0 + ptsPlayer;
   let scoreComputer = 0 + pytsComputer;
-  let namePlayer    = await getName();
-  
-  canvas.width  = 1920;
+  let namePlayer = await getName();
+
+  canvas.width = 1920;
   canvas.height = 1080;
-  
+
   const ball = createBall([10, 10], [canvas.width / 2, canvas.height / 2], 20);
   const paddlePlayer = createPaddle(15, [60, canvas.height / 2 - 100], [40, 200]);
   const paddleComputer = createPaddle(15, [canvas.width - 100, canvas.height / 2 - 100], [40, 200]);
 
-  const gameOverSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2042/2042-preview.mp3');
-  const winGameSound  = new Audio('https://assets.mixkit.co/active_storage/sfx/2065/2065-preview.mp3');
-  const reboundSound  = new Audio('https://assets.mixkit.co/active_storage/sfx/2073/2073-preview.mp3');
+  const gameOverSound = new Audio(
+    "https://assets.mixkit.co/active_storage/sfx/2042/2042-preview.mp3",
+  );
+  const winGameSound = new Audio(
+    "https://assets.mixkit.co/active_storage/sfx/2065/2065-preview.mp3",
+  );
+  const reboundSound = new Audio(
+    "https://assets.mixkit.co/active_storage/sfx/2073/2073-preview.mp3",
+  );
 
   // Carregar áudio antes de usá-los
-  gameOverSound.addEventListener('canplaythrough', () => {
-    console.log('Som de game over carregado.');
+  gameOverSound.addEventListener("canplaythrough", () => {
+    console.log("Som de game over carregado.");
   });
 
-  winGameSound.addEventListener('canplaythrough', () => {
-    console.log('Som de vitória carregado.');
+  winGameSound.addEventListener("canplaythrough", () => {
+    console.log("Som de vitória carregado.");
   });
 
-  reboundSound.addEventListener('canplaythrough', () => {
-    console.log('Som de rebote carregado.');
+  reboundSound.addEventListener("canplaythrough", () => {
+    console.log("Som de rebote carregado.");
   });
 
   let lastUpdateTime = Date.now();
 
   function playSound(sound) {
-
     if (!getSoundStatus()) {
       sound.play();
     }
@@ -63,8 +67,8 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, pytsComputer) {
 
   gameLoopSolo(canvas, ctx, ball, paddlePlayer, paddleComputer);
 
-  window.onkeydown = (e) => KeyPressedSolo[e.keyCode] = true;
-  window.onkeyup = (e) => KeyPressedSolo[e.keyCode] = false;
+  window.onkeydown = (e) => (KeyPressedSolo[e.keyCode] = true);
+  window.onkeyup = (e) => (KeyPressedSolo[e.keyCode] = false);
 
   window.addEventListener("keydown", (e) => {
     if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(e.code) > -1) {
@@ -81,9 +85,9 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, pytsComputer) {
         (ball.speedX < 0 && ball.positionX <= paddle.Center()[0])
       ) {
         return;
-      }      
+      }
       ball.speedX *= -1;
-      playSound(reboundSound); 
+      playSound(reboundSound);
     }
   }
 
@@ -123,13 +127,13 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, pytsComputer) {
 
     if (ball.speedX < 0) {
       scoreComputer += 1;
-      localStorage.removeItem('scoreComputer');
-      localStorage.setItem('scoreComputer', scoreComputer);
+      localStorage.removeItem("scoreComputer");
+      localStorage.setItem("scoreComputer", scoreComputer);
       ball.speedX = -10;
     } else {
       scorePlayer += 1;
-      localStorage.removeItem('scorePlayer');
-      localStorage.setItem('scorePlayer', scorePlayer);
+      localStorage.removeItem("scorePlayer");
+      localStorage.setItem("scorePlayer", scorePlayer);
       ball.speedX = 10;
     }
 
@@ -139,14 +143,18 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, pytsComputer) {
       ctx.font = "100px monospace";
       ctx.textAlign = "center";
       console.log("scoreComputer:", scoreComputer, "scorePlayer", scorePlayer);
-      ctx.fillText(scorePlayer > scoreComputer ? namePlayer : "Game Over\n You lost!", canvas.width / 2, canvas.height / 2);
+      ctx.fillText(
+        scorePlayer > scoreComputer ? namePlayer : "Game Over\n You lost!",
+        canvas.width / 2,
+        canvas.height / 2,
+      );
 
       try {
         if (scoreComputer === 7) {
           await playSound(gameOverSound);
           audioPlayed = true;
         } else if (scorePlayer === 7) {
-          await  playSound(winGameSound);
+          await playSound(winGameSound);
           //audioPlayed = true;
         }
       } catch (error) {
@@ -158,7 +166,7 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, pytsComputer) {
 
     ball.speedY = Math.random() < 0.5 ? 10 : -10;
     return false;
-  }
+  };
 
   function simulateKeyPressForComputer(ball, paddle) {
     const ballCenterY = ball.positionY;
@@ -175,7 +183,8 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, pytsComputer) {
     const currentTime = Date.now();
     const deltaTime = currentTime - lastUpdateTime;
 
-    if (deltaTime >= 1000) { // realizar a atualização da movimentação uma vez por segundo
+    if (deltaTime >= 1000) {
+      // realizar a atualização da movimentação uma vez por segundo
       simulateKeyPressForComputer(ball, paddle);
       paddleCollision(canvas, paddle);
       lastUpdateTime = currentTime;
@@ -185,23 +194,28 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, pytsComputer) {
   function Score(ctx, canvas, scorePlayer, scoreComputer) {
     ctx.fillStyle = "white";
     ctx.font = "bold 60px Arial";
-    ctx.fillText(scoreComputer, canvas.width / 2 - 100, 120);
-    ctx.fillText(scorePlayer, canvas.width / 2 + 100, 120);
+    ctx.fillText(scorePlayer, canvas.width / 2 - 100, 120);
+    ctx.fillText(scoreComputer, canvas.width / 2 + 100, 120);
   }
 
   function gameLoopSolo(canvas, ctx, ball, paddlePlayer, paddleComputer) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    loopIdSolo = window.requestAnimationFrame(() => gameLoopSolo(canvas, ctx, ball, paddlePlayer, paddleComputer));
-    localStorage.setItem('loopIdSolo', loopIdSolo);
-    localStorage.setItem('canvas', JSON.stringify(canvas));
-    localStorage.setItem('ctx', JSON.stringify(ctx));
-    localStorage.setItem('ball', ball);
-    localStorage.setItem('paddlePlayer', paddlePlayer);
-    localStorage.setItem('paddleComputer', paddleComputer);
+    loopIdSolo = window.requestAnimationFrame(() =>
+      gameLoopSolo(canvas, ctx, ball, paddlePlayer, paddleComputer),
+    );
+
+    localStorage.setItem("loopIdSolo", loopIdSolo);
+    localStorage.setItem("canvas", JSON.stringify(canvas));
+    localStorage.setItem("ctx", JSON.stringify(ctx));
+    localStorage.setItem("ball", ball);
+    localStorage.setItem("paddlePlayer", paddlePlayer);
+    localStorage.setItem("paddleComputer", paddleComputer);
     ball.update();
     paddlePlayer.update(true);
     updateComputerPaddle(ball, paddleComputer);
+
     if (ballCollision(canvas, ball, ctx, paddlePlayer, paddleComputer)) return;
+
     paddleCollision(canvas, paddlePlayer);
     paddleCollision(canvas, paddleComputer);
     BallPaddleCollision(ball, paddlePlayer);
@@ -210,10 +224,10 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, pytsComputer) {
     paddlePlayer.render(ctx);
     paddleComputer.render(ctx);
     Score(ctx, canvas, scorePlayer, scoreComputer);
-    ball.speedX += ball.speedX > 0 ? 0.01 : -0.01;
-    ball.speedY += ball.speedY > 0 ? 0.01 : -0.01;
-  }
 
+    ball.speedX += ball.speedX > 0 ? 0.001 : -0.001;
+    ball.speedY += ball.speedY > 0 ? 0.001 : -0.001;
+  }
 }
 
 const createPaddle = (speed, position, size) => ({
@@ -244,7 +258,7 @@ const createPaddle = (speed, position, size) => ({
 
   Center() {
     return [this.positionX + this.sizeX / 2, this.positionY + this.sizeY / 2];
-  }
+  },
 });
 
 const createBall = (speed, position, size) => ({
@@ -264,5 +278,5 @@ const createBall = (speed, position, size) => ({
   update() {
     this.positionX += this.speedX;
     this.positionY += this.speedY;
-  }
+  },
 });
