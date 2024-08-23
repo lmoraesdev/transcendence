@@ -55,6 +55,36 @@ nav div {
   margin-bottom: 0px;
 }
 
+.menu-suspended {
+  position: absolute;
+  top:100%;
+  background-color: black;
+  justify-items: center;
+}
+
+.menu-suspended ul {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.menu-button{
+  border: none;
+  color: white;
+  background-color: black;
+  font-weight: 600;
+
+}
+
+.menu-button:hover{
+  border: none;
+  color: #F3C00C;
+  border-bottom: 2px solid #F3C00C;
+}
+
 a.colorizer {
   color: var(--color-font-white) !important;
   text-decoration: none;

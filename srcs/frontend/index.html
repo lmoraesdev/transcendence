@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="/web/css/style.css" />
     <link rel="stylesheet" href="/web/css/components/bvambient.css" />
     <link rel="stylesheet" href="./web/css/components/Navbar.css" />
-    
+    <link rel="stylesheet" href="./web/js/components/Profile/ProfileData.css" />
     
     <!-- Vanilla JS -->
     <script defer src="/web/bootstrap-5.2.3-dist/js/bootstrap.min.js"></script>
@@ -24,35 +24,68 @@
     <title>ft_transcendence</title>
   </head>
   <body>
-    <nav class="navbar">
-      <div>
-        <img src="./web/images/logo_pong.png" alt="logo pong"/>
-      </div>
-      <div class="navbar-items">
-        <ul class="navbar-items">
-          <li><button class="navbar-button">Home</button></li>
-          <li><button class="navbar-button">Statistics</button></li>
-          <li><button class="navbar-button">Leaderboard</button></li>
-          <li><button class="navbar-button">Tournament</button></li>
-          <li><button class="navbar-button">Guilds</button></li>
-        </ul>
-      </div>
-      <div class="navbar-perfil" role="button">
-        <p>Nome</p>
-        <img src="./web/images/pngegg.png" alt="Foto do perfil" width="50px" height="50px"/>
+    <header>
+      <nav class="navbar">
         <div>
-          <ul>
-            <li>Profile</li>
-            <li>Settings</li>
-            <li>Exit</li>
+          <img src="./web/images/logo_pong.png" alt="logo pong"/>
+        </div>
+        <div class="navbar-items">
+          <ul class="navbar-items">
+            <li><button class="navbar-button">Home</button></li>
+            <li><button class="navbar-button">Statistics</button></li>
+            <li><button class="navbar-button">Leaderboard</button></li>
+            <li><button class="navbar-button">Tournament</button></li>
+            <li><button class="navbar-button">Guilds</button></li>
           </ul>
         </div>
+        <div class="navbar-perfil" role="button">
+          <p>Nome</p>
+          <img src="./web/images/profile.png" alt="Foto do perfil" width="50px" height="50px"/>
+          <div class="menu-suspended">
+            <ul>
+              <li><button class="menu-button">Profile</button></li>
+              <li><button class="menu-button">Settings</button></li>
+              <li><button class="menu-button">
+                Exit
+              </button>
+              </li>
+            </ul>
+          </div>
+      </div>
+      </nav>
+    </header>
+    
+    <div class="profile">
+      <div class="profile-data">
+        <div>
+            <h2 class="profile-title">Nome</h2>
+            <img class="profile-img" src='./web/images/profile.png' alt='Foto perfil'width='150px' height='150px'/>
+        </div>
+        <div class="profile-statistcs">
+          <div>
+            <p class="profile-number">0</p>
+            <p class="profile-text">General Rank</p>
+          </div>
+          <div>
+            <p class="profile-number">0</p>
+            <p class="profile-text">Ladder Victories</p>
+          </div>
+        </div>
+        <div class="profile-statistcs">
+          <div>
+          <p class="profile-number">0</p>
+          <p class="profile-text">Score</p>
+        </div>
+        <div>
+          <p class="profile-number">0</p>
+          <p class="profile-text">Total Ladder Games</p>
+        </div>
+      </div>
     </div>
-    </nav>
+    </div>
     <div id="root"></div>
     <script defer src="/web/js/components/bvambient.js" type="module"></script>
   </body>
-  <script src="./web/js/components/NavBar/NavBarNovo.js">    </script>
 </html>
 
   <!--------------------------- PAGES --------------------------->

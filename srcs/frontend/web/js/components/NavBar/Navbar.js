@@ -1,4 +1,4 @@
-import fetching from "../../helpers/fetching.js";
+import fetching from "../helpers/fetching.js";
 
 const Navbar = async () => {
   const navbarHTML = `
