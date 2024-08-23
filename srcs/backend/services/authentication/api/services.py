@@ -1,6 +1,7 @@
 import datetime
 import jwt
 import logging
+from pprint import pformat
 from django.conf import settings
 from django.core.cache import cache
 from rest_framework.response import Response
@@ -26,7 +27,7 @@ def decodeGooleToken(idToken: str) -> Dict[str, str]:
     decodeToken = jwt.decode(idToken, options={"verify_signature": False})
     return decodeToken
 
-def  get2FACode(playerId: int, code: int) -> bool:
+def   get2FACode(playerId: int) -> str:
     playerIdEnconde = str(playerId).encode("utf-8")
     return TOTP(b32encode(playerIdEnconde)).provisioning_uri(name="player", issuer_name="ft_transcendence")
 
