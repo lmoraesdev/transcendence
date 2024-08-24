@@ -62,22 +62,37 @@
     font-size: 20px;
 }
 
-.profile-infos {
+.friendCard {
     display: flex;
-    gap: 22px;
+    flex-direction: column;
+}
+
+.friendCard img {
+    width: 100px;
+    border: 1px solid black;
+    border-radius: 999px;
+}
+
+.friendName {
+    display: flex;
+    flex-direction: row;
     font-size: 18px;
-    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
 }
 
-label{
-    font-size: 18px;
+.listFriends {
+    background-color: rgb(240, 240, 240);
+    border-radius: 30px;
+    border: 0.5px solid #C4C4C4;
+    padding: 15px;
 }
 
-input[type="radio"] {
-    display: none;
+.listFriends h2 {
+    margin-top: 0;
 }
 
-input[type="radio"]:checked + label {
-    color: #D0A50B;
-    border-bottom: 2px solid #D0A50B;
+.listCards{
+    display: flex;
+    gap: 30px;
 }

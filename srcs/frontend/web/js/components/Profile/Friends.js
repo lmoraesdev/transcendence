@@ -1,9 +1,14 @@
-const Friend = () => {
+import ButtonRed from "../Button/Button-red"
+
+const Friend = (name, src) => {
     return (
-        <div class='flex'>
-            <img alt='Foto do amigo'/>
-            <h3>Nome do Amigo</h3>
+    <div class='friendCard'>
+        <img src={src} alt='Foto do amigo'/>
+        <div class="friendName">
+            <h3>{name}</h3>
+            <ButtonRed>Del</ButtonRed>
         </div>
+    </div>
     )
 }
 

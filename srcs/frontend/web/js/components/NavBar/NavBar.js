@@ -7,10 +7,9 @@ const NavBar = () => {
         </div>
         <div class={style.navbar-items}>
           <input type='radio' name='navbar' value='home' id='home'><label for='home' class={style.navbar-button}>Home</label></input>
-          <input type='radio' name='navbar' value='statistics' id='statistics'><label for='statistics' class={style.navbar-button}>Statistcs</label></input>
           <input type='radio' name='navbar' value='leaderboard' id='leaderboard'><label for='leaderboard' class={style.navbar-button}>Leaderboard</label></input>
-          <input type='radio' name='navbar' value='tournament' id='tournament'><label for='tournament' class={style.navbar-button}>Tournament</label></input>
-          <input type='radio' name='navbar' value='guilds' id='guilds'><label for='guilds' class={style.navbar-button}>Guilds</label></input>
+          <input type='radio' name='navbar' value='profile' id='profile'><label for='profile' class={style.navbar-button}>Profile</label></input>
+          <input type='radio' name='navbar' value='settings' id='settings'><label for='settings' class={style.navbar-button}>Settings</label></input>
         </div>
       </nav>)
 }
