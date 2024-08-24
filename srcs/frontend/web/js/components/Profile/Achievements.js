@@ -1,8 +1,11 @@
+import Conquists from "./Conquist"
+
 const Achievements = () => {
     return (
         <div>
-            <h3>Nome da Conquistaw</h3>
-            <p>Descrição da conquista</p>
+           <Conquists index='1'/>
+           <Conquists index='2'/>
+           <Conquists index='3'/>
         </div>
     )
 }

@@ -24,37 +24,18 @@
     <title>ft_transcendence</title>
   </head>
   <body>
-    <header>
-      <nav class="navbar">
-        <div>
-          <img src="./web/images/logo_pong.png" alt="logo pong"/>
-        </div>
-        <div class="navbar-items">
-          <ul class="navbar-items">
-            <li><button class="navbar-button">Home</button></li>
-            <li><button class="navbar-button">Statistics</button></li>
-            <li><button class="navbar-button">Leaderboard</button></li>
-            <li><button class="navbar-button">Tournament</button></li>
-            <li><button class="navbar-button">Guilds</button></li>
-          </ul>
-        </div>
-        <div class="navbar-perfil" role="button">
-          <p>Nome</p>
-          <img src="./web/images/profile.png" alt="Foto do perfil" width="50px" height="50px"/>
-          <div class="menu-suspended">
-            <ul>
-              <li><button class="menu-button">Profile</button></li>
-              <li><button class="menu-button">Settings</button></li>
-              <li><button class="menu-button">
-                Exit
-              </button>
-              </li>
-            </ul>
-          </div>
+    <nav class='navbar'>
+      <div>
+        <img src="./web/images/logo_pong.png" alt="logo pong"/>
       </div>
-      </nav>
-    </header>
-    
+      <div class='navbar-items'>
+        <input type='radio' name='navbar' value='home' id='home'><label for='home' class='navbar-button'>Home</label></input>
+        <input type='radio' name='navbar' value='statistics' id='statistics'><label for='statistics' class='navbar-button'>Statistcs</label></input>
+        <input type='radio' name='navbar' value='leaderboard' id='leaderboard'><label for='leaderboard' class='navbar-button'>Leaderboard</label></input>
+        <input type='radio' name='navbar' value='tournament' id='tournament'><label for='tournament' class='navbar-button'>Tournament</label></input>
+        <input type='radio' name='navbar' value='guilds' id='guilds'><label for='guilds' class='navbar-button'>Guilds</label></input>
+      </div>
+    </nav>
     <div class="profile">
       <div class="profile-data">
         <div>
@@ -81,14 +62,14 @@
       </div>
     </div>
     <div class="profile-infos">
-          <input type='checkbox' class="profile-option">
-            Guilds
+          <input type="radio" name="option" value="guild" id="guild" checked>
+            <label for="guild" class="profile-option">Guilds</label>
           </input>
-          <input type='checkbox'>
-            Achievements
+          <input type="radio" name="option" value="achievements"  id="achievements">
+            <label for="achievements" class="profile-option">Achievements</label>
           </input>
-          <input type='checkbox'>
-            Friends
+          <input type="radio" name="option" value="friends"  id="friends">
+            <label for="friends" class="profile-option">Friends</label>
           </input>
     </div>
     </div>

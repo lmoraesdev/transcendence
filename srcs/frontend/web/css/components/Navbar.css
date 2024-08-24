@@ -43,46 +43,18 @@ nav div {
   border-bottom: 2px solid #F3C00C;
 }
 
-.navbar-perfil{
-  display: flex;
-  gap: 20px;
-  place-items: center;
-  flex-wrap: wrap;
-  font-weight: 600;
+
+label{
+  font-size: 18px;
 }
 
-.navbar-perfil p{
-  margin-bottom: 0px;
+input[type="radio"] {
+  display: none;
 }
 
-.menu-suspended {
-  position: absolute;
-  top:100%;
-  background-color: black;
-  justify-items: center;
-}
-
-.menu-suspended ul {
-  padding-left: 1rem;
-  padding-right: 1rem;
-  justify-content: center;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.menu-button{
-  border: none;
-  color: white;
-  background-color: black;
-  font-weight: 600;
-
-}
-
-.menu-button:hover{
-  border: none;
-  color: #F3C00C;
-  border-bottom: 2px solid #F3C00C;
+input[type="radio"]:checked + label {
+  color: #D0A50B;
+  border-bottom: 2px solid #D0A50B;
 }
 
 a.colorizer {

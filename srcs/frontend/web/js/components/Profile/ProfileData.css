@@ -66,9 +66,18 @@
     display: flex;
     gap: 22px;
     font-size: 18px;
+    justify-content: flex-start;
 }
 
-.profile-option:checked {
-    color:#D0A50B;
+label{
+    font-size: 18px;
+}
+
+input[type="radio"] {
+    display: none;
+}
+
+input[type="radio"]:checked + label {
+    color: #D0A50B;
     border-bottom: 2px solid #D0A50B;
 }
