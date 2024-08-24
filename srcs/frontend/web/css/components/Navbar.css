@@ -57,43 +57,7 @@ input[type="radio"]:checked + label {
   border-bottom: 2px solid #D0A50B;
 }
 
-a.colorizer {
-  color: var(--color-font-white) !important;
-  text-decoration: none;
-  /*animation: colorizing 5s infinite ease-in-out;
-  -webkit-animation: colorizing 5s infinite ease-in-out;*/
-}
-
-p#profile-name {
-  /*color: var(--color-font-white) !important;*/
-  color: #F3C00C !important;
-}
-
-.profile-photo {
-  width: 100px;
-  height: 100px;
-}
-
-a.colorizer :hover,
-a.colorizer :active {
-  /*color: var(--color-font-white) !important;*/
-  color: #F3C00C !important;
-  border-bottom: 2px solid #F3C00C;
-}
-
-a.link {
-  /*background-color: var(--color-primary) !important;*/
-  text-decoration: none;
-  color: black !important;
-}
-
-a.link:hover,
-a.link:active {
-  /*background-color: var(--color-primary) !important;
-  color: var(--color-font-white) !important;*/
-  color: #F3C00C !important;
-  border-bottom: 2px solid #F3C00C;
-}
+/* até aqui é onde fiz as coisas do navbar, abaixo são as antigas configurações, ainda não fiz o menu responsivo na questão de tamanho de tela */
 
 .hamburger {
   display: none;

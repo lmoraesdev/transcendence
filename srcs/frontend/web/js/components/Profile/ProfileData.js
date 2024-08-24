@@ -27,17 +27,6 @@ const ProfileData = () => {
           </div>
         </div>
       </div>
-        <div class='profile-infos'>
-            <input type='checkbox'>
-              <span>Guilds</span>
-            </input>
-            <input type='checkbox'>
-              <span>Achievements</span>
-            </input>
-            <input type='checkbox'>
-              <span>Friends</span>
-            </input>
-      </div>
     </div>
   )
 }
