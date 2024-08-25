@@ -135,3 +135,10 @@ a.link:active {
     height: 40px;
   }
 }
+
+.my-bar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 20vh;
+}

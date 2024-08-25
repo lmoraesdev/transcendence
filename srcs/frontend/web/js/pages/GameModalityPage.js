@@ -14,7 +14,7 @@ const GameModalityPage = () => {
               <h1 class="fs-2 my-2">Choose game mode to start</h1>
               <div class="d-flex justify-content-around w-100 p-3">
                   <div class="text-center">
-                      <button class="bt d-flex justify-content-around w-100 h-100 p-3 game-mode-1"></button>
+                      <button class="bt game-mode-button game-mode-1"></button>
                       <p class="game-mode-text">Solo Game</p>
                   </div>
                   <div class="text-center">
@@ -59,7 +59,7 @@ const GameModalityPage = () => {
   const buttons = parentElement.querySelectorAll('.game-mode-button');
   buttons[0].addEventListener('click', () => redirectToGameMode(1));
   buttons[1].addEventListener('click', () => redirectToGameMode(2));
-  // buttons[2].addEventListener('click', () => redirectToGameMode(3));
+  buttons[2].addEventListener('click', () => redirectToGameMode(3));
 };
 
 export default GameModalityPage;
