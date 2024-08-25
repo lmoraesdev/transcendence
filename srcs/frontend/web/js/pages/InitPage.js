@@ -1,5 +1,4 @@
 import Logo from '../components/Logo.js';
-import Footer from '../components/Footer.js';
 import helpers from '../helpers/helpers.js';
 
 
@@ -106,8 +105,6 @@ const InitPage = async () => {
       btn.classList.add('transition-step-2');
     }
   });*/
-
-  Footer();
 }
 
 export default InitPage;

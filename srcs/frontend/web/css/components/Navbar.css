@@ -11,44 +11,53 @@
   }
 }
 
-
-a.colorizer {
-  color: var(--color-font-white) !important;
-  text-decoration: none;
-  /*animation: colorizing 5s infinite ease-in-out;
-  -webkit-animation: colorizing 5s infinite ease-in-out;*/
+nav div {
+  display: flex !important;
 }
 
-p#profile-name {
-  /*color: var(--color-font-white) !important;*/
-  color: #F3C00C !important;
+.navbar {
+  display: flex;
+  background-color: black;
+  color: white;
+  place-items: center;
 }
 
-.profile-photo {
-  width: 100px;
-  height: 100px;
+.navbar-items li{
+  display: inline-block !important;
+  padding: 10px;
+  margin: 5px;
+  place-items: center;
 }
 
-a.colorizer :hover,
-a.colorizer :active {
-  /*color: var(--color-font-white) !important;*/
-  color: #F3C00C !important;
+.navbar-button{
+  padding:10px !important;
+  border: none;
+  color: white;
+  background-color: black;
+  font-weight: 600;
+}
+
+.navbar-button:hover{
+  border: none;
+  color: #F3C00C;
   border-bottom: 2px solid #F3C00C;
 }
 
-a.link {
-  /*background-color: var(--color-primary) !important;*/
-  text-decoration: none;
-  color: black !important;
+
+label{
+  font-size: 18px;
 }
 
-a.link:hover,
-a.link:active {
-  /*background-color: var(--color-primary) !important;
-  color: var(--color-font-white) !important;*/
-  color: #F3C00C !important;
-  border-bottom: 2px solid #F3C00C;
+input[type="radio"] {
+  display: none;
 }
+
+input[type="radio"]:checked + label {
+  color: #D0A50B;
+  border-bottom: 2px solid #D0A50B;
+}
+
+/* até aqui é onde fiz as coisas do navbar, abaixo são as antigas configurações, ainda não fiz o menu responsivo na questão de tamanho de tela */
 
 .hamburger {
   display: none;

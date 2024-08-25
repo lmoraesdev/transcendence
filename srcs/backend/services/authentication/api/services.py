@@ -27,7 +27,11 @@ def decodeGooleToken(idToken: str) -> Dict[str, str]:
     decodeToken = jwt.decode(idToken, options={"verify_signature": False})
     return decodeToken
 
+<<<<<<< HEAD
 def   get2FACode(playerId: int) -> str:
+=======
+def  get2FACode(playerId: int, code: int) -> bool:
+>>>>>>> fbb8b467702f5f9fb8683dd90c40efa3ef17f11c
     playerIdEnconde = str(playerId).encode("utf-8")
     return TOTP(b32encode(playerIdEnconde)).provisioning_uri(name="player", issuer_name="ft_transcendence")
 
@@ -57,21 +61,16 @@ def jwtCookieRequired(viewFunction):
     return wrappedView
 
 def createPlayer(data: Dict[str, str]) -> Player:
-    logger.debug("Dados do jogador recebidos: %s", data)
     try:
         email = data['email']
-        username = data['username']
-        firstName = data['firstName']
-        lastName = data['last_name']
-        avatar = data.get('avatar')
-        
-        #logger.debug("Verificando se o jogador já existe...")
         if Player.objects.filter(email=email).exists():
-            logger.debug("Jogador encontrado com o email: %s", email)
             player = Player.objects.get(email=email)
             return player
+        username = data['username']
+        firstName = data['firstName']
+        lastName = data['lastName']
+        avatar = data.get('avatar')
         
-        #logger.debug("Criando novo jogador com o email: %s", email)
         player = Player.objects.create(
             email = email,
             username = username,

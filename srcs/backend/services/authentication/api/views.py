@@ -1,6 +1,5 @@
 import requests
 import jwt
-import json 
 import logging
 from os import getenv
 from pprint import pformat
@@ -104,12 +103,10 @@ def OAuthGoogle(request):
 def googleCallbackOAuth(request):
     code = request.GET.get("code")
     error = request.GET.get("error")
-    if error:
+    if error is not None:
         return Response({"statusCode": 401, "error": error})
-
-    if not code:
-        return Response({"statusCode": 401, "error": "User Not Authorized"})
-
+    if code is None:
+        return Response({"statusCode": 401, "error": "User Not Autorized"})
     data = {
         "code": code,
         "client_id": getenv("GOOGLE_CLIENT_ID"),
@@ -117,49 +114,29 @@ def googleCallbackOAuth(request):
         "redirect_uri": f'{settings.PUBLIC_AUTHENTICATION_URL}google/callback/',
         "grant_type": "authorization_code",
     }
-
-    try:
-        auth_response = requests.post("https://oauth2.googleapis.com/token", data=data)
-        auth_response.raise_for_status()  # Lança um erro se o status não for 200
-        tokens = auth_response.json()
-    except requests.RequestException:
-        return Response({"statusCode": 401, "error": "Failed to obtain access token from Google."})  
-        
-    access_token = tokens.get("access_token")
-    id_token = tokens.get("id_token")
-
-    if not access_token or not id_token:
-        return Response({"statusCode": 401, "error": "Invalid token response from Google"})
-
-    tokenDecoded = decodeGooleToken(id_token)
-
-    if tokenDecoded is None:
-        return Response({"statusCode": 401, "error": "Failed to decode ID token"})
-
+    auth_response = requests.post("https://oauth2.googleapis.com/token", data=data)
+    if not auth_response.ok:
+        return Response({"statusCode": 401, "error": "Failed to obtain access token from Google."})
+    tokens = auth_response.json()
+    if tokens["access_token"] is None:
+        return Response({"statusCode": 401, "error": "AccessToken is invalid"})
+    token = tokens["id_token"]
+    tokenDecoded = decodeGooleToken(token)
     playerData = {
         "email": tokenDecoded['email'],
         "username": tokenDecoded['name'],
         "firstName": tokenDecoded['given_name'],
-        "last_name": tokenDecoded['family_name'],
+        "lastName": tokenDecoded['family_name'],
         "avatar": tokenDecoded['picture'],
     }
-
     player = createPlayer(playerData)
-
     if player is None:
         return redirect(f"https://{settings.BASE_URL}/login/", permanent=True)
         #return Response({"statusCode": 401, "error": "Failed to create player"})
 
     jwtToken = generateJwt(player.id, player.twoFactor)
     response = redirect(f"https://{settings.BASE_URL}/{'twofa' if player.twoFactor else 'home'}/", permanent=True)
-    response.set_cookie(
-        'jwt_token',
-        jwtToken,
-        httponly=True,
-        secure=True,
-        samesite='Strict'
-    )
-
+    response.set_cookie("jwt_token", value=jwtToken, httponly=True, secure=True)
     return response
 
 @api_view(['GET'])

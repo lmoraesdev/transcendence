@@ -2,7 +2,7 @@ const Footer = () => {
   const templateHTML = `
     <template id="footer-template">
       <div class="footer d-flex col mt-auto mb-2 mx-auto">
-        <p class="mt-auto">Copyright © 2024 🎮 All rights reserved</p>
+        <p class=">Copyright © 2024 🎮 All rights reserved</p>
       </div>
     </template>
   `;
