@@ -1,10 +1,7 @@
 import fetching from '../helpers/fetching.js';
 import { toggleSound } from '../helpers/soundControl.js';
-import { showNav } from '../helpers/helpers.js';
 
 const SettingPage = () => {
-  showNav();
-
   const settingHTML = `
     <template id="setting-template">
       <main class="container-fluid p-3 d-flex flex-column align-items-center gap-5 mb-2">

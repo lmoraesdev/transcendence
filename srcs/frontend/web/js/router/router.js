@@ -12,17 +12,39 @@ import { checkAndRefreshToken } from '../services/auth.js';
 import { wsFour } from "../game/pongFour.js";
 import { wsTwo } from "../game/pongTwo.js";
 
+// const showNav = (func) => {
+//   return () => {
+//     const navbarElement = document.querySelector('.navbar');
+
+//     if (navbarElement)
+//       navbarElement.style.display = "flex";
+
+//     func();
+//   }
+// }
+
+// const hideNav = (func) => {
+//   return () => {
+//     const navbarElement = document.querySelector('.navbar');
+
+//     if (navbarElement)
+//       navbarElement.style.display = "flex";
+
+//     func();
+//   }
+// }
+
 const routes = {
-  "/": LoginPage,
-  "/login/": LoginPage,
-  "/twofa/": TwofaPage,
-  "/home/": GameModalityPage,
-  "/game-modality/": GameModalityPage,
-  "/profile/": ProfilePage,
-  "/settings/": SettingPage,
-  "/leaderboard/": Leaderboard,
-  "/tournaments/": TournamentPage,
-  "/game/": GamePage,
+  "/": hideNav(LoginPage),
+  "/login/": hideNav(LoginPage),
+  "/twofa/": hideNav(TwofaPage),
+  "/home/": showNav(GameModalityPage),
+  "/game-modality/": showNav(GameModalityPage),
+  "/profile/": showNav(ProfilePage),
+  "/settings/": showNav(SettingPage),
+  "/leaderboard/": showNav(Leaderboard),
+  "/tournaments/": showNav(TournamentPage),
+  "/game/": showNav(GamePage),
 }
 
 const router = {
@@ -116,7 +138,27 @@ const router = {
   },
 };
 
+function showNav(func) {
+  return () => {
+    const navbarElement = document.querySelector('.navbar');
 
+    if (navbarElement)
+      navbarElement.style.display = "flex";
+
+    func();
+  }
+}
+
+function hideNav(func) {
+  return () => {
+    const navbarElement = document.querySelector('.navbar');
+
+    if (navbarElement)
+      navbarElement.style.display = "flex";
+
+    func();
+  }
+}
 
 export default router;
 

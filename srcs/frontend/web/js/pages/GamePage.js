@@ -4,11 +4,8 @@ import { runPongFourGame, wsFour } from "../game/pongFour.js";
 import { runPongCoopGame } from "../game/pongCoop.js";
 import { runPongSoloGame } from "../game/pongSolo.js";
 import fetching from '../helpers/fetching.js';
-import { showNav } from '../helpers/helpers.js';
 
 const GamePage = () => {
-  showNav();
-
   let disableSound = localStorage.getItem('disableSound') === 'true';
 
   const gameHTML = `

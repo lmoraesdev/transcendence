@@ -1,9 +1,6 @@
 import TwofaInput from "../components/TwofaInput.js";
-import { hideNav } from '../helpers/helpers.js';
 
 const TwofaPage = () => {
-  hideNav();
-
   const twofaHTML = `
     <template id="twofa-template">
       <div></div>

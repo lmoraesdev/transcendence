@@ -1,9 +1,6 @@
 import fetching from "../helpers/fetching.js";
-import { showNav } from '../helpers/helpers.js';
 
 const TournamentPage = () => {
-  showNav();
-
   const tournamentHTML = `
     <template id="tournament-template">
       <main class="container-fluid d-flex flex-column justify-content-around align-items-stretch gap-3 my-5">

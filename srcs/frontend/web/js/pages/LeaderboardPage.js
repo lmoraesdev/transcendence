@@ -1,8 +1,4 @@
-import { showNav } from '../helpers/helpers.js';
-
 const Leaderboard = async () => {
-  showNav();
-
   const leaderboardHTML = `
     <template id="leaderboard-template">
       <div class="bg-white mx-4 border border-2 border-dark rounded-5 p-0">

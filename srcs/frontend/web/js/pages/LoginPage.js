@@ -1,7 +1,4 @@
-import { hideNav } from '../helpers/helpers.js';
 const LoginPage = async () => {
-  hideNav();
-
   const loginHTML = `
     <template id="login-template">
       <div class="h-100 border border-dark border-2 rounded-5 p-4 bg-light col-md-6 mx-auto my-auto">

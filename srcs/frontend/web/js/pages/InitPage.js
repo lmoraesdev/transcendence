@@ -1,11 +1,8 @@
 import helpers from '../helpers/helpers.js'
-import { showNav } from '../helpers/helpers.js';
 
 const { createTemplate, animateSVGElements  } = helpers;
 
 const InitPage = async () => {
-  showNav();
-
   const templateHTML = `
     <template id="init-template">
       <figure class="logo-content">

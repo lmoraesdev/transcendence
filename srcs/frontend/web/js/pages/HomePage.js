@@ -1,8 +1,4 @@
-import { showNav } from '../helpers/helpers.js';
-
 const HomePage = () => {
-  showNav();
-
   const templateHTML = `
     <template id="home-template">
       <main class="container-fluid d-flex flex-column justify-content-center gap-5 my-5">

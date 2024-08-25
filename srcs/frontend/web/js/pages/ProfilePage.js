@@ -1,11 +1,8 @@
 import fetching from "../helpers/fetching.js";
 import MatchHistory from "../components/MatchHistory.js";
 import FriendsList from "../components/FriendsList.js"
-import { showNav } from "../helpers/helpers.js";
 
 const ProfilePage = () => {
-  showNav();
-
   const profileHTML = `
     <template id="profile-template">
       <main class="profile-container container-fluid d-flex flex-column justify-content-center gap-5 mt-5">

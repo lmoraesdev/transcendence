@@ -2,11 +2,8 @@ import Modal from '../components/Modal.js';
 import { runPongCoopGame } from '../game/pongCoop.js';
 import { runPongTwoGame, Ball, Paddle, keys } from '../game/pongTwo.js';
 import { runPongFourGame } from '../game/pongFour.js';
-import { showNav } from '../helpers/helpers.js';
 
 const GameModalityPage = () => {
-  showNav();
-
   const gameModalityHTML = `
       <template id="game-modality-template">
           <div

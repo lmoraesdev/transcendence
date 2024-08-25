@@ -1,8 +1,4 @@
-import { showNav } from '../helpers/helpers.js';
-
 const NotfoundPage = () => {
-  showNav();
-
   const notfoundHTML = `
     <template id="notfound-template">
       <div></div>
