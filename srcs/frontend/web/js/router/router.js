@@ -34,15 +34,11 @@ import { wsTwo } from "../game/pongTwo.js";
 //   }
 // }
 
-const loginRoute = "/login/";
-const twofaRoute = "/twofa/";
-const defaultRoute = "/home/";
-
 const routes = {
-  loginRoute: hideNav(LoginPage),
-  twofaRoute: hideNav(TwofaPage),
-  defaultRoute: showNav(GameModalityPage),
   "/": hideNav(LoginPage),
+  "/login/": hideNav(LoginPage),
+  "/twofa/": hideNav(TwofaPage),
+  "/home/": showNav(GameModalityPage),
   "/game-modality/": showNav(GameModalityPage),
   "/profile/": showNav(ProfilePage),
   "/settings/": showNav(SettingPage),
@@ -93,13 +89,12 @@ const router = {
     ws.onmessage = (event) => {
       const message = event.data;
       console.log("message", message);
-      if (message === "Valid" &&
-          (pathname == loginRoute || pathname == twofaRoute)) {
-        pathname = defaultRoute;
+      if (message === "Valid") {
+        if (pathname == "/login/" || pathname == "/twofa/") pathname = "/home/";
       } else if (message === "Twofa") {
-        pathname = twofaRoute;
+        pathname = "/twofa/";
       } else if (message === "Invalid") {
-        pathname = loginRoute;
+        pathname = "/login/";
       }
       router.go(pathname, window.location.search, "replace");
     };
@@ -159,7 +154,7 @@ function hideNav(func) {
     const navbarElement = document.querySelector('.navbar');
 
     if (navbarElement)
-      navbarElement.style.display = "flex";
+      navbarElement.style.display = "none";
 
     func();
   }

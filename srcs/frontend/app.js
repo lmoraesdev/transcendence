@@ -4,8 +4,6 @@ import router from "./web/js/router/router.js";
 import Navbar from "./web/js/components/Navbar.js";
 import Footer from "./web/js/components/Footer.js";
 
-import { hideNav } from "./web/js/helpers/helpers.js";
-
 Object.defineProperty(window, "ft_transcendence_host", {
   value: "localhost",
   writable: false,
@@ -43,6 +41,10 @@ window.addEventListener("DOMContentLoaded", () => {
   Navbar();
   Footer();
 
-  hideNav();
+  const navbarElement = document.querySelector('.navbar');
+
+  if (navbarElement)
+    navbarElement.style.display = "none";
+
   router.init();
 });
