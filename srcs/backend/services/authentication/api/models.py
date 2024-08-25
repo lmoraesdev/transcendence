@@ -16,8 +16,8 @@ class Player(AbstractBaseUser):
 
     id = models.BigAutoField(primary_key=True, auto_created=True)
     email = models.EmailField(max_length=50, blank=False, null=False, unique=True)
-    username = models.CharField(max_length=20, blank=False, null=False)
-    firstName = models.CharField(max_length=25, blank=False, null=False)
+    username = models.CharField(max_length=60, blank=False, null=False)
+    firstName = models.CharField(max_length=35, blank=False, null=False)
     lastName = models.CharField(max_length=25, blank=False, null=False)
     avatar = models.URLField(blank=True, null=True)
     twoFactor = models.BooleanField(default=False)

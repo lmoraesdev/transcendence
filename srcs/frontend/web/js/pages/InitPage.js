@@ -1,35 +1,65 @@
+import Logo from '../components/Logo.js';
 import Footer from '../components/Footer.js';
-import helpers from '../helpers/helpers.js'
+import helpers from '../helpers/helpers.js';
 
-const { createTemplate, animateSVGElements  } = helpers;
+
+const { createTemplate } = helpers;
 
 const InitPage = async () => {
   const templateHTML = `
     <template id="init-template">
-      <figure class="logo-content">
-        <svg id="logo" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-          x="0px" y="0px" viewBox="0 0 300 210" xml:space="preserve">
-          <style type="text/css">
-            .st0 { fill: #010101; }
-            .st1 { fill: #FFFFFF; }
-            .animate {
-                animation: svgAnimation 8s ease-in-out infinite;
-            }
-          </style>
-          <rect x="16.32" y="99.93" class="st0" width="267.44" height="98.28"/>
-          <path class="st1 animate" d="M157.57,149.43c0,22.74-17.13,40.47-41.53,40.47c-23.59,0-41.54-18.43-41.54-41.17
-            c0-22.74,17.87-41.45,40.66-41.45S157.57,123.15,157.57,149.43z M116.15,123.51c-13.71,0-25.23,11.21-25.23,25.38
-            c0,14.17,11.52,25.94,25.23,25.94c13.71,0,26.17-11.08,26.17-25.25C142.32,135.41,129.86,123.51,116.15,123.51z"/>
-          <path class="st1 animate" d="M267.44,187.4v-40.37h-23.67v14.88h7.32v11.97c-11.55,0-20.89-14.16-21.08-24.06
-            c-0.25-12.7,9.64-25.63,25.44-25.94c6.38,0,8.65,1.55,11.87,2.72v-17.14c-4.8-1.94-10.54-2.2-12.69-2.2
-            c-8.02,0-14.36,2.22-20.52,5.82c-12.37,7.25-20.33,19.28-20.33,35.06c0,21.87,17.23,41.28,39.96,41.28
-            C259.42,189.41,264.6,188.5,267.44,187.4z"/>
-          <path class="st1 animate" d="M185.17,108.63c-15.57,0-27.61,10.03-27.61,24.67v55.16h16.46v-53.13c0-5.44,4.89-10.09,11.75-10.09
-            c8.53,0,11.8,5.29,11.8,10.09v53.13h16.46V133.3C214.04,118.66,199.5,108.63,185.17,108.63z"/>
-          <path class="st1 animate" d="M76.05,134.69c0,16.24-12.99,25.39-24.83,25.39h-9.06v30.2h-16v-80.13h24.07
-            C63.03,110.15,76.05,119.15,76.05,134.69z M60.22,135.18c0-10.19-9.51-10.53-9.51-10.53h-8.84v20.26h9.05
-            C50.92,144.91,60.22,144.46,60.22,135.18z"/>
-        </svg>
+      <div class="login-container h-100 d-flex mx-auto my-0">
+      
+        <div class="login-content d-block col m-auto">
+          ${Logo({ container: [
+            'additional-container-class', 
+            'small-logo', 
+            'm-auto', 'w-50', 
+            'img-fluid'
+          ], image: ['additional-image-class', 'small-logo'] }).outerHTML}
+          <div class="login-content-description">
+            <p class="text-center text-break fs-6 p-3 mb-5">
+              To access the game, log in with your 42 account or your Google account.
+            </p>
+          </div>
+          <div class="login-content-buttons d-grid p-5 gap-2 mx-auto">
+            <button class="btn btn-primary mb-2 text-center fw-bold" type="button">
+                <svg 
+                  class="img-42" 
+                  version="1.1" viewBox="0 0 1896 1420" width="45" height="30" 
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path transform="translate(0)" d="m0 0h1896v1420h-1896z" fill="#ffffff00"/>
+                  <path transform="translate(798,290)" d="m0 0h210l-6 7-12 11-17 17-1 2h-2l-2 4-8 7-19 19-5 6-8 7-51 51-5 6-8 7-273 273v1l416 1v379h-209l-1-209h-415l-4-1v-131l1-40 13-12 389-389 5-4 6-7h2l2-4z" fill="#fff"/>
+                  <path transform="translate(1097,290)" d="m0 0h420v210l-125 125h-2v2l-29 29-8 7-5 5-6 7-7 6-21 21-6 7-1 207 8-7 81-81 8-7 8-9 8-7 96-96 2 3-1 206h-420v-208l7-8 201-201 1-2v-207l-5 4-7 8-195 195h-2z" fill="#fff"/>
+                </svg>              
+                Login with 42
+            </button>
+            <button class="btn btn-primary text-center fw-bold" type="button">
+              <svg 
+                class="img-google bi bi-google" 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="30" height="20" 
+                fill="#FF0000" 
+                viewBox="0 0 16 16"
+              >
+                <path d="M15.545 6.558a9.4 9.4 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.7 7.7 0 0 1 5.352 2.082l-2.284 2.284A4.35 4.35 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.8 4.8 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.7 3.7 0 0 0 1.599-2.431H8v-3.08z" fill="#fff"/>
+              </svg>
+              Login with Google
+            </button>          
+          </div>
+        </div>
+        <div class="login-img p-4 col m-auto">
+          <img 
+            alt="demo game pong" 
+            src="https://cdn.dribbble.com/users/2092880/screenshots/6426030/pong_1.gif" 
+            class="img-fluid rounded-5 p-4 object-fit-cover" 
+            style="object-position: center; width:500px; height:500px;" 
+          />
+        </div>
+      </div>
+
+     <!--<figure class="logo-content">
       </figure>
       <div class="wrapper">
         <a class="cta-init hidden" href=${`https://${window.ft_transcendence_host}/login/`}>
@@ -44,7 +74,7 @@ const InitPage = async () => {
           </span> 
           <span class="animation-init">LOGIN</span>
         </a>
-      </div>
+      </div>-->
     </template>
   `;
 
@@ -61,11 +91,11 @@ const InitPage = async () => {
   root.appendChild(component);
   root.classList.add("my-page");
 
-  animateSVGElements("#logo path");
+  //animateSVGElements("#logo path");
 
   const btn = document.querySelector('.cta-init');
 
-  setTimeout(() => {
+  /*setTimeout(() => {
     btn.classList.remove('hidden');
     btn.classList.add('transition-step-1');
   }, 3000); 
@@ -75,7 +105,7 @@ const InitPage = async () => {
       btn.classList.remove('transition-step-1');
       btn.classList.add('transition-step-2');
     }
-  });
+  });*/
 
   Footer();
 }

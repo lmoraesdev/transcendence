@@ -1,4 +1,4 @@
-/* Container e Wrappers */
+/* Container e Wrappers 
 .container {
     display: flex;
     flex-direction: column;
@@ -14,7 +14,7 @@
     margin: 0 auto;
 }
 
-/* Botão CTA */
+/* Botão CTA 
 .cta-init {
     display: flex;
     padding: 10px 45px;
@@ -33,8 +33,8 @@
 }
 
 .cta-init.transition-step-1 {
-    transform: translateX(-2000px) scale(0.7); /* Segunda transformação */
-    transition: transform 0.5s ease-in-out; /* Transição para a segunda transformação */
+    transform: translateX(-2000px) scale(0.7);
+    transition: transform 0.5s ease-in-out; 
     animation: backInLeft 1s forwards;
     visibility: visible;
     opacity: 1;
@@ -47,7 +47,7 @@
 
 
 /*.cta-init.animated {
-}*/
+}
 
 .cta-init:focus {
     outline: none;
@@ -68,7 +68,7 @@
     margin-right: 15px;
 }
 
-/* Animações */
+/* Animações 
 span.animation-init {
     transform: skewX(15deg);
 }
@@ -104,7 +104,7 @@ path.two {
     animation: color_anim 1s infinite 0.2s;
 }
 
-/* Logo */
+/* Logo 
 figure.logo-content { 
     display: flex;
     align-items: center;
@@ -117,7 +117,7 @@ svg#logo {
     height: auto;
 }
 
-/* Efeitos e Animações Especiais */
+/* Efeitos e Animações Especiais 
 @keyframes color_anim {
     0% {
         fill: white;
@@ -150,7 +150,7 @@ svg#logo {
     10%, 80% { opacity: 1; }
 }
 
-/* Hover Tip */
+/* Hover Tip 
 #init-template:hover:after {
     position: absolute;
     left: 0;
@@ -183,4 +183,4 @@ svg#logo {
 
 #fade-in.image-container {
     width: inherit;
-}
+}*/
