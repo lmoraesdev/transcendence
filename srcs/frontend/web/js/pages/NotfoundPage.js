@@ -78,7 +78,5 @@ const NotfoundPage = () => {
 
   parentElement.innerHTML  = "";
   parentElement.appendChild(component);
-
-  Footer();
 };
 export default NotfoundPage;

@@ -32,7 +32,6 @@ const router = {
 
     window.addEventListener("popstate", (event) => {
       event.preventDefault();
-      console.log(event);
       if (wsTwo)
         wsTwo.close(1000);
       if (wsFour)
@@ -83,7 +82,14 @@ const router = {
   go: async (route, query, state) => {
     const contentElement = document.getElementById("main");
 
-    const loadingIndicator = "<h2>Carregando...</h2>";
+    const loadingIndicator = `
+      <div class="loading">
+        <div class="spinner-grow m-2" role="status">
+        </div>
+        <span>Loading...</span>
+      </div>
+    `;
+
     const previousContent = contentElement.innerHTML;
     contentElement.innerHTML = loadingIndicator;
 
