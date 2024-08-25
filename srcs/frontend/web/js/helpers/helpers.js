@@ -15,7 +15,7 @@ const executeSequentially = (secondFunction) => {
     particle_background: "#faf9f5",
     refresh_onfocus: false,
   });
-  
+
   if (typeof secondFunction === "function") {
     secondFunction();
   }
@@ -80,10 +80,24 @@ const togglePasswordVisibility = (passwordInput, passwordIcon, iconEye) => {
   }
 };
 
+export const hideNav = () => {
+  const navbarElement = document.querySelector('.navbar');
+
+  if (navbarElement)
+    navbarElement.style.display = "none";
+}
+
+export const showNav = () => {
+  const navbarElement = document.querySelector('.navbar');
+
+  if (navbarElement)
+    navbarElement.style.display = "flex";
+}
+
 export default {
   executeSequentially,
   getRandom,
   createTemplate,
   animateSVGElements,
-  togglePasswordVisibility
+  togglePasswordVisibility,
 };

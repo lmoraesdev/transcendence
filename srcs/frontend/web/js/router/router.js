@@ -1,28 +1,38 @@
-import initPage from '../pages/InitPage.js';
-import HomePage from '../pages/HomePage.js';
-import LoginPage from '../pages/LoginPage.js';
-import ProfilePage from '../pages/ProfilePage.js';
-import GamePage from '../pages/GamePage.js';
-import TournamentPage from '../pages/TournamentPage.js';
 import GameModalityPage from '../pages/GameModalityPage.js';
-import SettingPage from '../pages/SettingPage.js';
-import NotfoundPage from '../pages/NotfoundPage.js';
-import helpers from '../helpers/helpers.js';
+import GamePage from '../pages/GamePage.js';
 import Leaderboard from '../pages/LeaderboardPage.js';
-import fetching from "../helpers/fetching.js";
-import { wsTwo } from "../game/pongTwo.js";
-import { wsFour } from "../game/pongFour.js";
+import LoginPage from '../pages/LoginPage.js';
+import NotfoundPage from '../pages/NotfoundPage.js';
+import ProfilePage from '../pages/ProfilePage.js';
+import SettingPage from '../pages/SettingPage.js';
+import TournamentPage from '../pages/TournamentPage.js';
+import TwofaPage from '../pages/TwofaPage.js';
+
 import { checkAndRefreshToken } from '../services/auth.js';
+import { wsFour } from "../game/pongFour.js";
+import { wsTwo } from "../game/pongTwo.js";
 
-
-const { executeSequentially } = helpers;
+const routes = {
+  "/": LoginPage,
+  "/login/": LoginPage,
+  "/twofa/": TwofaPage,
+  "/home/": GameModalityPage,
+  "/game-modality/": GameModalityPage,
+  "/profile/": ProfilePage,
+  "/settings/": SettingPage,
+  "/leaderboard/": Leaderboard,
+  "/tournaments/": TournamentPage,
+  "/game/": GamePage,
+}
 
 const router = {
   init: async () => {
 
     await checkAndRefreshToken();
 
-    addEventListener("popstate", (event) => {
+    document.addEventListener("popstate", (event) => {
+      event.preventDefault();
+      console.log(event);
       if (wsTwo)
         wsTwo.close(1000);
       if (wsFour)
@@ -30,25 +40,18 @@ const router = {
       router.go(event.state.route, event.state.query, "navigation");
     });
 
-    let pathname = location.pathname;
-    /*console.log("pathname", pathname);
-    if (pathname === "/") {
-      //pathname = "/login";
-      console.log("init", pathname);
-      router.go("/", '', 'add');
-      //initPage();
-    } else if (pathname === "/login/") {
-      pathname = "/login"
-      console.log("login", pathname);
-      router.go("/login", '', 'add');
-    } else if (pathname === "/home/") {
-      pathname = "/home"
-      console.log("home", pathname);
-      router.go("/home", '', 'add');
-      //HomePage();
-    }*/
+    document.addEventListener("click", event => {
+      if (!event.target.matches(".nav-link"))
+        return;
+      event.preventDefault();
+      if (wsTwo)
+        wsTwo.close(1000);
+      if (wsFour)
+        wsFour.close(1000);
+      router.go(event.target.pathname, "", "add");
+    })
 
-    //if (pathname === "/") pathname = "/home/";
+    let pathname = location.pathname;
     console.log("path: " + pathname, location);
 
     const wsUrl = `wss://${window.ft_transcendence_host}/authentication/ws/login/`;
@@ -68,27 +71,9 @@ const router = {
       if (message === "Valid") {
         if (pathname == "/login/" || pathname == "/twofa/") pathname = "/home/";
       } else if (message === "Twofa") {
-        if (
-          pathname == "/game/" ||
-          pathname == "/home/" ||
-          pathname == "/login/" ||
-          pathname == "/profile/" ||
-          pathname == "/setting/" ||
-          pathname == "/tournaments/"
-        )
-          pathname = "/twofa/";
+        pathname = "/twofa/";
       } else if (message === "Invalid") {
-        if (
-          pathname == "/game/" ||
-          pathname == "/home/" ||
-          pathname == "/twofa/" ||
-          pathname == "/profile/" ||
-          pathname == "/setting/" ||
-          pathname == "/tournaments/"
-        )
-          pathname = "/";
-      } else if (message === "Invalid" && pathname == "/login/") {
-          pathname = "/";
+        pathname = "/login/";
       }
       router.go(pathname, window.location.search, "replace");
     };
@@ -96,11 +81,11 @@ const router = {
   },
 
   go: async (route, query, state) => {
-    const root = document.querySelector("#root");
+    const contentElement = document.getElementById("main");
 
     const loadingIndicator = "<h2>Carregando...</h2>";
-    const previousContent = root.innerHTML;
-    root.innerHTML = loadingIndicator;
+    const previousContent = contentElement.innerHTML;
+    contentElement.innerHTML = loadingIndicator;
 
     await checkAndRefreshToken();
 
@@ -110,45 +95,24 @@ const router = {
       history.replaceState({ route, query }, "", route + query);
 
     try {
-      if (route === "/") {
-        //executeSequentially(initPage()); A chamada conjunta tras um efeito js
-        initPage();
-      } else if (route === "/login/") {
-        //executeSequentially(LoginPage());
-        LoginPage();
-      } else if (route === "/home/") {
-        //executeSequentially(HomePage());
-        HomePage();
-      } else if (route === "/profile/") {
-        //executeSequentially(ProfilePage());
-        ProfilePage();
-      } else if (route === "/game/" || route === "/game") {
-        GamePage();
-      } else if (route === "/game-modality/") {
-        //executeSequentially(GameModalityPage());
-        GameModalityPage()
-      } else if (route === "/tournaments/") {
-        TournamentPage();
-      } else if (route === "/settings/") {
-        SettingPage(); 
-      } else if (route === "/twofa/") {
-        TwofaPage(); 
-      } else if (route === "/leaderboard/") {
-        Leaderboard(); 
-      } else {
-        NotfoundPage();
-        scrollTo(0, 0);
-      }
+
+      if (route.slice(-1) != "/")
+        route += "/"
+
+      const targetPage = routes[route] || NotfoundPage;
+      targetPage();
+
     } catch (error) {
       console.error("Erro ao carregar a página:", error);
       // Restaura o conteúdo anterior em caso de erro
-      root.innerHTML = previousContent;
+      contentElement.innerHTML = previousContent;
     }
   },
 };
+
+
 
 export default router;
 
 //Ajustar caminho de tela para bloquear acesso direto
 //Ajustar diminuição do carregamento de tela
-

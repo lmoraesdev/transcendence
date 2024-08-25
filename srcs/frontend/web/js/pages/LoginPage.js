@@ -1,6 +1,6 @@
-import Footer from '../components/Footer.js';
-
+import { hideNav } from '../helpers/helpers.js';
 const LoginPage = async () => {
+  hideNav();
 
   const loginHTML = `
     <template id="login-template">
@@ -18,9 +18,9 @@ const LoginPage = async () => {
               <a
                 class="bt bt-white bt-animate bg-white btn-outline-dark btn-lg rounded-circle border border-2 border-dark d-flex align-items-center justify-content-center p-3"
                 href=${`https://${window.ft_transcendence_host}/authentication/intra/`}>
-                <svg 
-                  class="img-42" 
-                  version="1.1" viewBox="0 0 1896 1420" width="80" height="80" 
+                <svg
+                  class="img-42"
+                  version="1.1" viewBox="0 0 1896 1420" width="80" height="80"
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path transform="translate(0)" d="m0 0h1896v1420h-1896z" fill="#fff"/>
@@ -34,11 +34,11 @@ const LoginPage = async () => {
                 class="bt bt-white bt-animate bg-white btn-outline-dark btn-lg rounded-circle border border-2 border-dark d-flex align-items-center justify-content-center p-3"
                 href=${`https://${window.ft_transcendence_host}/authentication/google/`}
               >
-                <svg 
-                  class="img-google bi bi-google" 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  width="80" height="80" 
-                  fill="#FF0000" 
+                <svg
+                  class="img-google bi bi-google"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="80" height="80"
+                  fill="#FF0000"
                   viewBox="0 0 16 16"
                 >
                   <path d="M15.545 6.558a9.4 9.4 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.7 7.7 0 0 1 5.352 2.082l-2.284 2.284A4.35 4.35 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.8 4.8 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.7 3.7 0 0 0 1.599-2.431H8v-3.08z"/>
@@ -52,7 +52,7 @@ const LoginPage = async () => {
   `;
 
   const templateLogin = document.createElement('div');
-  
+
   if (!document.querySelector('#login-template')) {
     templateLogin.innerHTML = loginHTML;
     document.body.appendChild(templateLogin);
@@ -60,14 +60,10 @@ const LoginPage = async () => {
 
   const template  = document.getElementById("login-template");
   const component = template.content.cloneNode(true);
+  const parentElement = document.getElementById("main");
 
-  const root      = document.querySelector('#root');
-  
-  root.innerHTML  = "";
-  root.appendChild(component);
-  root.classList.add("my-page");
-  
-  Footer();
+  parentElement.innerHTML  = "";
+  parentElement.appendChild(component);
 };
 
 export default LoginPage;

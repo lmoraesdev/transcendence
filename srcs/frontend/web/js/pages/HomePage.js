@@ -1,11 +1,10 @@
-import Navbar from '../components/Navbar.js';
-import Footer from '../components/Footer.js';
+import { showNav } from '../helpers/helpers.js';
 
 const HomePage = () => {
+  showNav();
 
   const templateHTML = `
     <template id="home-template">
-      <div id="my-navbar"></div>
       <main class="container-fluid d-flex flex-column justify-content-center gap-5 my-5">
         <section class="d-flex flex-wrap justify-content-center align-items-center gap-5 w-100">
           <play-card game="PG" wallpaper="/web/images/pong_glass.svg"></play-card>
@@ -23,17 +22,11 @@ const HomePage = () => {
 
   const template = document.getElementById("home-template");
   const component = template.content.cloneNode(true);
+  const parentElement = document.getElementById("main");
 
-  const root = document.querySelector('#root');
-
-  root.innerHTML = "";
-  root.appendChild(component);
-  root.classList.add("my-page");
-
-  Navbar();
-  Footer();
+  parentElement.innerHTML  = "";
+  parentElement.appendChild(component);
 }
 
 export default HomePage;
 // Colocar indicadores no main de acordo com o figma
-

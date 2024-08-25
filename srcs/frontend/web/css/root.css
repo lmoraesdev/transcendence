@@ -27,12 +27,9 @@
 }
 
 #root {
+  background: radial-gradient(circle,#E4CF16, #D4AF37, #E5B76E, #FFD700);
   min-height: 100vh;
   font-family: "Audiowide", sans-serif;
-}
-
-.my-page {
-  background: radial-gradient(circle,#E4CF16, #D4AF37, #E5B76E, #FFD700);
 }
 
 .background {
@@ -40,11 +37,16 @@
 }
 
 .my-page {
-  height: min-content;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+.my-bar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 20vh;
 }
 
 img {

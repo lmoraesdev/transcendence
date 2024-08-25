@@ -1,6 +1,8 @@
 import TwofaInput from "../components/TwofaInput.js";
+import { hideNav } from '../helpers/helpers.js';
 
 const TwofaPage = () => {
+  hideNav();
 
   const twofaHTML = `
     <template id="twofa-template">
@@ -11,24 +13,23 @@ const TwofaPage = () => {
         <div id="twofaInput"></div>
       </div>
       <my-footer></my-footer>
-    </template>  
+    </template>
   `;
+
   const twofaPage = document.querySelector('#twofa-template');
-  
+
   if (!twofaPage) {
     const templateContainer = document.createElement('div');
     templateContainer.innerHTML = twofaHTML;
     document.body.appendChild(templateContainer);
   }
-  
+
   const template  = document.getElementById("twofa-template");
   const component = template.content.cloneNode(true);
+  const parentElement = document.getElementById("main");
 
-  const root      = document.querySelector('#root');
-
-  root.innerHTML  = "";
-  root.appendChild(component);
-  root.classList.add("my-page");
+  parentElement.innerHTML  = "";
+  parentElement.appendChild(component);
 
   TwofaInput();
 
