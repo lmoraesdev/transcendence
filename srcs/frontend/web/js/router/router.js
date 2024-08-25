@@ -30,7 +30,7 @@ const router = {
 
     await checkAndRefreshToken();
 
-    document.addEventListener("popstate", (event) => {
+    window.addEventListener("popstate", (event) => {
       event.preventDefault();
       console.log(event);
       if (wsTwo)
