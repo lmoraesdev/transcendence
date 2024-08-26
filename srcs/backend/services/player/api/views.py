@@ -292,3 +292,30 @@ class MatchesHistory(APIView):
                 "status": 500,
                 "message": str(e),
             })
+        
+class ListAllUser(APIView):
+
+    @method_decorator(jwtCookieRequired)
+    def get(self, request):
+        try:
+            username = request.query_params.get('username')
+            if username:
+                playerExclude = Player.objects.filter(username=username)
+                if not playerExclude.exists():
+                    raise Player.DoesNotExist
+                listPlayer = Player.objects.exclude(id=playerExclude.first().id)
+            else:
+                listPlayer = Player.objects.all()
+            serializer = PlayerInfoSerializer(listPlayer, many=True)
+            return Response(serializer.data)
+
+        except Player.DoesNotExist:
+            return Response({
+                "status": 404,
+                "message": "User not found",
+            }, status=404)
+        except Exception as e:
+            return Response({
+                "status": 500,
+                "message": str(e),
+            }, status=500)

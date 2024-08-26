@@ -40,6 +40,8 @@ ls:
 	@docker network ls
 
 clean: down
+	# @echo ~$(GREEN) *** Remove content for log folders *** $(RESET)
+
 
 fclean: clean
 	@echo "$(GREEN)** Removing data... **$(RESET)"
