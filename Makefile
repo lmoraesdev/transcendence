@@ -40,7 +40,19 @@ ls:
 	@docker network ls
 
 clean: down
-	# @echo ~$(GREEN) *** Remove content for log folders *** $(RESET)
+	@echo "$(GREEN) *** Remove content for log folders *** $(RESET)"
+	sudo rm -f ./srcs/backend/services/player/logs/print.log
+	sudo rm -f ./srcs/backend/services/authentication/logs/print.log
+	sudo rm -f ./srcs/backend/services/matchmaking/logs/print.log
+	sudo rm -f ./srcs/backend/services/pong/logs/print.log
+	sudo rm -f ./srcs/backend/services/tournament/logs/print.log
+	@echo "$(GREEN) *** Remove static and assets folders *** $(RESET)"
+	sudo rm -rf ./srcs/backend/services/player/static/
+	sudo rm -rf ./srcs/backend/services/player/assets/
+	sudo rm -rf ./srcs/backend/services/authentication/static/
+	sudo rm -rf ./srcs/backend/services/matchmaking/static/
+	sudo rm -rf ./srcs/backend/services/pong/static/
+	sudo rm -rf ./srcs/backend/services/tournament/static/
 
 
 fclean: clean
