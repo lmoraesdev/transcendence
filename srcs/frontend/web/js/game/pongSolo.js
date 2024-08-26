@@ -211,7 +211,12 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
     loopIdSolo = window.requestAnimationFrame(() =>
       gameLoopSolo(canvas, ctx, ball, paddlePlayer, paddleComputer),
     );
-
+    localStorage.setItem('loopIdSolo', loopIdSolo);
+    localStorage.setItem('canvas', JSON.stringify(canvas));
+    localStorage.setItem('ctx', JSON.stringify(ctx));
+    localStorage.setItem('ball', ball);
+    localStorage.setItem('paddlePlayer', paddlePlayer);
+    localStorage.setItem('paddleComputer', paddleComputer);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ball.update();
     ballCollision(canvas, ball, ctx, paddlePlayer, paddleComputer);

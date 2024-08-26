@@ -1,4 +1,3 @@
-import Footer from "../components/Footer.js";
 import router from "../router/router.js";
 import { runPongTwoGame, wsTwo } from "../game/pongTwo.js";
 import { runPongFourGame, wsFour } from "../game/pongFour.js";
@@ -212,7 +211,7 @@ const GamePage = () => {
 
   if (avatarElement && nameElement) {
     fetching(`https://${window.ft_transcendence_host}/player/`).then((res) => {
-      avatarElement.src = res.player.avatar;
+      avatarElement.src = res.player.avatar ? res.player.avatar : '/web/images/profile.png';
       nameElement.textContent = res.player.firstName ? res.player.firstName : "";
     });
   }
@@ -221,7 +220,10 @@ const GamePage = () => {
     showStartMessage();
   }
 
-  Footer();
+  const footer = document.getElementById('footer-template');
+
+  footer.classList.remove('hidden');
+
 };
 
 export default GamePage;

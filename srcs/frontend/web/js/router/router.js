@@ -91,7 +91,7 @@ const router = {
   go: async (route, query, state) => {
     const root = document.querySelector("#root");
 
-    const loadingIndicator = "<h2>Carregando...</h2>";
+    const loadingIndicator = "<h2>Loading...</h2>";
     const previousContent = root.innerHTML;
     root.innerHTML = loadingIndicator;
 
@@ -112,7 +112,7 @@ const router = {
       } else if (route === "/profile/") {
         //executeSequentially(ProfilePage());
         ProfilePage();
-      } else if (route === "/game/" || route === "/game") {
+      } else if (route === "/game/") {
         GamePage();
       } else if (route === "/game-modality/") {
         //executeSequentially(GameModalityPage());
