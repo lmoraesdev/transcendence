@@ -1,10 +1,6 @@
-import Navbar from '../components/Navbar.js';
-import Footer from "../components/Footer.js";
-
 const Leaderboard = async () => {
   const leaderboardHTML = `
     <template id="leaderboard-template">
-      <div id="my-navbar"></div>
       <div class="bg-white mx-4 border border-2 border-dark rounded-5 p-0">
         <div class="d-flex align-items-center justify-content-center my-4">
           <p class="text-center fs-2 icon-crown">👑​</p>
@@ -29,7 +25,7 @@ const Leaderboard = async () => {
   `;
 
   const templateLogin = document.createElement('div');
-  
+
   if (!document.querySelector('#leaderboard-template')) {
     templateLogin.innerHTML = leaderboardHTML;
     document.body.appendChild(templateLogin);
@@ -37,15 +33,10 @@ const Leaderboard = async () => {
 
   const template  = document.getElementById("leaderboard-template");
   const component = template.content.cloneNode(true);
+  const parentElement = document.getElementById("main");
 
-  const root      = document.querySelector('#root');
-  
-  root.innerHTML  = "";
-  root.appendChild(component);
-  root.classList.add("my-page");
-
-  Navbar();
-  Footer();
+  parentElement.innerHTML  = "";
+  parentElement.appendChild(component);
 };
 
 export default Leaderboard;
