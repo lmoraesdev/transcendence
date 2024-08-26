@@ -1,6 +1,6 @@
 import fetching from "../helpers/fetching.js";
-import Footer from '../components/Footer.js';
-import Navbar from '../components/Navbar.js';
+//import Footer from '../components/Footer.js';
+//import Navbar from '../components/Navbar.js';
 import MatchHistory from "../components/MatchHistory.js";
 import FriendsList from "../components/FriendsList.js"
     
@@ -8,7 +8,7 @@ const ProfilePage = () => {
 
   const profileHTML = `
     <template id="profile-template">
-      <div id="my-navbar"></div>
+      <!--<div id="my-navbar"></div>-->
       <main class="profile-container container-fluid d-flex flex-column justify-content-center gap-5 mt-5">
         <div class="player-data d-flex justify-content-around align-items-center flex-wrap gap-1 p-3 rounded-5">
           <div class="data-section d-flex flex-column justify-content-center align-items-center gap-2 p-2 rounded-5">
@@ -73,10 +73,10 @@ const ProfilePage = () => {
     root.querySelector(".player-data .losses").innerText = res.player.losses;
   });
 
-  Navbar();
+  //Navbar();
   MatchHistory();
   FriendsList();
-  Footer();
+  //Footer();
 };
 
 export default ProfilePage;

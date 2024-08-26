@@ -1,146 +1,80 @@
-
-@keyframes colorizing {
-  0% {
-    background-color: var(--color-yellow);
-  }
-  50% {
-    background-color: var(--color-blue);
-  }
-  100% {
-    background-color: var(--color-yellow);
-  }
-}
-
-nav div {
-  display: flex !important;
-}
-
+/* Estilo padrão */
 .navbar {
   display: flex;
   background-color: black;
   color: white;
   place-items: center;
+  justify-content: space-between;
 }
 
-.navbar-items li{
+.navbar-items li {
   display: inline-block !important;
   padding: 10px;
   margin: 5px;
   place-items: center;
 }
 
-.navbar-button{
-  padding:10px !important;
+.navbar-button {
+  padding: 10px !important;
   border: none;
   color: white;
   background-color: black;
   font-weight: 600;
 }
 
-.navbar-button:hover{
+.btn-outline-warning {
+  border: none !important;
+  color: #F3C00C;
+}
+
+.navbar-button:hover,
+.btn-outline-warning:hover {
   border: none;
   color: #F3C00C;
-  border-bottom: 2px solid #F3C00C;
+  background: none !important;
+  border-radius: 0px !important;
+  border-bottom: 2px solid #F3C00C !important;
 }
 
-
-label{
-  font-size: 18px;
-}
-
-input[type="radio"] {
-  display: none;
-}
-
-input[type="radio"]:checked + label {
-  color: #D0A50B;
-  border-bottom: 2px solid #D0A50B;
-}
-
-/* até aqui é onde fiz as coisas do navbar, abaixo são as antigas configurações, ainda não fiz o menu responsivo na questão de tamanho de tela */
-
-.hamburger {
-  display: none;
-  cursor: pointer;
-  background-color: var(--color-primary);
-}
-
-.hamburger .line {
-  width: 30px;
-  height: 4px;
-  background-color: var(--color-font-white);
-  margin-block: 6px;
-}
-
-.hamburger:hover {
-  background-color: var(--color-primary);
-}
-
-@media only screen and (max-width: 1111px) {
-  my-navbar.active {
-    background-color: var(--color-primary);
-  }
-
-  .hamburger {
-    display: block;
-  }
-
-  .nav-bar {
-    display: none !important;
-    width: 100vw;
-    height: fit-content;
-    padding-block: 1rem;
+/* Media Queries para responsividade */
+@media (max-width: 768px) {
+  .navbar-menu {
+    display: none;
+    flex-direction: column;
+    width: 100%;
     position: absolute;
     top: 100%;
     left: 0;
-    background-color: var(--color-primary);
-    color: var(--color-font-white);
-    overflow: hidden;
+    background-color: black;
   }
 
-  .nav-bar ul {
-    flex-direction: column;
+  .navbar-menu.show {
+    display: flex;
   }
 
-  my-navbar.active .nav-bar {
+  .navbar-toggler {
+    display: inline-block;
+    border: none;
+    background: none;
+    font-size: 24px;
+    color: #F3C00C;
+    cursor: pointer;
+  }
+
+  .navbar-menu button {
+    width: 100%;
+    text-align: left;
+    padding: 15px;
+    border-bottom: 1px solid #F3C00C;
+  }
+}
+
+@media (min-width: 769px) {
+  .navbar-toggler {
+    display: none;
+  }
+
+  .navbar-menu {
     display: flex !important;
-  }
-}
-
-@media only screen and (max-width: 576px) {
-  my-navbar.d-flex {
-    padding-inline: 0.5rem !important;
-  }
-
-  my-navbar .logo {
-    font-size: 1rem !important;
-    padding-inline: 0 !important;
-  }
-
-  .hamburger .line {
-    width: 15px;
-    height: 2px;
-    margin-block: 3px;
-  }
-}
-
-@media (max-width: 992px) {
-  .profile-photo {
-    width: 75px;
-    height: 75px;
-  }
-}
-
-@media (max-width: 768px) {
-  .profile-photo {
-    width: 50px;
-    height: 50px;
-  }
-}
-
-@media (max-width: 576px) {
-  .profile-photo {
-    width: 40px;
-    height: 40px;
   }
 }

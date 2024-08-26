@@ -1,9 +1,26 @@
-import styles from './Buttons.css'
-
-const Button =(text) => {
-    return(
-        <button class={styles.button} onClick={onClick}>{text}</button>
-    )
-}
-
-export default Button;
+const Button = ({ label, customClasses = [], onClick, link }) => {
+    const buttonContainer = document.createElement('button');
+    buttonContainer.classList.add(
+      'btn', 
+      'btn-primary', 
+      'text-center', 
+      'fw-bold', 
+      ...customClasses
+    );
+    buttonContainer.type = 'button';
+    buttonContainer.innerHTML = `${label}`;
+  
+    if (typeof onClick === 'function') {
+      buttonContainer.addEventListener('click', onClick);
+    } else if (link) {
+      buttonContainer.addEventListener('click', () => {
+        window.location.href = link;
+      });
+    }
+  
+    return buttonContainer;
+  };
+    
+  export default Button;
+    
+    

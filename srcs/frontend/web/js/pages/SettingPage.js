@@ -1,5 +1,5 @@
-import Navbar from '../components/Navbar.js';
-import Footer from '../components/Footer.js';
+//import Navbar from '../components/Navbar.js';
+//import Footer from '../components/Footer.js';
 import fetching from '../helpers/fetching.js';
 import { toggleSound } from '../helpers/soundControl.js';
 
@@ -7,7 +7,7 @@ import { toggleSound } from '../helpers/soundControl.js';
 const SettingPage = () => {
   const settingHTML = `
     <template id="setting-template">
-      <div id="my-navbar"></div>
+      <!--<div id="my-navbar"></div>-->
       <main class="container-fluid p-3 d-flex flex-column align-items-center gap-5 mb-2">
         <div class="text-bg-light rounded-3 p-3 w-100">
           <h1 class="setting-header  py-2 rounded-3 fs-5 text-center display-1 fw-bold">
@@ -187,8 +187,8 @@ const SettingPage = () => {
     };
   }
 
-  Navbar();
-  Footer();
+  //Navbar();
+  //Footer();
 };
 
 export default SettingPage;

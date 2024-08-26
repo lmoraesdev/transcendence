@@ -2,7 +2,6 @@ import router from "./web/js/router/router.js";
 
 // Components
 import Stars from "./web/js/components/Stars.js";
-import Navbar from "./web/js/components/Navbar.js";
 import Footer from "./web/js/components/Footer.js";
 import PlayCard from "./web/js/components/PlayCard.js";
 import FriendsList from "./web/js/components/FriendsList.js";
@@ -13,7 +12,6 @@ import PlayerCard from "./web/js/components/PlayerCard.js";
 import MatchCard from "./web/js/components/MatchCard.js";
 import MatchHistory from "./web/js/components/MatchHistory.js";
 import LoginButton from "./web/js/components/LoginButton.js";
-import TwofaInput from "./web/js/components/TwofaInput.js";
 import TournamentCard from "./web/js/components/TournamentCard.js";
 import TournamentPlayers from "./web/js/components/TournamentPlayers.js";
 import TournamentPopup from "./web/js/components/TournamentPopup.js";

@@ -1,4 +1,3 @@
-import initPage from '../pages/InitPage.js';
 import HomePage from '../pages/HomePage.js';
 import LoginPage from '../pages/LoginPage.js';
 import ProfilePage from '../pages/ProfilePage.js';
@@ -9,7 +8,7 @@ import SettingPage from '../pages/SettingPage.js';
 import NotfoundPage from '../pages/NotfoundPage.js';
 import helpers from '../helpers/helpers.js';
 import Leaderboard from '../pages/LeaderboardPage.js';
-import fetching from "../helpers/fetching.js";
+import TwofaPage from '../pages/TwofaPage.js';
 import { wsTwo } from "../game/pongTwo.js";
 import { wsFour } from "../game/pongFour.js";
 import { checkAndRefreshToken } from '../services/auth.js';
@@ -32,12 +31,7 @@ const router = {
 
     let pathname = location.pathname;
     /*console.log("pathname", pathname);
-    if (pathname === "/") {
-      //pathname = "/login";
-      console.log("init", pathname);
-      router.go("/", '', 'add');
-      //initPage();
-    } else if (pathname === "/login/") {
+    if (pathname === "/login/") {
       pathname = "/login"
       console.log("login", pathname);
       router.go("/login", '', 'add');
@@ -77,7 +71,7 @@ const router = {
           pathname == "/tournaments/"
         )
           pathname = "/twofa/";
-      } else if (message === "Invalid") {
+      } /*else if (message === "Invalid") {
         if (
           pathname == "/game/" ||
           pathname == "/home/" ||
@@ -86,10 +80,9 @@ const router = {
           pathname == "/setting/" ||
           pathname == "/tournaments/"
         )
-          pathname = "/";
-      } else if (message === "Invalid" && pathname == "/login/") {
-          pathname = "/";
-      }
+          //pathname = "/login";
+          return;
+      } */
       router.go(pathname, window.location.search, "replace");
     };
     ws.onerror = (error) => console.error(`WebSocket error: ${error}`);
@@ -110,10 +103,7 @@ const router = {
       history.replaceState({ route, query }, "", route + query);
 
     try {
-      if (route === "/") {
-        //executeSequentially(initPage()); A chamada conjunta tras um efeito js
-        initPage();
-      } else if (route === "/login/") {
+      if (route === "/login/" || route === "/login") {
         //executeSequentially(LoginPage());
         LoginPage();
       } else if (route === "/home/") {
@@ -131,7 +121,7 @@ const router = {
         TournamentPage();
       } else if (route === "/settings/") {
         SettingPage(); 
-      } else if (route === "/twofa/") {
+      } else if (route === "/twofa/" || route === "/twofa") {
         TwofaPage(); 
       } else if (route === "/leaderboard/") {
         Leaderboard(); 

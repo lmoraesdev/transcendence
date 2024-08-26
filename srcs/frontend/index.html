@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Favicon -->
-    <link rel="shortcut icon" href="/web/images/pong" type="image/x-icon" />
+    <link rel="shortcut icon" href="/web/images/pong_favicon.png" type="image/x-icon" />
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="/web/bootstrap-5.2.3-dist/css/bootstrap.min.css" />
@@ -24,47 +24,39 @@
     
     <title>ft_transcendence</title>
   </head>
-  <body>
+  <body class="d-flex flex-column h-100">
+    <nav 
+      id="navbar"
+      class="d-flex p-4 navbar hidden"
+    >
+      <div>
+        <img src="/web/images/logo_pong.png" alt="logo pong" />
+      </div>
+      <button 
+        class="navbar-toggler" 
+        type="button" 
+        data-bs-toggle="collapse" 
+        data-bs-target="#navbarSupportedContent" 
+        aria-controls="navbarSupportedContent" 
+        aria-expanded="false" 
+        aria-label="Toggle navigation"
+      >
+        &#9776;
+      </button>
+      <div id="navbarSupportedContent" class="navbar-menu collapse navbar-collapse justify-content-around align-items-center w-100">
+        <button class="btn btn-outline-warning" id="home">Home</button>
+        <button class="btn btn-outline-warning" id="leaderboard">Leaderboard</button>
+        <button class="btn btn-outline-warning" id="profile">Profile</button>
+        <button class="btn btn-outline-warning" id="settings">Settings</button>
+      </div>
+    </nav>
     <div id="root"></div>
-    <footer id="footer-template">
-      <div class="footer d-flex col mt-auto mb-2 mx-auto">
-        <p>Copyright © 2024 🎮 All rights reserved</p>
+    <footer id="footer-template" class="footer hidden">
+      <div class="footer col mt-auto mb-2 mx-auto">
+        <p class="text-center">Copyright © 2024 🎮 All rights reserved</p>
       </div>
     </footer>
     <script defer src="/web/js/components/bvambient.js" type="module"></script>
+
   </body>
 </html>
-
-  <!--------------------------- PAGES --------------------------->
-
-  <!-- HOME PAGE -->
-   <!--
-  <template id="home-template">
-    <my-navbar></my-navbar>
-    <main class="container-fluid d-flex flex-column justify-content-center gap-5 my-5">
-      <section class="d-flex flex-wrap justify-content-center align-items-center gap-5 w-100">
-        <play-card game="PG" wallpaper="/web/images/pong_glass.svg"></play-card>
-      </section>
-    </main>
-    <my-footer></my-footer>
-  </template>
--->
-
-  <!-- LOGIN PAGE -->
-   <!--
-  <template id="login-template">
-    <div></div>
-    <div class="d-flex flex-wrap justify-content-center align-items-center gap-5 pt-5">
-      <div class="d-flex flex-column justify-content-center align-items-center gap-3">
-        <img class="w-75" src="/web/images/pong.svg" alt="logo" referrerpolicy="no-referrer">
-        <h1 class="display-1 text-center fw-bold m-0">PING PONG</h1>
-      </div>
-    </div>
-    <div class="d-flex flex-column justify-content-center align-items-center gap-3">
-      <login-button color="success" link="https://localhost/authentication/intra/" text="Intra 42"></login-button>
-      <login-button color="primary" link="https://localhost/authentication/google/" text="Google"></login-button>
-    </div>
-    <my-footer></my-footer>
-  </template>
--->
-

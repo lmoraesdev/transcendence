@@ -80,10 +80,28 @@ const togglePasswordVisibility = (passwordInput, passwordIcon, iconEye) => {
   }
 };
 
+// Sanitizar URLs
+const sanitizeUrl = (url) => {
+  const parser = document.createElement('a');
+  parser.href = url;
+  return parser.href;
+}
+
+// Função para criar elementos de forma segura, uma prevenção de XSS em strings HTML
+// utilizar este ao inves de createTemplate
+const createSafeElement = (html) => {
+  const div = document.createElement('div');
+  div.textContent = html;
+  return div.innerHTML;
+}
+
+
 export default {
   executeSequentially,
   getRandom,
   createTemplate,
   animateSVGElements,
-  togglePasswordVisibility
+  togglePasswordVisibility,
+  sanitizeUrl,
+  createSafeElement
 };

@@ -1,12 +1,26 @@
-import styles from './Buttons.css'
+const ButtonLogin = ({ label, iconSVG, customClasses = [], onClick, link }) => {
+  const buttonContainer = document.createElement('button');
+  buttonContainer.classList.add(
+    'btn', 
+    'btn-primary', 
+    'text-center', 
+    'fw-bold', 
+    ...customClasses
+  );
+  buttonContainer.type = 'button';
+  buttonContainer.innerHTML = `${iconSVG} ${label}`;
 
-const ButtonLogin = (img, app, onClick) => {
-    return (
-        <button class={styles.button} onClick={onClick}>
-            <img src={img} alt={alt} />
-            <span>Login with {app}</span>
-        </button>
-    )
-}
+  if (typeof onClick === 'function') {
+    buttonContainer.addEventListener('click', onClick);
+  } else if (link) {
+    buttonContainer.addEventListener('click', () => {
+      window.location.href = link;
+    });
+  }
 
+  return buttonContainer;
+};
+  
 export default ButtonLogin;
+  
+  

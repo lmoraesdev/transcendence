@@ -1,10 +1,10 @@
-import Navbar from '../components/Navbar.js';
-import Footer from "../components/Footer.js";
+//import Navbar from '../components/Navbar.js';
+//import Footer from "../components/Footer.js";
 
 const Leaderboard = async () => {
   const leaderboardHTML = `
     <template id="leaderboard-template">
-      <div id="my-navbar"></div>
+      <!--<div id="my-navbar"></div>-->
       <div class="bg-white mx-4 border border-2 border-dark rounded-5 p-0">
         <div class="d-flex align-items-center justify-content-center my-4">
           <p class="text-center fs-2 icon-crown">👑​</p>
@@ -44,8 +44,8 @@ const Leaderboard = async () => {
   root.appendChild(component);
   root.classList.add("my-page");
 
-  Navbar();
-  Footer();
+  //Navbar();
+  //Footer();
 };
 
 export default Leaderboard;

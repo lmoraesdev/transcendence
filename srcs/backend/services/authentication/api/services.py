@@ -27,11 +27,7 @@ def decodeGooleToken(idToken: str) -> Dict[str, str]:
     decodeToken = jwt.decode(idToken, options={"verify_signature": False})
     return decodeToken
 
-<<<<<<< HEAD
-def   get2FACode(playerId: int) -> str:
-=======
 def  get2FACode(playerId: int, code: int) -> bool:
->>>>>>> fbb8b467702f5f9fb8683dd90c40efa3ef17f11c
     playerIdEnconde = str(playerId).encode("utf-8")
     return TOTP(b32encode(playerIdEnconde)).provisioning_uri(name="player", issuer_name="ft_transcendence")
 

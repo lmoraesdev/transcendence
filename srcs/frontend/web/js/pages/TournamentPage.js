@@ -1,11 +1,11 @@
-import Navbar from '../components/Navbar.js';
-import Footer from '../components/Footer.js';
+//import Navbar from '../components/Navbar.js';
+//import Footer from '../components/Footer.js';
 import fetching from "../helpers/fetching.js";
 
 const TournamentPage = () => {
   const tournamentHTML = `
     <template id="tournament-template">
-      <div id="my-navbar"></div>
+      <!--<div id="my-navbar"></div>-->
       <main class="container-fluid d-flex flex-column justify-content-around align-items-stretch gap-3 my-5">
         <section class="tournament-actions d-none flex-column justify-content-center align-items-center py-5 px-4 rounded-5 gap-5">
           <div class="tournament-create d-flex flex-column justify-content-center p-4 rounded-5 gap-4">
@@ -147,8 +147,8 @@ const TournamentPage = () => {
     }
   });
 
-  Navbar();
-  Footer();
+  //Navbar();
+  //Footer();
 };
 
 export default TournamentPage;

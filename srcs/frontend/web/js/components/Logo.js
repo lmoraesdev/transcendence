@@ -1,6 +1,11 @@
 const Logo = (customClasses = {}) => {
   const logoContainer = document.createElement('div');
-  logoContainer.classList.add('logo-container', 'text-center', 'mb-4', ...customClasses.container || []);
+  logoContainer.classList.add(
+    'logo-container', 
+    'text-center', 
+    'mb-4', 
+    ...customClasses.container || []
+  );
 
   const logoSVG = `
     <svg 
