@@ -1,7 +1,4 @@
-import Footer from '../components/Footer.js';
-
 const NotfoundPage = () => {
-  
   const notfoundHTML = `
     <template id="notfound-template">
       <div></div>
@@ -61,7 +58,7 @@ const NotfoundPage = () => {
           </svg>
         </div>
       </div>
-    </template>  
+    </template>
   `;
 
   const templateContainer = document.createElement('div');
@@ -73,13 +70,9 @@ const NotfoundPage = () => {
 
   const template = document.getElementById("notfound-template");
   const component = template.content.cloneNode(true);
+  const parentElement = document.getElementById("main");
 
-  const root      = document.querySelector('#root');
-
-  root.innerHTML  = "";
-  root.appendChild(component);
-  root.classList.add("my-page");
-
-  Footer();
+  parentElement.innerHTML  = "";
+  parentElement.appendChild(component);
 };
 export default NotfoundPage;

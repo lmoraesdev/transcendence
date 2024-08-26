@@ -15,7 +15,7 @@ const executeSequentially = (secondFunction) => {
     particle_background: "#faf9f5",
     refresh_onfocus: false,
   });
-  
+
   if (typeof secondFunction === "function") {
     secondFunction();
   }
@@ -85,5 +85,5 @@ export default {
   getRandom,
   createTemplate,
   animateSVGElements,
-  togglePasswordVisibility
+  togglePasswordVisibility,
 };

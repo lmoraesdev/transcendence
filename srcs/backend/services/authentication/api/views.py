@@ -2,6 +2,7 @@ import requests
 import jwt
 import logging
 from os import getenv
+from pprint import pformat
 from django.conf import settings
 from django.core.cache import cache
 from django.http import HttpResponse
@@ -51,7 +52,6 @@ def intraCallbackOAuth(request):
     if not userToken.ok:
         return Response({"statusCode": 401, "detail": "No access token in the token response"})
     
-    logger.debug("playerData -> %s", userToken.json())
     playerData = {
         "email": userToken.json()['email'],
         "username": userToken.json()['login'],
@@ -140,34 +140,90 @@ def googleCallbackOAuth(request):
 @api_view(['GET'])
 @jwtCookieRequired
 def qrCode2FA(request):
+    logger.debug(f"entrou no qrcode\nrequest = {pformat(request)}")
     token = request.COOKIES.get("jwt_token")
+    logger.debug(f"token: {pformat(token)}")
     decodedToken = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+    logger.debug(f"decodeToken: {pformat(decodedToken)}")
     playerId = decodedToken['id']
+    logger.debug(f"playerId: {playerId}")
     qrCode = get2FACode(playerId)
+    logger.debug(f"qrCode: {pformat(qrCode)}")
     image = make_qr_code_image(qrCode, QRCodeOptions(), True)
+    logger.debug(f"imagem = {pformat(image)}")
     return HttpResponse(image, content_type='image/svg+xml')
 
 @api_view(["POST"])
 def verify2FA(request):
+    logger.debug("Iniciando verificação 2FA")
+    
     code = request.data.get("code")
+    if not code:
+        logger.error("Código 2FA não fornecido na requisição.")
+        return Response({"statusCode": 400, "error": "2FA code not provided"})
+
+    logger.debug(f"Código 2FA recebido: {code}")
+    
     jwtToken = request.COOKIES.get("jwt_token")
+    if not jwtToken:
+        logger.error("Token JWT não encontrado nos cookies.")
+        return Response({"statusCode": 401, "error": "JWT token not found in cookies"})
+
+    logger.debug(f"Token JWT recebido: {jwtToken}")
+    
     try:
         decodedToken = jwt.decode(jwtToken, settings.SECRET_KEY, algorithms=["HS256"])
-    except:
+        logger.debug(f"Token JWT decodificado: {decodedToken}")
+    except jwt.ExpiredSignatureError:
+        logger.error("Token JWT expirado.")
+        return Response({"statusCode": 401, "error": "Token expired"})
+    except jwt.InvalidTokenError:
+        logger.error("Token JWT inválido.")
         return Response({"statusCode": 401, "error": "Invalid token"})
-    playerId = decodedToken['id']
-    twoFactor = decodedToken['twofa']
+    except Exception as e:
+        logger.error(f"Erro ao decodificar token JWT: {str(e)}")
+        return Response({"statusCode": 500, "error": "Internal server error"})
+
+    playerId = decodedToken.get('id')
+    twoFactor = decodedToken.get('twofa')
+
+    if playerId is None or twoFactor is None:
+        logger.error(f"Dados inválidos no token JWT. playerId: {playerId}, twoFactor: {twoFactor}")
+        return Response({"statusCode": 401, "error": "Invalid token data"})
+
+    logger.debug(f"Player ID: {playerId}, Two Factor: {twoFactor}")
+
     if twoFactor is False:
+        logger.debug("2FA não está habilitado, verificando o código 2FA.")
         if not check2FACode(playerId, code):
+            logger.error("Código 2FA incorreto.")
             return Response({"statusCode": 401, "message": "Incorrect 2FA code."})
-        player = Player.objects.get(id=playerId)
-        player.twoFactor = True
-        player.save()
-        return Response({"statusCode": 200, "message": "Successfully verified"})
+
+        try:
+            player = Player.objects.get(id=playerId)
+            player.twoFactor = True
+            player.save()
+            logger.debug(f"2FA habilitado com sucesso para o player ID: {playerId}")
+            return Response({"statusCode": 200, "message": "Successfully verified"})
+        except Player.DoesNotExist:
+            logger.error(f"Player com ID {playerId} não encontrado.")
+            return Response({"statusCode": 404, "error": "Player not found"})
+        except Exception as e:
+            logger.error(f"Erro ao atualizar o player: {str(e)}")
+            return Response({"statusCode": 500, "error": "Internal server error"})
+
     else:
+        logger.debug("2FA já está habilitado, verificando o código 2FA.")
         if not check2FACode(playerId, code):
+            logger.error("Código 2FA incorreto.")
             return Response({"statusCode": 401, "message": "Incorrect 2FA code."})
-        jwtToken = generateJwt(playerId, False)
-        response = Response({"statusCode": 200, "message": "Successfully verified", "redirected": True})
-        response.set_cookie("jwt_token", value=jwtToken, httponly=True, secure=True)
-        return response
+
+        try:
+            jwtToken = generateJwt(playerId, False)
+            response = Response({"statusCode": 200, "message": "Successfully verified", "redirected": True})
+            response.set_cookie("jwt_token", value=jwtToken, httponly=True, secure=True)
+            logger.debug(f"Token JWT renovado e cookie atualizado para o player ID: {playerId}")
+            return response
+        except Exception as e:
+            logger.error(f"Erro ao gerar novo token JWT: {str(e)}")
+            return Response({"statusCode": 500, "error": "Internal server error"})

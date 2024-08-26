@@ -6,7 +6,7 @@ const Navbar = async () => {
       <nav class="navbar navbar-expand-lg bg-white m-4 border border-2 border-dark rounded-5 p-0 align-items-center">
         <div class="container-fluid">
           <a class="navbar-brand fs-6 px-1 py-0" href="#">
-            <img 
+            <img
               id="profile-photo"
               src="https://static.vecteezy.com/system/resources/previews/047/589/492/non_2x/profile-photo-logo-sign-outline-vector.jpg"
               alt="user photo"
@@ -47,11 +47,11 @@ const Navbar = async () => {
   const navbarElement = document.querySelector('#my-navbar');
   navbarElement.appendChild(component);
   navbarElement.classList.add(
-    "justify-content-between", 
+    "justify-content-between",
     "position-relative",
     "height-fit-content",
-    "w-100", 
-    "py-2"
+    "w-100",
+    "p-0"
   );
 
   const avatarElement = document.querySelector('#profile-photo');
@@ -59,7 +59,7 @@ const Navbar = async () => {
 
   if (avatarElement && nameElement) {
     fetching(`https://${window.ft_transcendence_host}/player/`).then((res) => {
-      avatarElement.src = res.player.avatar;
+      avatarElement.src = res.player.avatar || "/web/images/genericUser.svg";
       nameElement.textContent = res.player.firstName ? res.player.firstName : "";
     });
   }

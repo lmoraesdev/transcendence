@@ -1,4 +1,3 @@
-import Footer from '../components/Footer.js';
 import router from "../router/router.js";
 import { runPongTwoGame, wsTwo } from "../game/pongTwo.js";
 import { runPongFourGame, wsFour } from "../game/pongFour.js";
@@ -14,11 +13,11 @@ const GamePage = () => {
       <div class="d-flex flex-wrap content-game justify-content-between align-items-center">
         <div class="content-user d-block mx-4 px-1 py-0">
           <img
-            id="user-game-photo" 
+            id="user-game-photo"
             alt="adversary photo" width="80" height="80"
             style="border-color: #F3C00C !important;"
             class="mt-4 d-inline-block align-text-top rounded-circle border border-3"
-            src=${`https://static.vecteezy.com/system/resources/previews/047/589/492/non_2x/profile-photo-logo-sign-outline-vector.jpg`} 
+            src=${`https://static.vecteezy.com/system/resources/previews/047/589/492/non_2x/profile-photo-logo-sign-outline-vector.jpg`}
           />
           <p id="user-game-name" class="text-dark text-center fs-6"></p>
         </div>
@@ -48,14 +47,14 @@ const GamePage = () => {
           </a>
         </div>
         <div class="content-adversary d-block mx-4 px-1 py-0">
-          <img 
+          <img
             alt="adversary photo" width="80" height="80"
             style="border-color: #F3C00C !important;"
             class="mt-4 d-inline-block align-text-top rounded-circle border border-3"
             src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExc3ptbnV6bzBka3M0cDBmY2x1dXV0ZGVpYzA5bTE0MjRtbHRuZXZhNiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/2gn1hmYEZb8EKlrVZh/giphy.webp"
           />
           <p class="text-dark text-center fs-6">Adversary</p>
-        </div>        
+        </div>
         <h1 class="game-mode fw-bold m-0"></h1>
         <!--<button class="game-exit btn btn-lg fw-bold" href="/home/">Exit</button>-->
       </div>
@@ -67,7 +66,7 @@ const GamePage = () => {
         </div>
         <div class="d-flex justify-content-center align-items-center">
           <div class="button  game-exit"><a class="btn-game" href="/home/">Exit</a></div>
-          <div class="button"><a class="btn-game" id="new-game">New Game</a></div>          
+          <div class="button"><a class="btn-game" id="new-game">New Game</a></div>
           <div class="button"><a class="btn-game" id="pause">|| Pause</a></div>
           <div class="button"><a class="btn-game" id="play">Play ></a></div>
           <div class="button"><a class="btn-game" id="sound">Sound On</a></div>
@@ -84,15 +83,13 @@ const GamePage = () => {
 
   const template = document.getElementById("game-template");
   const component = template.content.cloneNode(true);
+  const parentElement = document.getElementById("main");
 
-  const root = document.querySelector('#root');
-  root.innerHTML = "";
-  root.appendChild(component);
-  root.classList.add("my-page");
+  parentElement.innerHTML  = "";
+  parentElement.appendChild(component);
 
-  //const game_type = root.querySelector(".game-mode");
-  const game_header = root.querySelector(".game-header");
-  const game_exit   = root.querySelector(".game-exit");
+  const game_header = parentElement.querySelector(".game-header");
+  const game_exit   = parentElement.querySelector(".game-exit");
   const soundButton = document.getElementById("sound");
   const playButton  = document.getElementById("play");
   const newGame     = document.getElementById("new-game");
@@ -134,7 +131,7 @@ const GamePage = () => {
     ctx.textAlign = "center";
     ctx.fillText("Press Play to Start", canvas.width / 2, canvas.height / 2);
   };
-  
+
   canvas.width  = 1920;
   canvas.height = 1080;
 
@@ -189,7 +186,7 @@ const GamePage = () => {
     } else {
         gameRunning = true;
         gamePaused = false;
-        drawOverlay();        
+        drawOverlay();
         resumeGame();
       }
   });
@@ -198,7 +195,7 @@ const GamePage = () => {
     gameRunning = true;
     gamePaused = false;
     drawOverlay();
-    startNewGame(); 
+    startNewGame();
   });
 
   game_exit.addEventListener("click", () => {
@@ -220,8 +217,6 @@ const GamePage = () => {
   if (game_header) {
     showStartMessage();
   }
-
-  Footer();
 };
 
 export default GamePage;

@@ -1,4 +1,3 @@
-import Footer from '../components/Footer.js';
 import helpers from '../helpers/helpers.js'
 
 const { createTemplate, animateSVGElements  } = helpers;
@@ -41,7 +40,7 @@ const InitPage = async () => {
                 <path class="three" d="M0.154393339,3.89485454 L3.97631488,0.139296592 C4.17083111,-0.0518420739 4.48263286,-0.0518571125 4.67716753,0.139262789 L25.6916134,20.7848311 C26.0855801,21.1718824 26.0911863,21.8050225 25.704135,22.1989893 C25.7000188,22.2031791 25.6958657,22.2073326 25.6916762,22.2114492 L4.67709797,42.8607841 C4.48259567,43.0519059 4.17082418,43.0519358 3.97628526,42.8608513 L0.154518591,39.1069479 C-0.0424848215,38.9134427 -0.0453206733,38.5968729 0.148184538,38.3998695 C0.150289256,38.3977268 0.152413239,38.395603 0.154556228,38.3934985 L16.9937789,21.8567812 C17.1908028,21.6632968 17.193672,21.3467273 17.0001876,21.1497035 C16.9980647,21.1475418 16.9959223,21.1453995 16.9937605,21.1432767 L0.15452076,4.60825197 C-0.0425130651,4.41477773 -0.0453986756,4.09820839 0.148075568,3.90117456 C0.150162624,3.89904911 0.152268631,3.89694235 0.154393339,3.89485454 Z" fill="#FFFFFF"></path>
               </g>
             </svg>
-          </span> 
+          </span>
           <span class="animation-init">LOGIN</span>
         </a>
       </div>
@@ -55,11 +54,10 @@ const InitPage = async () => {
 
   const template = document.getElementById("init-template");
   const component = template.content.cloneNode(true);
-  const root = document.querySelector('#root');
-  
-  root.innerHTML = "";
-  root.appendChild(component);
-  root.classList.add("my-page");
+  const parentElement = document.getElementById("main");
+
+  parentElement.innerHTML  = "";
+  parentElement.appendChild(component);
 
   animateSVGElements("#logo path");
 
@@ -68,7 +66,7 @@ const InitPage = async () => {
   setTimeout(() => {
     btn.classList.remove('hidden');
     btn.classList.add('transition-step-1');
-  }, 3000); 
+  }, 3000);
 
   btn.addEventListener('transitionend', () => {
     if (btn.classList.contains('transition-step-1')) {
@@ -76,8 +74,6 @@ const InitPage = async () => {
       btn.classList.add('transition-step-2');
     }
   });
-
-  Footer();
 }
 
 export default InitPage;
