@@ -1,3 +1,8 @@
 home-page main {
   max-width: 1080px;
 }
+
+img#avatar-home {
+  width: 100px;
+  height: 100px;
+}
