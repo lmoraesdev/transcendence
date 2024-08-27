@@ -2,13 +2,13 @@ export class AI {
   constructor(initialDifficulty) {
     this.baseDifficulty = initialDifficulty; // Dificuldade base para referência
     this.difficulty = initialDifficulty; // Dificuldade inicial da IA
-    this.randomnessFactor = 8; // Fator de aleatoriedade inicial
-    this.movementVariance = 2; // Variância inicial para movimentação imprevisível
+    this.randomnessFactor = 10; // Fator de aleatoriedade inicial
+    this.movementVariance = 5; // Variância inicial para movimentação imprevisível
     this.evolutionLevel = 0; // Nível atual de evolução da IA
     this.maxEvolutionLevel = 5; // Nível máximo de evolução da IA
     this.evolutionDecay = 0.2; // Taxa de decadência da evolução quando a IA marca pontos
     this.learningRate = 0.1; // Taxa de aprendizado da IA
-    this.initialDifficultyReduction = 2; // Redução inicial da dificuldade para novos jogadores
+    this.initialDifficultyReduction = 3; // Redução inicial da dificuldade para novos jogadores
     this.lastBallPosition = { x: 0, y: 0 }; // Para rastrear a última posição da bola
     this.refreshInterval = 1000; // Intervalo de atualização da IA em milissegundos
     this.lastUpdate = Date.now(); // Tempo da última atualização
