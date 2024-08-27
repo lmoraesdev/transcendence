@@ -5,7 +5,7 @@ import FriendsList from "../components/FriendsList.js"
 const ProfilePage = () => {
   const profileHTML = `
     <template id="profile-template">
-      <main class="text-black profile-container container-fluid d-flex flex-column justify-content-center gap-5 mt-5">
+      <main class="profile-container container-fluid d-flex flex-column justify-content-center gap-5 mt-5">
         <div class="player-data d-flex justify-content-around align-items-center flex-wrap gap-1 p-3 rounded-5">
           <div class="data-section d-flex flex-column justify-content-center align-items-center gap-2 p-2 rounded-5">
             <h4 class="username align-self-stretch text-center m-0 p-2 rounded-5"></h4>
@@ -58,14 +58,13 @@ const ProfilePage = () => {
   parentElement.appendChild(component);
 
   fetching(`https://${window.ft_transcendence_host}/player/`).then((res) => {
-    parentElement.querySelector(".player-data .avatar")?.setAttribute("src", res.player.avatar ||
-      `https://${window.ft_transcendence_host}/images/genericUser.png`);
-    parentElement.querySelector(".player-data .username").innerText = res.player.username || "";
-    parentElement.querySelector(".player-data .first-name").innerText = res.player.first_name || "";
-    parentElement.querySelector(".player-data .last-name").innerText = res.player.last_name || "";
-    parentElement.querySelector(".player-data .champions").innerText = res.player.champions || "";
-    parentElement.querySelector(".player-data .wins").innerText = res.player.wins || "";
-    parentElement.querySelector(".player-data .losses").innerText = res.player.losses || "";
+    parentElement.querySelector(".player-data .avatar").setAttribute("src", res.player.avatar);
+    parentElement.querySelector(".player-data .username").innerText = res.player.username;
+    parentElement.querySelector(".player-data .first-name").innerText = res.player.first_name;
+    parentElement.querySelector(".player-data .last-name").innerText = res.player.last_name;
+    parentElement.querySelector(".player-data .champions").innerText = res.player.champions;
+    parentElement.querySelector(".player-data .wins").innerText = res.player.wins;
+    parentElement.querySelector(".player-data .losses").innerText = res.player.losses;
   });
 
   MatchHistory();
