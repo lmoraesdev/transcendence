@@ -5,7 +5,7 @@ import FriendsList from "../components/FriendsList.js"
 const ProfilePage = () => {
   const profileHTML = `
     <template id="profile-template">
-      <main class="profile-container container-fluid d-flex flex-column justify-content-center gap-5 mt-5">
+      <main class="text-black profile-container container-fluid d-flex flex-column justify-content-center gap-5 mt-5">
         <div class="player-data d-flex justify-content-around align-items-center flex-wrap gap-1 p-3 rounded-5">
           <div class="data-section d-flex flex-column justify-content-center align-items-center gap-2 p-2 rounded-5">
             <h4 class="username align-self-stretch text-center m-0 p-2 rounded-5"></h4>

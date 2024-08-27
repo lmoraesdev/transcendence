@@ -1,4 +1,5 @@
 import fetching from "../../helpers/fetching.js";
+import router from "../../router/router.js";
 
 /*const TwofaInput = () => {
   const twofaInputHTML = `
@@ -44,7 +45,7 @@ import fetching from "../../helpers/fetching.js";
         if (res.statusCode === 200) {
           input.value = "";
           if (res.redirected)
-            window.location.href = `https://${window.ft_transcendence_host}/home/`;
+            router.go('/home/', '', false);
           else {
             const popup_twofa = document.querySelector(".popup-twofa");
             const popup_twofa_qrcode = document.querySelector(".popup-twofa-qrcode");

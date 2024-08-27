@@ -112,19 +112,19 @@ const HomePage = () => {
   const buttonSolo = ButtonHome({
     label: 'Solo',
     customClasses: ['btn-light', 'shadow', 'text-dark', 'bg-body', 'rounded', 'p-4', 'mb-4'],
-    link: `https://${window.ft_transcendence_host}/game?mode=solo`,
+    link: "/game?mode=solo",
   });
 
   const buttonMultiplayer = ButtonHome({
     label: 'Multiplayer',
     customClasses: ['btn-light', 'shadow', 'text-dark', 'bg-body', 'rounded', 'p-4', 'mb-4'],
-    link: `https://${window.ft_transcendence_host}/game?mode=two`,
+    link: "/game?mode=two",
   });
 
   const buttonTournamente = ButtonHome({
     label: 'Tournament',
     customClasses: ['btn-light', 'shadow', 'text-dark', 'bg-body', 'rounded', 'p-4', 'mb-4'],
-    link: `https://${window.ft_transcendence_host}/tournaments`,
+    link: "/tournaments",
   });
   
   buttonsContainer.appendChild(buttonSolo);
