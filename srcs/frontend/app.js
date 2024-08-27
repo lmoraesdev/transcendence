@@ -9,11 +9,6 @@ Object.defineProperty(window, "ft_transcendence_host", {
   writable: false,
 });
 
-Object.defineProperty(window, "player", {
-  value: "localhost",
-  writable: false,
-})
-
 window.addEventListener("keydown", function (e) {
   const target = e.target;
   const isInputField = target.tagName;
