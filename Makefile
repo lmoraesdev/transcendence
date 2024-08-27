@@ -11,23 +11,23 @@ run:
 	@sudo mkdir -p $(VOLUME)/wordpress
 	@sudo mkdir -p $(VOLUME)/mariadb
 	@echo "$(GREEN)** Compose Up ** $(RESET)"
-	@docker-compose --file=$(COMPOSE) up --build --detach
+	@docker compose --file=$(COMPOSE) up --build --detach
 
 up:
 	@echo "$(GREEN)** Compose Up ** $(RESET)"
-	@docker-compose --file=$(COMPOSE) up --build --detach
+	@docker compose --file=$(COMPOSE) up --build --detach
 
 down:
 	@echo "$(GREEN)** Compose down ** $(RESET)"
-	@docker-compose --file=$(COMPOSE) down --rmi all --remove-orphans -v
+	@docker compose --file=$(COMPOSE) down --rmi all --remove-orphans -v
 
 start:
 	@echo "$(GREEN)** Start containers ** $(RESET)"
-	@docker-compose --file=$(COMPOSE) start
+	@docker compose --file=$(COMPOSE) start
 
 stop:
 	@echo "$(GREEN)** Stop containers ** $(RESET)"
-	@docker-compose --file=$(COMPOSE) stop
+	@docker compose --file=$(COMPOSE) stop
 
 ls:
 	@echo "$(GREEN)**** List containers ****$(RESET)"
@@ -53,21 +53,21 @@ re: fclean all
 
 build:
 	@echo "$(GREEN)** Build containers ** $(RESET)"
-	@docker-compose --file=$(COMPOSE) build
+	@docker compose --file=$(COMPOSE) build
 
 restart: down up
 
 logs:
 	@echo "$(GREEN)** Logs **$(RESET)"
-	@docker-compose --file=$(COMPOSE) logs
+	@docker compose --file=$(COMPOSE) logs
 
 ps:
 	@echo "$(GREEN)** Logs **$(RESET)"
-	@docker-compose --file=$(COMPOSE) ps
+	@docker compose --file=$(COMPOSE) ps
 
 exec:
 	@echo "$(GREEN)** Exec **$(RESET)"
-	@docker-compose --file=$(COMPOSE) exec $(SERVICE) $(COMMAND)
+	@docker compose --file=$(COMPOSE) exec $(SERVICE) $(COMMAND)
 
 .PHONY: all run up down start stop ls clean fclean re build restart logs exec help ps
 help:

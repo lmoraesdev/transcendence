@@ -1,4 +1,8 @@
+// pongSolo.js
+
+import { AI } from "./ai.js";
 import fetching from "../helpers/fetching.js";
+import { updateStats } from "../IA/statsDashboard.js";
 import { soundEnabled } from "../helpers/soundControl.js";
 
 let loopIdSolo;
@@ -30,7 +34,7 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
   canvas.width = 1920;
   canvas.height = 1080;
 
-  const ball = createBall([4, 4], [canvas.width / 2, canvas.height / 2], 20); // Velocidade inicial aumentada
+  const ball = createBall([4, 4], [canvas.width / 2, canvas.height / 2], 20);
   const paddlePlayer = createPaddle(10, [60, canvas.height / 2 - 100], [40, 200]);
   const paddleComputer = createPaddle(10, [canvas.width - 100, canvas.height / 2 - 100], [40, 200]);
 
@@ -44,7 +48,6 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
     "https://assets.mixkit.co/active_storage/sfx/2073/2073-preview.mp3",
   );
 
-  // Carregar áudio antes de usá-los
   gameOverSound.addEventListener("canplaythrough", () =>
     console.log("Som de game over carregado."),
   );
@@ -52,8 +55,8 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
   reboundSound.addEventListener("canplaythrough", () => console.log("Som de rebote carregado."));
 
   let lastUpdateTime = Date.now();
-  let aiIntelligence = 5; // Nível inicial de inteligência da IA
-  let aiPerformance = { hits: 0, misses: 0 }; // Desempenho da IA
+  let ai = new AI(5);
+  let aiPerformance = { hits: 0, misses: 0 };
 
   function playSound(sound) {
     if (!getSoundStatus()) {
@@ -85,14 +88,11 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
       ball.speedX *= -1;
       playSound(reboundSound);
 
-      // Aumenta a velocidade da bola após colisão com a raquete
-      ball.speedX *= 1.1; // Ajustado para um aumento mais gradual
-      ball.speedY *= 1.1; // Ajustado para um aumento mais gradual
+      ball.speedX *= 1.1;
+      ball.speedY *= 1.1;
 
-      // Atualiza o desempenho da IA
       aiPerformance.hits++;
     } else {
-      // Atualiza o desempenho da IA se ela errou o golpe
       aiPerformance.misses++;
     }
   }
@@ -127,153 +127,79 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
     if (ball.speedX < 0) {
       scoreComputer += 1;
       localStorage.setItem("scoreComputer", scoreComputer);
-      ball.speedX = -4; // Velocidade inicial maior após pontuação da IA
-      aiIntelligence = Math.max(1, aiIntelligence - 1);
-      aiPerformance.misses = 0; // Reinicia o contador de erros
+      ball.speedX = -4;
+      ai.adjustDifficulty(false);
+      aiPerformance.misses = 0;
     } else {
       scorePlayer += 1;
       localStorage.setItem("scorePlayer", scorePlayer);
-      ball.speedX = 4; // Velocidade inicial maior após pontuação do jogador
-      aiIntelligence = Math.min(10, aiIntelligence + 1);
-      aiPerformance.hits = 0; // Reinicia o contador de acertos
+      ball.speedX = 4;
+      ai.adjustDifficulty(true);
+      aiPerformance.hits = 0;
     }
 
     if (scorePlayer === 7 || scoreComputer === 7) {
       window.cancelAnimationFrame(loopIdSolo);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.font = "100px monospace";
-      ctx.textAlign = "center";
-      ctx.fillText(
-        scorePlayer > scoreComputer ? namePlayer : "Game Over\n You lost!",
-        canvas.width / 2,
-        canvas.height / 2,
-      );
-
-      try {
-        if (scoreComputer === 7) {
-          await playSound(gameOverSound);
-        } else if (scorePlayer === 7) {
-          await playSound(winGameSound);
-        }
-      } catch (error) {
-        console.error("Erro ao reproduzir som:", error);
+      if (scorePlayer > scoreComputer) {
+        alert(namePlayer);
+        playSound(winGameSound);
+      } else {
+        alert("Game Over!");
+        playSound(gameOverSound);
       }
-      return true;
+      localStorage.clear();
+      window.location.reload();
     }
-
-    ball.speedY = Math.random() < 0.5 ? 4 : -4; // Velocidade vertical inicial maior
-    return false;
+    updateStats();
+    return true;
   };
 
-  function predictBallPosition(ball, paddle) {
-    // Calcula a posição da bola no futuro com base na sua velocidade
-    const timeToReachPaddle = (paddle.positionX - ball.positionX) / ball.speedX;
-    const predictedY = ball.positionY + ball.speedY * timeToReachPaddle;
-    return predictedY;
-  }
-
-  function simulateKeyPressForComputer(ball, paddle) {
-    const predictedY = predictBallPosition(ball, paddle);
-    const paddleCenterY = paddle.positionY + paddle.sizeY / 2;
-
-    if (predictedY < paddleCenterY - 10) {
-      paddle.positionY -= paddle.speedY;
-    } else if (predictedY > paddleCenterY + 10) {
-      paddle.positionY += paddle.speedY;
-    }
-  }
-
-  function updateComputerPaddle(ball, paddle) {
-    const currentTime = Date.now();
-    const deltaTime = currentTime - lastUpdateTime;
-
-    // Atualiza a IA com uma alta frequência para garantir precisão
-    if (deltaTime >= 1000 / 60) {
-      // Atualiza a cada 60ms (aproximadamente 60 FPS)
-      simulateKeyPressForComputer(ball, paddle);
-      paddleCollision(canvas, paddle);
-      lastUpdateTime = currentTime;
-    }
-
-    // Ajusta a inteligência da IA para uma dificuldade muito alta
-    aiIntelligence = 10; // Define a IA para o nível máximo de dificuldade
-  }
-
-  function Score(ctx, canvas, scorePlayer, scoreComputer) {
-    ctx.fillStyle = "white";
-    ctx.font = "bold 60px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText(scorePlayer, canvas.width / 2 - 100, 100);
-    ctx.fillText(scoreComputer, canvas.width / 2 + 100, 100);
-  }
-
   function gameLoopSolo(canvas, ctx, ball, paddlePlayer, paddleComputer) {
+    const now = Date.now();
+    const deltaTime = now - lastUpdateTime;
+    lastUpdateTime = now;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#000";
+    ctx.fillRect(
+      ball.positionX - ball.size,
+      ball.positionY - ball.size,
+      ball.size * 2,
+      ball.size * 2,
+    );
+
+    ctx.fillStyle = "#00f";
+    ctx.fillRect(
+      paddlePlayer.positionX,
+      paddlePlayer.positionY,
+      paddlePlayer.sizeX,
+      paddlePlayer.sizeY,
+    );
+    ctx.fillRect(
+      paddleComputer.positionX,
+      paddleComputer.positionY,
+      paddleComputer.sizeX,
+      paddleComputer.sizeY,
+    );
+
+    ball.positionX += (ball.speedX * deltaTime) / 1000;
+    ball.positionY += (ball.speedY * deltaTime) / 1000;
+
+    BallPaddleCollision(ball, paddlePlayer);
+    BallPaddleCollision(ball, paddleComputer);
+
+    ballCollision(canvas, ball, ctx, paddlePlayer, paddleComputer);
+
+    ai.update(ball, paddleComputer, canvas.height);
+
+    paddlePlayer.positionY += (KeyPressedSolo[KeyW] ? -10 : 0) + (KeyPressedSolo[KeyS] ? 10 : 0);
+    paddleComputer.positionY = ball.positionY - paddleComputer.sizeY / 2;
+
+    paddleCollision(canvas, paddlePlayer);
+    paddleCollision(canvas, paddleComputer);
+
     loopIdSolo = window.requestAnimationFrame(() =>
       gameLoopSolo(canvas, ctx, ball, paddlePlayer, paddleComputer),
     );
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ball.update();
-    ballCollision(canvas, ball, ctx, paddlePlayer, paddleComputer);
-    ball.render(ctx);
-    paddlePlayer.update(true);
-    paddleComputer.update(false);
-    paddlePlayer.render(ctx);
-    paddleComputer.render(ctx);
-    Score(ctx, canvas, scorePlayer, scoreComputer);
-    BallPaddleCollision(ball, paddlePlayer);
-    BallPaddleCollision(ball, paddleComputer);
-    updateComputerPaddle(ball, paddleComputer);
   }
 }
-
-const createPaddle = (speed, position, size) => ({
-  speedY: speed,
-  positionX: position[0],
-  positionY: position[1],
-  sizeX: size[0],
-  sizeY: size[1],
-
-  update(isPlayer) {
-    if (isPlayer) {
-      if (KeyPressedSolo[KeyS]) {
-        this.positionY += this.speedY;
-      }
-      if (KeyPressedSolo[KeyW]) {
-        this.positionY -= this.speedY;
-      }
-    }
-  },
-
-  render(ctx) {
-    ctx.fillStyle = "whitesmoke";
-    ctx.beginPath();
-    ctx.roundRect(this.positionX, this.positionY, this.sizeX, this.sizeY, 20);
-    ctx.stroke();
-    ctx.fill();
-  },
-
-  Center() {
-    return [this.positionX + this.sizeX / 2, this.positionY + this.sizeY / 2];
-  },
-});
-
-const createBall = (speed, position, size) => ({
-  speedX: speed[0],
-  speedY: speed[1],
-  positionX: position[0],
-  positionY: position[1],
-  size: size,
-
-  render(ctx) {
-    ctx.beginPath();
-    ctx.arc(this.positionX, this.positionY, this.size, 0, 2 * Math.PI);
-    ctx.fillStyle = "white";
-    ctx.fill();
-  },
-
-  update() {
-    this.positionX += this.speedX;
-    this.positionY += this.speedY;
-  },
-});
