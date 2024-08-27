@@ -9,6 +9,11 @@ Object.defineProperty(window, "ft_transcendence_host", {
   writable: false,
 });
 
+Object.defineProperty(window, "player", {
+  value: "localhost",
+  writable: false,
+})
+
 window.addEventListener("keydown", function (e) {
   const target = e.target;
   const isInputField = target.tagName;
@@ -41,10 +46,10 @@ window.addEventListener("DOMContentLoaded", () => {
   Navbar();
   Footer();
 
-  const navbarElement = document.querySelector('.navbar');
+  const navbarElement = document.getElementById("main-bar");
 
   if (navbarElement)
-    navbarElement.style.display = "none";
+    navbarElement.style.visibility = "hidden";
 
   router.init();
 });

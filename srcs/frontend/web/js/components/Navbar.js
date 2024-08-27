@@ -3,7 +3,7 @@ import fetching from "../helpers/fetching.js";
 const Navbar = async () => {
   const navbarHTML = `
     <template id="navbar-template">
-      <nav class="navbar navbar-expand-lg bg-white m-4 border border-2 border-dark rounded-5 p-0 align-items-center">
+      <nav id="main-bar" class="navbar navbar-expand-lg bg-white m-4 border border-2 border-dark rounded-5 p-0 align-items-center">
         <div class="container-fluid">
           <a class="navbar-brand fs-6 px-1 py-0" href="#">
             <img
@@ -59,8 +59,15 @@ const Navbar = async () => {
 
   if (avatarElement && nameElement) {
     fetching(`https://${window.ft_transcendence_host}/player/`).then((res) => {
-      avatarElement.src = res.player.avatar || "/web/images/genericUser.svg";
-      nameElement.textContent = res.player.firstName ? res.player.firstName : "";
+      const defaultSrc = "/web/images/genericUser.svg";
+
+      if (res.player) {
+        avatarElement.src = res.player.avatar || defaultSrc;
+        nameElement.textContent = res.player.firstName || "";
+      } else {
+        avatarElement.src = defaultSrc;
+        nameElement.textContent = "";
+      }
     });
   }
 

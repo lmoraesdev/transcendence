@@ -8,100 +8,55 @@ import SettingPage from '../pages/SettingPage.js';
 import TournamentPage from '../pages/TournamentPage.js';
 import TwofaPage from '../pages/TwofaPage.js';
 
-import { checkAndRefreshToken } from '../services/auth.js';
-import { wsFour } from "../game/pongFour.js";
 import { wsTwo } from "../game/pongTwo.js";
-
-// const showNav = (func) => {
-//   return () => {
-//     const navbarElement = document.querySelector('.navbar');
-
-//     if (navbarElement)
-//       navbarElement.style.display = "flex";
-
-//     func();
-//   }
-// }
-
-// const hideNav = (func) => {
-//   return () => {
-//     const navbarElement = document.querySelector('.navbar');
-
-//     if (navbarElement)
-//       navbarElement.style.display = "flex";
-
-//     func();
-//   }
-// }
+import { wsFour } from "../game/pongFour.js";
+import fetching from "../helpers/fetching.js";
 
 const routes = {
   "/": hideNav(LoginPage),
   "/login/": hideNav(LoginPage),
   "/twofa/": hideNav(TwofaPage),
   "/home/": showNav(GameModalityPage),
+  "/game/": showNav(GamePage),
   "/game-modality/": showNav(GameModalityPage),
+  "/leaderboard/": showNav(Leaderboard),
   "/profile/": showNav(ProfilePage),
   "/settings/": showNav(SettingPage),
-  "/leaderboard/": showNav(Leaderboard),
   "/tournaments/": showNav(TournamentPage),
-  "/game/": showNav(GamePage),
 }
 
 const router = {
   init: async () => {
-
-    await checkAndRefreshToken();
-
     window.addEventListener("popstate", (event) => {
       event.preventDefault();
+
       if (wsTwo)
         wsTwo.close(1000);
+
       if (wsFour)
         wsFour.close(1000);
-      router.go(event.state.route, event.state.query, "navigation");
+      router.go(event.state.route, event.state.query, false);
     });
 
     document.addEventListener("click", event => {
       if (!event.target.matches(".nav-link"))
         return;
+
       event.preventDefault();
+
       if (wsTwo)
         wsTwo.close(1000);
+
       if (wsFour)
         wsFour.close(1000);
-      router.go(event.target.pathname, "", "add");
-    })
 
-    let pathname = location.pathname;
-    console.log("path: " + pathname, location);
+      router.go(event.target.pathname, event.target.pathname, false);
+    });
 
-    const wsUrl = `wss://${window.ft_transcendence_host}/authentication/ws/login/`;
-    const ws = new WebSocket(wsUrl);
-
-    console.log('ws', ws);
-
-    ws.onopen = () => console.log('WebSocket connection opened');
-    ws.onerror = (error) => {
-      console.error(`WebSocket error:`, error);
-      console.error(`Error details:`, JSON.stringify(error, null, 2));
-    };
-
-    ws.onmessage = (event) => {
-      const message = event.data;
-      console.log("message", message);
-      if (message === "Valid") {
-        if (pathname == "/login/" || pathname == "/twofa/") pathname = "/home/";
-      } else if (message === "Twofa") {
-        pathname = "/twofa/";
-      } else if (message === "Invalid") {
-        pathname = "/login/";
-      }
-      router.go(pathname, window.location.search, "replace");
-    };
-    ws.onerror = (error) => console.error(`WebSocket error: ${error}`);
+    router.go(location.pathname, location.pathname, true);
   },
 
-  go: async (route, query, state) => {
+  go: async (route, query, shouldReplace) => {
     const contentElement = document.getElementById("main");
 
     const loadingIndicator = `
@@ -112,24 +67,39 @@ const router = {
       </div>
     `;
 
+    let playerResponse = null;
     const previousContent = contentElement.innerHTML;
     contentElement.innerHTML = loadingIndicator;
 
-    await checkAndRefreshToken();
-
-    if (state === "add" && location.pathname !== route)
-      history.pushState({ route, query }, "", route + query);
-    else if (state === "replace")
-      history.replaceState({ route, query }, "", route + query);
-
     try {
+      await fetching(`https://${window.ft_transcendence_host}/player/`).then((res) => {
+        playerResponse = res;
+      });
 
-      if (route.slice(-1) != "/")
+      if (route.slice(-1) != "/" && !route.startsWith("/game?"))
         route += "/"
 
-      const targetPage = routes[route] || NotfoundPage;
-      targetPage();
+      if (!playerResponse)
+        // TODO: should we log out in this case?
+        route = "/login/";
+      if (playerResponse.status == 200) {
+        if (route == "/login/" || route == "/twofa/" || route == "/")
+          route = "/home/";
+      }
+      else if (playerResponse.status == 402)
+        route = "/twofa/";
+      else
+        route = "/login/";
 
+      const targetPage = route.startsWith("/game?") ? showNav(GamePage) :
+        (routes[route] || showNav(NotfoundPage));
+
+      if (shouldReplace)
+        history.replaceState({ route, query }, null, route);
+      else
+        history.pushState({ route, query }, null, route);
+
+      targetPage();
     } catch (error) {
       console.error("Erro ao carregar a página:", error);
       // Restaura o conteúdo anterior em caso de erro
@@ -140,10 +110,10 @@ const router = {
 
 function showNav(func) {
   return () => {
-    const navbarElement = document.querySelector('.navbar');
+    const navbarElement = document.getElementById("main-bar");
 
     if (navbarElement)
-      navbarElement.style.display = "flex";
+      navbarElement.style.visibility = "visible";
 
     func();
   }
@@ -151,16 +121,13 @@ function showNav(func) {
 
 function hideNav(func) {
   return () => {
-    const navbarElement = document.querySelector('.navbar');
+    const navbarElement = document.getElementById("main-bar");
 
     if (navbarElement)
-      navbarElement.style.display = "none";
+      navbarElement.style.visibility = "hidden";
 
     func();
   }
 }
 
 export default router;
-
-//Ajustar caminho de tela para bloquear acesso direto
-//Ajustar diminuição do carregamento de tela

@@ -2,6 +2,7 @@ import Modal from '../components/Modal.js';
 import { runPongCoopGame } from '../game/pongCoop.js';
 import { runPongTwoGame, Ball, Paddle, keys } from '../game/pongTwo.js';
 import { runPongFourGame } from '../game/pongFour.js';
+import router from '../router/router.js';
 
 const GameModalityPage = () => {
   const gameModalityHTML = `
@@ -42,21 +43,23 @@ const GameModalityPage = () => {
   parentElement.innerHTML  = "";
   parentElement.appendChild(component);
 
-  const redirectToGameMode = (mode) => {
+  const redirectToGameMode = (event, mode) => {
+
+    event.preventDefault();
 
     if (mode === 1) {
-      window.location.href = `https://localhost/game?mode=solo`;
+      router.go("/game/", `/game?mode=solo`, false);
     } else if (mode === 2) {
-      window.location.href = `https://localhost/game?mode=two`;
+      router.go("/game/", `/game?mode=two`, false);
     } else if (mode === 3) {
-      window.location.href = `https://localhost/game?mode=four`;
+      router.go("/game/", `/game?mode=four`, false);
     }
   };
 
   const buttons = parentElement.querySelectorAll('.game-mode-button');
-  buttons[0].addEventListener('click', () => redirectToGameMode(1));
-  buttons[1].addEventListener('click', () => redirectToGameMode(2));
-  buttons[2].addEventListener('click', () => redirectToGameMode(3));
+  buttons[0].addEventListener('click', (event) => redirectToGameMode(event, 1));
+  buttons[1].addEventListener('click', (event) => redirectToGameMode(event, 2));
+  buttons[2].addEventListener('click', (event) => redirectToGameMode(event, 3));
 };
 
 export default GameModalityPage;
