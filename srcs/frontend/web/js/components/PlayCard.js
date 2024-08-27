@@ -47,13 +47,13 @@ const PlayCard = () => {
     head.textContent = "PING PONG";
   }
   play_two_elem.addEventListener("click", () => {
-    router.go(gameRoute, `?game=${game}&mode=two`, "add");
+    router.go(gameRoute, `?game=${game}&mode=two`, false);
   });
   play_four_elem.addEventListener("click", () => {
-    router.go(gameRoute, `?game=${game}&mode=four`, "add");
+    router.go(gameRoute, `?game=${game}&mode=four`, false);
   });
   play_coop_elem.addEventListener("click", () => {
-    router.go(gameRoute, `?game=${game}&mode=coop`, "add");
+    router.go(gameRoute, `?game=${game}&mode=coop`, false);
   });
 };
 
