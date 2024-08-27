@@ -9,7 +9,7 @@ from pyotp.totp import TOTP
 from functools import wraps
 from base64 import b32encode
 from typing import Dict
-from .models import Player
+from .models import Player, PlayerSettings
 
 logger = logging.getLogger('custom_logger')
 
@@ -74,6 +74,8 @@ def createPlayer(data: Dict[str, str]) -> Player:
             lastName = lastName,
             avatar = avatar
         )
+
+        PlayerSettings.objects.create(playerId=player)
         #logger.debug("Novo jogador criado: %s", player)
         #logger.debug("PLayer: %s", player)
         #return Player.objects.get(email=email)
