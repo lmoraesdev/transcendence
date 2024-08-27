@@ -76,6 +76,8 @@ const HomePage = () => {
         nameSpan.className = 'text-dark mx- 2 fw-bold ms-2';
         nameSpan.textContent = player.username;
 
+        console.log(player.username);
+
         const buttonDiv = document.createElement('div');
         buttonDiv.className = 'd-flex mx-2 my-auto mt-2';
         const addButton = document.createElement('button');
