@@ -239,8 +239,8 @@ const createPaddle = (speed, position, size) => ({
 });
 
 const createBall = (speed, position, size) => ({
-  speedX: speed[0] / 1.5, // Reduzir a velocidade para não parecer rápida
-  speedY: speed[1] / 1.5, // Reduzir a velocidade para não parecer rápida
+  speedX: speed[0] / 1.0, // Reduzir a velocidade para não parecer rápida
+  speedY: speed[1] / 1.0, // Reduzir a velocidade para não parecer rápida
   positionX: position[0],
   positionY: position[1],
   size: size,
