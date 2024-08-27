@@ -2,7 +2,7 @@ FROM    python:3.11.7
 
 RUN     apt-get update -y && \
         apt-get upgrade -y && \
-        apt-get install curl vim nano lsof netcat-openbsd -y
+        apt-get install curl vim nano lsof netcat-openbsd -y 
 
 RUN     mkdir -p /services/pong/
 

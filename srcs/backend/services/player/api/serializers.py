@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Player
+from .models import Player, PlayerSettings
 
 class PlayerSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,4 +20,18 @@ class PlayerInfoSerializer(serializers.ModelSerializer):
             "status",
             "victory",
             "defeat",
+        ]
+
+class PlayerSettingsInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlayerSettings
+        fields = [
+            "id",
+            "playerId",
+            "screenReader",
+            "highContrast",
+            "textSize",
+            "colorBlind",
+            "language",
+            "iaLevel",
         ]

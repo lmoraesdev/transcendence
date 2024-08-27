@@ -2,8 +2,8 @@ import os
 import logging
 import urllib.parse
 from pprint import pformat
-from .serializers import PlayerInfoSerializer
-from .models import  Friendship, Player, PlayerMatch, PlayerTournament 
+from .serializers import PlayerInfoSerializer, PlayerSettingsInfoSerializer
+from .models import  Friendship, Player, PlayerMatch, PlayerSettings
 from .decorators import jwtCookieRequired
 from django.db.models import Q
 from django.conf import settings
@@ -33,9 +33,15 @@ class PlayerInfo(APIView):
                 })
             player = Player.objects.get(id=request.decoded_token['id'])
             serializer = PlayerInfoSerializer(player)
+
+            logger.debug("pega a settings")
+            playerSettings = PlayerSettings.objects.get(playerId=player)
+            logger.debug(f"Settings = {pformat(playerSettings)}")
+            serializerSettings = PlayerSettingsInfoSerializer(playerSettings)
             return Response({
                 "status": 200,
-                "player": serializer.data
+                "player": serializer.data,
+                "playerSettings": serializerSettings.data
             })
         except Player.DoesNotExist:
             return Response({
@@ -52,64 +58,151 @@ class PlayerInfo(APIView):
     def post(self, request):
         try:
             changed = False
+            changedSettings = False
+            message = "No changes detected"
+
             id = request.decoded_token['id']
             playerData = request.data.get('player')
+            playerSettingsData = request.data.get('playerSettings')
 
             logger.info(f"Received request to update player with ID: {id}")
             logger.debug(f"player data {pformat(playerData)}")
-            player = Player.objects.get(id=id)
-            logger.info(f"Found player: {player}")
 
-            if "username" in playerData:
-                username = ' '.join(playerData["username"].split())
-                logger.debug(f"Username provided: {username}")
+            if (playerData is not None):
+                player = Player.objects.get(id=id)
+                logger.info(f"Found player: {player}")
+                if (player is not None):
+                    if ("username" in playerData):
+                        username = ' '.join(playerData["username"].split())
+                        logger.debug(f"Username provided: {username}")
 
-                if not username or len(playerData['username']) > 8:
-                    logger.warning(f"Invalid username: {username}")
-                    return Response({
-                        "status": 400,
-                        "message": "Invalid username",
-                    })
+                        if (not username or len(playerData['username']) > Player.username.max_length):
+                            logger.warning(f"Invalid username: {username}")
+                            return Response({
+                                "status": 400,
+                                "message": "Invalid username",
+                            })
 
-                player.username = username
-                changed = True
+                        player.username = username
+                        changed = True
 
-            if "first_name" in playerData:
-                firstName = ' '.join(playerData['first_name'].split())
-                logger.debug(f"First name provided: {firstName}")
+                    if ("first_name" in playerData):
+                        firstName = ' '.join(playerData['first_name'].split())
+                        logger.debug(f"First name provided: {firstName}")
 
-                if not firstName or len(firstName) > 20:
-                    logger.warning(f"Invalid first name: {firstName}")
-                    return Response({
-                        "status": 400,
-                        "message": "Invalid first name",
-                    })
+                        if (not firstName or len(firstName) > Player.firstName.max_length):
+                            logger.warning(f"Invalid first name: {firstName}")
+                            return Response({
+                                "status": 400,
+                                "message": "Invalid first name",
+                            })
 
-                player.firstName = firstName
-                changed = True
+                        player.firstName = firstName
+                        changed = True
 
-            if "last_name" in playerData:
-                lastName = ' '.join(playerData['last_name'].split())
-                logger.debug(f"Last name provided: {lastName}")
+                    if ("last_name" in playerData):
+                        lastName = ' '.join(playerData['last_name'].split())
+                        logger.debug(f"Last name provided: {lastName}")
 
-                if not lastName or len(lastName) > 20:
-                    logger.warning(f"Invalid last name: {lastName}")
-                    return Response({
-                        "status": 400,
-                        "message": "Invalid last name",
-                    })
+                        if (not lastName or len(lastName) > Player.lastName.max_length):
+                            logger.warning(f"Invalid last name: {lastName}")
+                            return Response({
+                                "status": 400,
+                                "message": "Invalid last name",
+                            })
 
-                player.lastName = lastName
-                changed = True
+                        player.lastName = lastName
+                        changed = True
 
-            if "two_factor" in playerData and playerData['two_factor'] is False:
-                logger.debug(f"Two-factor authentication setting: {playerData['two_factor']}")
-                player.twoFactor = playerData['two_factor']
-                changed = True
+                    if "two_factor" in playerData and playerData['two_factor'] is False:
+                        logger.debug(f"Two-factor authentication setting: {playerData['two_factor']}")
+                        player.twoFactor = playerData['two_factor']
+                        changed = True
 
-            player.save()
-            logger.info(f"Player updated successfully with ID: {id}")
-            message = "User updated successfully" if changed else "No changes detected"
+                    if (changed == True):
+                        player.save()
+                        logger.info(f"Player updated successfully with ID: {id}")
+            if (playerSettingsData is not None):
+                playerSettings = PlayerSettings.objects.get(playerId=Player.objects.get(id=id))
+                logger.info(f"Found settings: {playerSettings}")
+                if (playerSettings is not None):
+                    if "screenReader" in playerSettingsData:
+                        logger.debug(f"Screen reader setting: {playerSettingsData['screenReader']}")
+                        playerSettings.screenReader = playerSettingsData['screenReader']
+                        changedSettings = True
+
+                    if "highContrast" in playerSettingsData:
+                        logger.debug(f"High contrast setting: {playerSettingsData['highContrast']}")
+                        playerSettings.highContrast = playerSettingsData['highContrast']
+                        changedSettings = True
+
+                    if "textSize" in playerSettingsData:
+                        textSize = playerSettingsData['textSize']
+                        logger.debug(f"Text size provided: {textSize}")
+
+                        if textSize not in [choice[0] for choice in PlayerSettings.TEXT_SIZE_CHOICE]:
+                            logger.warning(f"Invalid text size: {textSize}")
+                            return Response({
+                                "status": 400,
+                                "message": "Invalid text size",
+                            })
+
+                        playerSettings.textSize = textSize
+                        changedSettings = True
+
+                    if "colorBlind" in playerSettingsData:
+                        colorBlind = playerSettingsData['colorBlind']
+                        logger.debug(f"Color blind setting provided: {colorBlind}")
+
+                        if colorBlind not in [choice[0] for choice in PlayerSettings.COLOR_BLIND_CHOICE]:
+                            logger.warning(f"Invalid color blind setting: {colorBlind}")
+                            return Response({
+                                "status": 400,
+                                "message": "Invalid color blind setting",
+                            })
+
+                        playerSettings.colorBlind = colorBlind
+                        changedSettings = True
+
+                    if "language" in playerSettingsData:
+                        language = playerSettingsData['language']
+                        logger.debug(f"Language provided: {language}")
+
+                        if language not in [choice[0] for choice in PlayerSettings.LANGUAGE_CHOICE]:
+                            logger.warning(f"Invalid language: {language}")
+                            return Response({
+                                "status": 400,
+                                "message": "Invalid language",
+                            })
+
+                        playerSettings.language = language
+                        changedSettings = True
+
+                    if "iaLevel" in playerSettingsData:
+                        iaLevel = playerSettingsData['iaLevel']
+                        logger.debug(f"IA level provided: {iaLevel}")
+
+                        if iaLevel not in [choice[0] for choice in PlayerSettings.IA_LEVE_CHOICE]:
+                            logger.warning(f"Invalid IA level: {iaLevel}")
+                            return Response({
+                                "status": 400,
+                                "message": "Invalid IA level",
+                            })
+
+                        playerSettings.iaLevel = iaLevel
+                        changedSettings = True
+
+                    if (changedSettings == True):
+                        playerSettings.save()
+                        logger.info(f"Player settings updated successfully for player ID: {id}")
+
+            if (changed == True or changedSettings == True):
+                if (changed == True and changedSettings == True):
+                    message = "User updated successfully and or Settings"
+                elif (changed == True):
+                    message = "User updated successfully"
+                elif (changedSettings == True):
+                    message = "User Settings updated successfully"
 
             return Response({
                 "status": 200,
@@ -122,7 +215,12 @@ class PlayerInfo(APIView):
                 "status": 404,
                 "message": "User not found",
             })
-
+        except PlayerSettings.DoesNotExist:
+            logger.error(f"Player Settings not found")
+            return Response({
+                "status": 405,
+                "message": "User Settings not found",
+            })
         except Exception as e:
             logger.exception("An unexpected error occurred")
             return Response({
@@ -347,6 +445,7 @@ class ListAllUser(APIView):
         try:
             username = request.query_params.get('username')
             if username:
+                username = ' '.join(username.split())
                 playerExclude = Player.objects.filter(username=username)
                 if not playerExclude.exists():
                     raise Player.DoesNotExist
