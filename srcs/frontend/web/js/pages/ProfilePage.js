@@ -58,13 +58,14 @@ const ProfilePage = () => {
   parentElement.appendChild(component);
 
   fetching(`https://${window.ft_transcendence_host}/player/`).then((res) => {
-    parentElement.querySelector(".player-data .avatar").setAttribute("src", res.player.avatar);
-    parentElement.querySelector(".player-data .username").innerText = res.player.username;
-    parentElement.querySelector(".player-data .first-name").innerText = res.player.first_name;
-    parentElement.querySelector(".player-data .last-name").innerText = res.player.last_name;
-    parentElement.querySelector(".player-data .champions").innerText = res.player.champions;
-    parentElement.querySelector(".player-data .wins").innerText = res.player.wins;
-    parentElement.querySelector(".player-data .losses").innerText = res.player.losses;
+    parentElement.querySelector(".player-data .avatar")?.setAttribute("src", res.player.avatar ||
+      `https://${window.ft_transcendence_host}/images/genericUser.png`);
+    parentElement.querySelector(".player-data .username").innerText = res.player.username || "";
+    parentElement.querySelector(".player-data .first-name").innerText = res.player.first_name || "";
+    parentElement.querySelector(".player-data .last-name").innerText = res.player.last_name || "";
+    parentElement.querySelector(".player-data .champions").innerText = res.player.champions || "";
+    parentElement.querySelector(".player-data .wins").innerText = res.player.wins || "";
+    parentElement.querySelector(".player-data .losses").innerText = res.player.losses || "";
   });
 
   MatchHistory();

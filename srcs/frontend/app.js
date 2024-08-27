@@ -26,9 +26,9 @@ function setProperty(key, value) {
 localStorage.setItem("colorizer", color || "yellow");
 if (color === "blue") {
   localStorage.setItem("colorizer", "blue");
-setProperty("--color-primary", "#2cacff30");
-setProperty("--color-primary-solid", "#0f3c5a");
-setProperty("--color-primary-light", "#2cacff");
+  setProperty("--color-primary", "#2cacff30");
+  setProperty("--color-primary-solid", "#0f3c5a");
+  setProperty("--color-primary-light", "#2cacff");
 } else {
   localStorage.setItem("colorizer", "yellow");
   setProperty("--color-primary", "#f8ec9030");
