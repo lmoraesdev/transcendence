@@ -1,26 +1,3 @@
-import { BVAmbient } from '../components/bvambient.js';
-
-const executeSequentially = (secondFunction) => {
-  new BVAmbient({
-    selector: "#root",
-    fps: 60,
-    max_transition_speed: 10000,
-    min_transition_speed: 8000,
-    particle_number: 50,
-    particle_maxwidth: 60,
-    particle_minwidth: 30,
-    particle_radius: 50,
-    particle_opacity: true,
-    particle_colision_change: false,
-    particle_background: "#faf9f5",
-    refresh_onfocus: false,
-  });
-
-  if (typeof secondFunction === "function") {
-    secondFunction();
-  }
-};
-
 const getRandom = (min, max) => {
   return Math.random() * (max - min) + min;
 };
@@ -81,7 +58,6 @@ const togglePasswordVisibility = (passwordInput, passwordIcon, iconEye) => {
 };
 
 export default {
-  executeSequentially,
   getRandom,
   createTemplate,
   animateSVGElements,
