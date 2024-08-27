@@ -4,6 +4,7 @@ import Leaderboard from '../pages/LeaderboardPage.js';
 import LoginPage from '../pages/LoginPage.js';
 import NotfoundPage from '../pages/NotfoundPage.js';
 import ProfilePage from '../pages/ProfilePage.js';
+import ProfileSetup from '../pages/ProfileSetup.js'
 import SettingPage from '../pages/SettingPage.js';
 import TournamentPage from '../pages/TournamentPage.js';
 import TwofaPage from '../pages/TwofaPage.js';
@@ -19,6 +20,7 @@ const routes = {
   "/home/": showNav(HomePage),
   "/game-modality/": hideNav(GameModalityPage),
   "/profile/": showNav(ProfilePage),
+  "/profile-setup/": showNav(ProfileSetup),
   "/settings/": showNav(SettingPage),
   "/leaderboard/": showNav(Leaderboard),
   "/tournaments/": showNav(TournamentPage),
@@ -72,8 +74,8 @@ const router = {
       } else if (message === "Invalid") {
         pathname = "/login/";
       }
-      router.go(pathname, window.location.search, "replace");
     };
+    router.go(pathname, window.location.search, "replace");
     ws.onerror = (error) => console.error(`WebSocket error: ${error}`);
   },
 
