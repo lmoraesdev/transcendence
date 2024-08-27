@@ -1,3 +1,5 @@
+import router from '../../router/router.js';
+
 const ButtonHome = ({ label, customClasses = [], onClick, link }) => {
     const buttonContainer = document.createElement('button');
     buttonContainer.classList.add(
@@ -12,11 +14,12 @@ const ButtonHome = ({ label, customClasses = [], onClick, link }) => {
       buttonContainer.addEventListener('click', onClick);
     } else if (link) {
       buttonContainer.addEventListener('click', () => {
-        window.location.href = link;
+        const [route, query] = link.split('?');
+        router.go(route, query ? `?${query}` : '', false);
       });
     }
   
     return buttonContainer;
-  };
-    
-  export default ButtonHome;
+};
+
+export default ButtonHome;

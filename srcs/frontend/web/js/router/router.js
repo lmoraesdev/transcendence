@@ -12,12 +12,13 @@ import TwofaPage from '../pages/TwofaPage.js';
 import { wsTwo } from "../game/pongTwo.js";
 import { wsFour } from "../game/pongFour.js";
 import fetching from "../helpers/fetching.js";
+import HomePage from '../pages/HomePage.js';
 
 const routes = {
   "/": hideNav(LoginPage),
   "/login/": hideNav(LoginPage),
   "/twofa/": hideNav(TwofaPage),
-  "/home/": showNav(GameModalityPage),
+  "/home/": showNav(HomePage),
   "/game/": hideNav(GamePage),
   "/game-modality/": showNav(GameModalityPage),
   "/leaderboard/": showNav(Leaderboard),

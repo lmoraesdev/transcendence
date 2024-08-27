@@ -76,6 +76,8 @@ const HomePage = () => {
         nameSpan.className = 'text-dark mx- 2 fw-bold ms-2';
         nameSpan.textContent = player.username;
 
+        console.log(player.username);
+
         const buttonDiv = document.createElement('div');
         buttonDiv.className = 'd-flex mx-2 my-auto mt-2';
         const addButton = document.createElement('button');
@@ -110,19 +112,19 @@ const HomePage = () => {
   const buttonSolo = ButtonHome({
     label: 'Solo',
     customClasses: ['btn-light', 'shadow', 'text-dark', 'bg-body', 'rounded', 'p-4', 'mb-4'],
-    link: `https://${window.ft_transcendence_host}/game?mode=solo`,
+    link: "/game?mode=solo",
   });
 
   const buttonMultiplayer = ButtonHome({
     label: 'Multiplayer',
     customClasses: ['btn-light', 'shadow', 'text-dark', 'bg-body', 'rounded', 'p-4', 'mb-4'],
-    link: `https://${window.ft_transcendence_host}/game?mode=two`,
+    link: "/game?mode=two",
   });
 
   const buttonTournamente = ButtonHome({
     label: 'Tournament',
     customClasses: ['btn-light', 'shadow', 'text-dark', 'bg-body', 'rounded', 'p-4', 'mb-4'],
-    link: `https://${window.ft_transcendence_host}/tournaments`,
+    link: "/tournaments",
   });
   
   buttonsContainer.appendChild(buttonSolo);

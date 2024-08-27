@@ -3,25 +3,28 @@ import fetching from "../helpers/fetching.js";
 const TournamentPage = () => {
   const tournamentHTML = `
     <template id="tournament-template">
-      <main class=" bg-white container-fluid d-flex flex-column justify-content-around align-items-stretch gap-3 my-5">
+      <main class="text-black bg-white container-fluid d-flex flex-column justify-content-around align-items-stretch gap-3 my-5">
         <section class="tournament-actions d-none flex-column justify-content-center align-items-center py-5 px-4 rounded-5 gap-5">
           <div class="tournament-create d-flex flex-column justify-content-center p-4 rounded-5 gap-4">
-            <h1 class="text-center fw-bold m-0">CREATE A TOURNAMENT</h1>
-            <button class="btn btn-lg fw-bold">CREATE</button>
+            <h1 class="text-center fw-bold m-0">Create a new tournament</h1>
+            <button class="btn btn-lg fw-bold">Create</button>
           </div>
           <div class="tournament-join d-flex flex-column justify-content-center align-items-center p-4 rounded-5 gap-4">
-            <h1 class="text-center fw-bold m-0">JOIN A TOURNAMENT</h1>
+            <h1 class="text-center fw-bold m-0">Join a tournament</h1>
             <div class="tournament-list d-flex flex-wrap justify-content-center align-items-center gap-1"></div>
           </div>
         </section>
         <section class="tournament-current d-none flex-column p-5 rounded-5">
-          <h1 class="text-center fw-bold rounded-5 py-5 mb-5">CURRENT TOURNAMENT</h1>
+          <h1 class="text-center fw-bold rounded-5 py-5 mb-5">Current Tournament</h1>
           <tournament-players></tournament-players>
           <tournament-matches></tournament-matches>
         </section>
       </main>
     </template>
   `;
+
+  /*tournament-actions: Criar e participar de torneios.
+   tournament-current: Torneio atual, incluindo jogadores e partidas. */
 
   const templateContainer = document.createElement('div');
 

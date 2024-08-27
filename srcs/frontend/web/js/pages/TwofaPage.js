@@ -1,6 +1,7 @@
 import TwofaInput from "../components/Input/TwofaInput.js";
 import TwofaButton from "../components/Button/TwofaButton.js";
 import fetching from '../helpers/fetching.js';
+import router from '../router/router.js';
 
 const TwofaPage = () => {
 
@@ -54,7 +55,7 @@ const TwofaPage = () => {
       if (res.statusCode === 200) {
         input.value = "";
         if (res.redirected) {
-          window.location.href = `https://${window.ft_transcendence_host}/home/`;
+          router.go('/home/', '', false);
         } else {
           closeTwoFaPopup(res.message);
         }

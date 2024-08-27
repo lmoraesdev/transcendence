@@ -1,3 +1,5 @@
+import router from '../../router/router.js';
+
 const ButtonLogin = ({ label, iconSVG, customClasses = [], onClick, link }) => {
   const buttonContainer = document.createElement('button');
   buttonContainer.classList.add(
@@ -14,7 +16,8 @@ const ButtonLogin = ({ label, iconSVG, customClasses = [], onClick, link }) => {
     buttonContainer.addEventListener('click', onClick);
   } else if (link) {
     buttonContainer.addEventListener('click', () => {
-      window.location.href = link;
+      const [route, query] = link.split('?');
+      router.go(route, query ? `?${query}` : '', false);    
     });
   }
 

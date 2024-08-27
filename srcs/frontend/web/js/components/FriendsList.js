@@ -49,6 +49,33 @@ const FriendsList = () => {
     "gap-2"
   );
 
+  const showCards = (friend_card_type) => {
+    const friend_cards = friendsList.querySelector(".friend-cards");
+    friend_cards.innerHTML = "";
+
+    if (friend_card_type === "search") {
+      friend_cards.appendChild(document.createElement("search-list"));
+      return;
+    }
+
+    fetching(
+      `https://${window.ft_transcendence_host}/player/friendship/?target=${friend_card_type}`,
+    ).then((req) => {
+      const arr = req.friendships;
+      for (let i = 0; i < arr.length; i++) {
+        const friend_card_elem = document.createElement("friend-card");
+        friend_card_elem.setAttribute("friend-card-type", friend_card_type);
+        friend_card_elem.setAttribute("player-id", arr[i].id);
+        friend_card_elem.setAttribute("first-name", arr[i].first_name);
+        friend_card_elem.setAttribute("last-name", arr[i].last_name);
+        friend_card_elem.setAttribute("username", arr[i].username);
+        friend_card_elem.setAttribute("avatar", arr[i].avatar);
+        friend_card_elem.setAttribute("status", arr[i].status);
+        friend_cards.appendChild(friend_card_elem);
+      }
+    });
+  }
+
   const nav          = friendsList.querySelector("nav");
   const friends_btn  = nav.querySelector(".friends-btn");
   const requests_btn = nav.querySelector(".requests-btn");

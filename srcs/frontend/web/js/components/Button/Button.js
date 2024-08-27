@@ -14,7 +14,8 @@ const Button = ({ label, customClasses = [], onClick, link }) => {
       buttonContainer.addEventListener('click', onClick);
     } else if (link) {
       buttonContainer.addEventListener('click', () => {
-        window.location.href = link;
+        const [route, query] = link.split('?');
+        router.go(route, query ? `?${query}` : '', false);
       });
     }
   
