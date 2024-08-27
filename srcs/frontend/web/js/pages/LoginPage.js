@@ -2,12 +2,11 @@ import Logo from '../components/Logo.js';
 import ButtonLogin from '../components/Button/Button-login.js';
 import helpers from '../helpers/helpers.js';
 
-const { createTemplate, sanitizeUrl } = helpers;
+const { createTemplate } = helpers;
 
 const LoginPage = async () => {
-  const sanitizedHost = sanitizeUrl(`https://${window.ft_transcendence_host}`);
 
-  const templateHTML = `
+  const templateLogin = `
     <template id="login-template">
       <div class="login-container h-100 d-flex mx-auto">
         <div class="login-content d-block col m-2">
@@ -27,7 +26,7 @@ const LoginPage = async () => {
         <div class="login-img p-4 col m-2">
           <img 
             alt="Demo Game Pong" 
-            src="${sanitizeUrl('https://cdn.dribbble.com/users/2092880/screenshots/6426030/pong_1.gif')}" 
+            src="https://cdn.dribbble.com/users/2092880/screenshots/6426030/pong_1.gif" 
             class="img-fluid rounded-5 p-4 object-fit-cover" 
           />
         </div>
@@ -36,23 +35,19 @@ const LoginPage = async () => {
   `;
 
   if (!document.querySelector('#login-template')) {
-    const templateContainer = createTemplate(templateHTML);
+    const templateContainer = createTemplate(templateLogin);
     document.body.appendChild(templateContainer);
   }
 
   const template = document.getElementById("login-template");
   const component = template.content.cloneNode(true);
-  const root = document.querySelector('#root');
-  
-  root.innerHTML = "";
-  root.appendChild(component);
-  root.classList.add("my-page");
+  const parentElement = document.getElementById("main");
 
-  const footer = document.getElementById('footer-template');
+  parentElement.innerHTML  = "";
+  parentElement.appendChild(component);
+  parentElement.classList.add("my-page");
 
-  footer.classList.remove('hidden');
-
-  const buttonsContainer = root.querySelector('.login-content-buttons');
+  const buttonsContainer = parentElement.querySelector('.login-content-buttons');
 
   const button42 = ButtonLogin({
     label: 'Login with 42',
@@ -70,6 +65,6 @@ const LoginPage = async () => {
 
   buttonsContainer.appendChild(button42);
   buttonsContainer.appendChild(buttonGoogle);
-}
+};
 
 export default LoginPage;

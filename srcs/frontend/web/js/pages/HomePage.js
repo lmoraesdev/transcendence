@@ -5,9 +5,10 @@ const HomePage = () => {
   const templateHTML = `
     <template id="home-template">
       <div class="bg-white p-4  h-100 d-flex mx-auto mb-4">
-        <div class="d-grid gap-2 col m-2">
-          <h1 class="text-dark text-center fs-4 my-3">Choose game mode to start</h1>
-          <div class="home-content-buttons d-grid gap-2 col m-2"></div>
+        <div class="gap-2 col m-2">
+        <div class="home-content-buttons d-grid gap-2 col m-2">
+          <h1 class="text-dark text-center fs-4 my-5">Choose game mode to start</h1>
+        </div>
         </div>
         <div class="d-block col m-2">
           <p class="text-dark text-center fs-4 my-3">All players</p>
@@ -28,11 +29,10 @@ const HomePage = () => {
 
   const template = document.getElementById("home-template");
   const component = template.content.cloneNode(true);
+  const parentElement = document.getElementById("main");
 
-  const root = document.querySelector('#root');
-  root.innerHTML = "";
-  root.appendChild(component);
-  root.classList.add("my-page");
+  parentElement.innerHTML = "";
+  parentElement.appendChild(component);
 
   const allPlayersContainer = document.getElementById('all-players');
   
@@ -104,36 +104,30 @@ const HomePage = () => {
 
   getAllPlayers();
 
-  const buttonsContainer = root.querySelector('.home-content-buttons');
+  const buttonsContainer = parentElement.querySelector('.home-content-buttons');
 
   // Vou ajustar o link correto dos botões abaixo
   const buttonSolo = ButtonHome({
     label: 'Solo',
-    customClasses: ['btn-light', 'shadow', 'text-dark', 'bg-body', 'rounded'],
+    customClasses: ['btn-light', 'shadow', 'text-dark', 'bg-body', 'rounded', 'p-4', 'mb-4'],
     link: `https://${window.ft_transcendence_host}/game?mode=solo`,
   });
 
   const buttonMultiplayer = ButtonHome({
     label: 'Multiplayer',
-    customClasses: ['btn-light', 'shadow', 'text-dark', 'bg-body', 'rounded'],
+    customClasses: ['btn-light', 'shadow', 'text-dark', 'bg-body', 'rounded', 'p-4', 'mb-4'],
     link: `https://${window.ft_transcendence_host}/game?mode=two`,
   });
 
   const buttonTournamente = ButtonHome({
-    label: 'Solo',
-    customClasses: ['btn-light', 'shadow', 'text-dark', 'bg-body', 'rounded'],
-    link: `https://${window.ft_transcendence_host}/game?mode=four`,
+    label: 'Tournament',
+    customClasses: ['btn-light', 'shadow', 'text-dark', 'bg-body', 'rounded', 'p-4', 'mb-4'],
+    link: `https://${window.ft_transcendence_host}/tournaments`,
   });
   
   buttonsContainer.appendChild(buttonSolo);
   buttonsContainer.appendChild(buttonMultiplayer);
   buttonsContainer.appendChild(buttonTournamente);
-
-  const navbar = document.getElementById('navbar');
-  const footer = document.getElementById('footer-template');
-
-  navbar.classList.remove('hidden');
-  footer.classList.remove('hidden');
 }
 
 export default HomePage;

@@ -7,27 +7,11 @@
   justify-content: space-between;
 }
 
-.navbar-items li {
-  display: inline-block !important;
-  padding: 10px;
-  margin: 5px;
-  place-items: center;
-}
-
-.navbar-button {
-  padding: 10px !important;
-  border: none;
-  color: white;
-  background-color: black;
-  font-weight: 600;
-}
-
 .btn-outline-warning {
   border: none !important;
   color: #F3C00C;
 }
 
-.navbar-button:hover,
 .btn-outline-warning:hover {
   border: none;
   color: #F3C00C;

@@ -1,4 +1,3 @@
-import Footer from '../components/Footer.js';
 import Modal from '../components/Modal.js';
 import { runPongCoopGame } from '../game/pongCoop.js';
 import { runPongTwoGame, Ball, Paddle, keys } from '../game/pongTwo.js';
@@ -29,70 +28,35 @@ const GameModalityPage = () => {
         </template>
     `;
 
-    const templateGameModality = document.createElement('div');
-  
-    if (!document.querySelector('#game-modality-template')) {
-        templateGameModality.innerHTML = gameModalityHTML;
-      document.body.appendChild(templateGameModality);
+  const templateGameModality = document.createElement('div');
+
+  if (!document.querySelector('#game-modality-template')) {
+    templateGameModality.innerHTML = gameModalityHTML;
+    document.body.appendChild(templateGameModality);
+  }
+
+  const template  = document.getElementById("game-modality-template");
+  const component = template.content.cloneNode(true);
+  const parentElement = document.getElementById("main");
+
+  parentElement.innerHTML  = "";
+  parentElement.appendChild(component);
+
+  const redirectToGameMode = (mode) => {
+
+    if (mode === 1) {
+      window.location.href = `https://localhost/game?mode=solo`;
+    } else if (mode === 2) {
+      window.location.href = `https://localhost/game?mode=two`;
+    } else if (mode === 3) {
+      window.location.href = `https://localhost/game?mode=four`;
     }
-  
-    const template  = document.getElementById("game-modality-template");
-    const component = template.content.cloneNode(true);
-    
-    const root      = document.querySelector('#root');
+  };
 
-    root.innerHTML  = "";
-    root.appendChild(component);
-    root.classList.add("my-page");
-
-    const redirectToGameMode = (mode) => {
-
-        if (mode === 1) {
-           window.location.href = `https://localhost/game?mode=solo`;
-        } else if (mode === 2) {
-            window.location.href = `https://localhost/game?mode=two`;
-        } else if (mode === 3) {
-            window.location.href = `https://localhost/game?mode=four`;
-        }            
-        /*const modalGame = document.getElementById('modalGame');
-
-        if (!modalGame.querySelector('.modal')) {
-            Modal(); 
-        }
-
-
-        // Ajustar travamento do fechamento da modal para redirecionamento e bloqueio 
-        //para não ter permissão de redirecionamento sem envio dos dados.
-        console.log("modal", modalGame);
-        const modal = new bootstrap.Modal(modalGame.querySelector('.modal'), {});
-        console.log("modal1", modal._isShown, modal);
-        modal.show();
-        console.log("modal2", modal._isShown, modal);
-
-        const observer = new MutationObserver(() => {
-            if (!modal._isShown) {        //modalGame.classList.contains('show')) {
-                if (mode === 1) {
-                    window.location.href = `https://localhost/game?mode=solo`;
-                } else if (mode === 2) {
-                    window.location.href = `https://localhost/game?mode=two`;
-                } else if (mode === 3) {
-                    window.location.href = `https://localhost/game?mode=four`;
-                } else {
-                    console.log("Invalid game mode selected.");
-                }
-                observer.disconnect();
-            }
-        });
-
-        observer.observe(modalGame, { attributes: true, attributeFilter: ['class'] });*/
-    };
-
-    const buttons = root.querySelectorAll('.game-mode-button');
-    buttons[0].addEventListener('click', () => redirectToGameMode(1));
-    buttons[1].addEventListener('click', () => redirectToGameMode(2));
-    buttons[2].addEventListener('click', () => redirectToGameMode(3));
-
-    Footer();
+  const buttons = parentElement.querySelectorAll('.game-mode-button');
+  buttons[0].addEventListener('click', () => redirectToGameMode(1));
+  buttons[1].addEventListener('click', () => redirectToGameMode(2));
+  buttons[2].addEventListener('click', () => redirectToGameMode(3));
 };
 
 export default GameModalityPage;

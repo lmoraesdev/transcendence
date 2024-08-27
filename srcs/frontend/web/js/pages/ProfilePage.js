@@ -1,14 +1,10 @@
 import fetching from "../helpers/fetching.js";
-//import Footer from '../components/Footer.js';
-//import Navbar from '../components/Navbar.js';
 import MatchHistory from "../components/MatchHistory.js";
 import FriendsList from "../components/FriendsList.js"
-    
-const ProfilePage = () => {
 
+const ProfilePage = () => {
   const profileHTML = `
     <template id="profile-template">
-      <!--<div id="my-navbar"></div>-->
       <main class="profile-container container-fluid d-flex flex-column justify-content-center gap-5 mt-5">
         <div class="player-data d-flex justify-content-around align-items-center flex-wrap gap-1 p-3 rounded-5">
           <div class="data-section d-flex flex-column justify-content-center align-items-center gap-2 p-2 rounded-5">
@@ -48,7 +44,7 @@ const ProfilePage = () => {
   `;
 
   const templateProfile = document.createElement('div');
-  
+
   if (!document.querySelector('#profile-template')) {
     templateProfile.innerHTML = profileHTML;
     document.body.appendChild(templateProfile);
@@ -56,27 +52,23 @@ const ProfilePage = () => {
 
   const template      = document.getElementById("profile-template");
   const component     = template.content.cloneNode(true);
-  
-  const root          = document.querySelector('#root');
+  const parentElement = document.getElementById("main");
 
-  root.innerHTML = "";
-  root.appendChild(component);
-  root.classList.add("my-page");
+  parentElement.innerHTML  = "";
+  parentElement.appendChild(component);
 
   fetching(`https://${window.ft_transcendence_host}/player/`).then((res) => {
-    root.querySelector(".player-data .avatar").setAttribute("src", res.player.avatar);
-    root.querySelector(".player-data .username").innerText = res.player.username;
-    root.querySelector(".player-data .first-name").innerText = res.player.first_name;
-    root.querySelector(".player-data .last-name").innerText = res.player.last_name;
-    root.querySelector(".player-data .champions").innerText = res.player.champions;
-    root.querySelector(".player-data .wins").innerText = res.player.wins;
-    root.querySelector(".player-data .losses").innerText = res.player.losses;
+    parentElement.querySelector(".player-data .avatar").setAttribute("src", res.player.avatar);
+    parentElement.querySelector(".player-data .username").innerText = res.player.username;
+    parentElement.querySelector(".player-data .first-name").innerText = res.player.first_name;
+    parentElement.querySelector(".player-data .last-name").innerText = res.player.last_name;
+    parentElement.querySelector(".player-data .champions").innerText = res.player.champions;
+    parentElement.querySelector(".player-data .wins").innerText = res.player.wins;
+    parentElement.querySelector(".player-data .losses").innerText = res.player.losses;
   });
 
-  //Navbar();
   MatchHistory();
   FriendsList();
-  //Footer();
 };
 
 export default ProfilePage;

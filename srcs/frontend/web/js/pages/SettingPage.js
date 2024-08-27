@@ -1,13 +1,9 @@
-//import Navbar from '../components/Navbar.js';
-//import Footer from '../components/Footer.js';
 import fetching from '../helpers/fetching.js';
 import { toggleSound } from '../helpers/soundControl.js';
-
 
 const SettingPage = () => {
   const settingHTML = `
     <template id="setting-template">
-      <!--<div id="my-navbar"></div>-->
       <main class="container-fluid p-3 d-flex flex-column align-items-center gap-5 mb-2">
         <div class="text-bg-light rounded-3 p-3 w-100">
           <h1 class="setting-header  py-2 rounded-3 fs-5 text-center display-1 fw-bold">
@@ -18,10 +14,10 @@ const SettingPage = () => {
               <input type="file" id="input-avatar" accept="image/jpeg, image/png, image/jpg">
               <label class="change-avatar mb-2 d-flex justify-content-center align-items-center rounded-3 border border-1 border-white" for="input-avatar">
                 <img
-                  src="/web/images/image-edit.svg" 
+                  src="/web/images/image-edit.svg"
                   style="object-fit: cover; cursor: pointer; width: 170px; height: 170px;"
                   class="avatar img-thumbnail rounded-circle border border-1 border-black"
-                  alt="avatar" 
+                  alt="avatar"
                   referrerpolicy="no-referrer"
                 >
               </label>
@@ -66,7 +62,7 @@ const SettingPage = () => {
                     <twofa-input></twofa-input>
                   </div>
                 </div>
-              </div>            
+              </div>
             </div>
           </div>
           <div class=" justify-content-around d-flex flex-wrap  align-items-center gap-2 p-2 rounded-3">
@@ -80,7 +76,7 @@ const SettingPage = () => {
       </main>
     </template>
   `;
-  
+
   const templateLogin = document.createElement('div');
 
   if (!document.querySelector('#setting-template')) {
@@ -90,26 +86,24 @@ const SettingPage = () => {
 
   const template  = document.getElementById("setting-template");
   const component = template.content.cloneNode(true);
+  const parentElement = document.getElementById("main");
 
-  const root      = document.querySelector('#root');
+  parentElement.innerHTML  = "";
+  parentElement.appendChild(component);
 
-  root.innerHTML  = "";
-  root.appendChild(component);
-  root.classList.add("my-page");
-
-  const avatar = root.querySelector(".setting-avatar .avatar");
-  const input_avatar = root.querySelector("#input-avatar");
-  const input_username = root.querySelector(".input-username");
-  const button_username = root.querySelector(".button-username");
-  const input_first_name = root.querySelector(".input-first-name");
-  const button_first_name = root.querySelector(".button-first-name");
-  const input_last_name = root.querySelector(".input-last-name");
-  const button_last_name = root.querySelector(".button-last-name");
-  const checkbox_twofa = root.querySelector(".setting-twofa input[type=checkbox]");
-  const popup_twofa = root.querySelector(".popup-twofa");
-  const popup_twofa_qrcode = root.querySelector(".popup-twofa-qrcode");
-  const popup_twofa_close = root.querySelector(".popup-twofa-close");
-  const checkbox_sound = root.querySelector('#toggle-sound-btn');
+  const avatar = parentElement.querySelector(".setting-avatar .avatar");
+  const input_avatar = parentElement.querySelector("#input-avatar");
+  const input_username = parentElement.querySelector(".input-username");
+  const button_username = parentElement.querySelector(".button-username");
+  const input_first_name = parentElement.querySelector(".input-first-name");
+  const button_first_name = parentElement.querySelector(".button-first-name");
+  const input_last_name = parentElement.querySelector(".input-last-name");
+  const button_last_name = parentElement.querySelector(".button-last-name");
+  const checkbox_twofa = parentElement.querySelector(".setting-twofa input[type=checkbox]");
+  const popup_twofa = parentElement.querySelector(".popup-twofa");
+  const popup_twofa_qrcode = parentElement.querySelector(".popup-twofa-qrcode");
+  const popup_twofa_close = parentElement.querySelector(".popup-twofa-close");
+  const checkbox_sound = parentElement.querySelector('#toggle-sound-btn');
 
   checkbox_sound.addEventListener('click', () => {
     toggleSound();
@@ -186,9 +180,6 @@ const SettingPage = () => {
       popup_twofa_qrcode.appendChild(img);
     };
   }
-
-  //Navbar();
-  //Footer();
 };
 
 export default SettingPage;

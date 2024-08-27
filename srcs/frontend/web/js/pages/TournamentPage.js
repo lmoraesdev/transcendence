@@ -1,12 +1,9 @@
-//import Navbar from '../components/Navbar.js';
-//import Footer from '../components/Footer.js';
 import fetching from "../helpers/fetching.js";
 
 const TournamentPage = () => {
   const tournamentHTML = `
     <template id="tournament-template">
-      <!--<div id="my-navbar"></div>-->
-      <main class="container-fluid d-flex flex-column justify-content-around align-items-stretch gap-3 my-5">
+      <main class=" bg-white container-fluid d-flex flex-column justify-content-around align-items-stretch gap-3 my-5">
         <section class="tournament-actions d-none flex-column justify-content-center align-items-center py-5 px-4 rounded-5 gap-5">
           <div class="tournament-create d-flex flex-column justify-content-center p-4 rounded-5 gap-4">
             <h1 class="text-center fw-bold m-0">CREATE A TOURNAMENT</h1>
@@ -23,7 +20,7 @@ const TournamentPage = () => {
           <tournament-matches></tournament-matches>
         </section>
       </main>
-    </template>  
+    </template>
   `;
 
   const templateContainer = document.createElement('div');
@@ -35,21 +32,20 @@ const TournamentPage = () => {
 
   const template  = document.getElementById("tournament-template");
   const component = template.content.cloneNode(true);
-  const root      = document.querySelector('#root');
+  const parentElement = document.getElementById("main");
 
-  root.innerHTML = "";
-  root.appendChild(component);
-  root.classList.add("my-page");
+  parentElement.innerHTML  = "";
+  parentElement.appendChild(component);
 
-  const tournament_actions = root.querySelector(".tournament-actions");
-  const tournament_current = root.querySelector(".tournament-current");
+  const tournament_actions = parentElement.querySelector(".tournament-actions");
+  const tournament_current = parentElement.querySelector(".tournament-current");
   const tournament_players = tournament_current.querySelector("tournament-players");
   const tournament_players_list = tournament_players.querySelector(".tournament-players-list");
   const tournament_players_start = tournament_players.querySelector(".start");
   const tournament_players_leave = tournament_players.querySelector(".leave");
   const tournament_matches = tournament_current.querySelector("tournament-matches");
   const create_btn = tournament_actions.querySelector(".tournament-create button");
-  const tournament_list = root.querySelector(".tournament-list");
+  const tournament_list = parentElement.querySelector(".tournament-list");
 
   fetching(`https://${window.ft_transcendence_host}/tournament/`).then((data) => {
     if (!data.current_tournament || data.current_tournament.status === "FN") {
@@ -66,7 +62,7 @@ const TournamentPage = () => {
             tournament_popup.setAttribute("popup-type", "JOIN");
             tournament_popup.setAttribute("tournament-id", tournament.id);
             tournament_popup.setAttribute("tournament-name", tournament.name);
-            root.appendChild(tournament_popup);
+            parentElement.appendChild(tournament_popup);
           });
         }
       } else {
@@ -77,7 +73,7 @@ const TournamentPage = () => {
         tournament_popup.setAttribute("popup-type", "CREATE");
         tournament_popup.setAttribute("tournament-id", null);
         tournament_popup.setAttribute("tournament-name", null);
-        root.appendChild(tournament_popup);
+        parentElement.appendChild(tournament_popup);
       });
     }
     if (data.current_tournament) {
@@ -124,7 +120,7 @@ const TournamentPage = () => {
       } else {
         tournament_matches.classList.remove("d-none");
         tournament_matches.classList.add("d-flex");
-        const match_elems = root.querySelectorAll("tournament-match-card");
+        const match_elems = parentElement.querySelectorAll("tournament-match-card");
         for (let i = 0; i < 7; ++i) {
           const match = data.current_tournament.matches[i];
           const match_elem = match_elems[i];
@@ -146,9 +142,6 @@ const TournamentPage = () => {
       }
     }
   });
-
-  //Navbar();
-  //Footer();
 };
 
 export default TournamentPage;

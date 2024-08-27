@@ -1,7 +1,6 @@
 import TwofaInput from "../components/Input/TwofaInput.js";
 import TwofaButton from "../components/Button/TwofaButton.js";
 import fetching from '../helpers/fetching.js';
-import helpers from '../helpers/helpers.js';
 
 const TwofaPage = () => {
 
@@ -20,17 +19,22 @@ const TwofaPage = () => {
       </div>
     </div>
   `;
+  const twofaPage = document.querySelector('#twofa-template');
 
-  const root = document.querySelector('#root');
-  root.innerHTML = ""; 
-  root.appendChild(twofaTemplate.content.cloneNode(true));
-  root.classList.add("my-page");
+  if (!twofaPage) {
+    const templateContainer = document.createElement('div');
+    templateContainer.innerHTML = twofaHTML;
+    document.body.appendChild(templateContainer);
+  }
 
-  const footer = document.getElementById('footer-template');
+  const template  = document.getElementById("twofa-template");
+  const component = template.content.cloneNode(true);
+  const parentElement = document.getElementById("main");
 
-  footer.classList.remove('hidden');
+  parentElement.innerHTML  = "";
+  parentElement.appendChild(component);
 
-  const twofaContainer = root.querySelector('.twofa-content');
+  const twofaContainer = parentElement.querySelector('.twofa-content');
   twofaContainer.appendChild(TwofaInput());
   twofaContainer.appendChild(TwofaButton());
 

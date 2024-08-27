@@ -10,10 +10,9 @@
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="/web/bootstrap-5.2.3-dist/css/bootstrap.min.css" />
-    
+
     <!-- CSS -->
     <link rel="stylesheet" href="/web/css/style.css" />
-    <link rel="stylesheet" href="/web/css/components/bvambient.css" />
     <link rel="stylesheet" href="./web/css/components/PlayerCard.css" />
     <link rel="stylesheet" href="./web/js/components/Button/Buttons.css" />
     <link rel="stylesheet" href="./web/js/components/Profile/ProfileData.css" />
@@ -22,42 +21,14 @@
     <script defer src="/web/bootstrap-5.2.3-dist/js/bootstrap.min.js"></script>
     <script defer src="/web/js/components/NavBar/NavBar.js" type="module"></script>
     <script defer src="/app.js" type="module"></script>
-    
+
     <title>ft_transcendence</title>
   </head>
-  <body class="d-flex flex-column h-100">
-    <nav 
-      id="navbar"
-      class="d-flex p-4 navbar hidden"
-    >
-      <div>
-        <img src="/web/images/logo_pong.png" alt="logo pong" />
-      </div>
-      <button 
-        class="navbar-toggler" 
-        type="button" 
-        data-bs-toggle="collapse" 
-        data-bs-target="#navbarSupportedContent" 
-        aria-controls="navbarSupportedContent" 
-        aria-expanded="false" 
-        aria-label="Toggle navigation"
-      >
-        &#9776;
-      </button>
-      <div id="navbarSupportedContent" class="navbar-menu collapse navbar-collapse justify-content-around align-items-center w-100">
-        <button class="btn btn-outline-warning" id="home">Home</button>
-        <button class="btn btn-outline-warning" id="leaderboard">Leaderboard</button>
-        <button class="btn btn-outline-warning" id="profile">Profile</button>
-        <button class="btn btn-outline-warning" id="settings">Settings</button>
-      </div>
-    </nav>
-    <div id="root"></div>
-    <footer id="footer-template" class="footer hidden">
-      <div class="footer col mt-auto mb-2 mx-auto">
-        <p class="text-center">Copyright © 2024 🎮 All rights reserved</p>
-      </div>
-    </footer>
-    <script defer src="/web/js/components/bvambient.js" type="module"></script>
-
+  <body>
+    <div id="root" class="my-page">
+      <header id="my-navbar" class="my-bar"></header>
+      <section id="main" class="my-page"></section>
+      <footer id="foot" class="my-foot"></footer>
+    </div>
   </body>
 </html>
