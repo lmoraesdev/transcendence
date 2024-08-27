@@ -5,6 +5,7 @@
 @import "./components/Stars.css";
 @import "./components/Footer.css";
 @import "./components/Modal.css";
+@import "./components/bvambient.css";
 @import "./components/FriendCard.css";
 @import "./components/FriendCardPopup.css";
 @import "./components/FriendsList.css";
@@ -22,8 +23,6 @@
 @import "./components/TournamentPlayers.css";
 @import "./components/TournamentPopup.css";
 @import "./components/TwofaInput.css";
-@import "./components/Buttons.css";
-@import "./components/ProfileData.css";
 
 /* Pages */
 @import "./pages/GamePage.css";
@@ -31,6 +30,7 @@
 @import "./pages/HomePage.css";
 @import "./pages/LoginPage.css";
 @import "./pages/NotfoundPage.css";
+@import "./pages/InitPage.css";
 @import "./pages/ProfilePage.css";
 @import "./pages/SettingPage.css";
 @import "./pages/TournamentPage.css";

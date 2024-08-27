@@ -132,8 +132,6 @@ def googleCallbackOAuth(request):
     player = createPlayer(playerData)
     if player is None:
         return redirect(f"https://{settings.BASE_URL}/login/", permanent=True)
-        #return Response({"statusCode": 401, "error": "Failed to create player"})
-
     jwtToken = generateJwt(player.id, player.twoFactor)
     response = redirect(f"https://{settings.BASE_URL}/{'twofa' if player.twoFactor else 'home'}/", permanent=True)
     response.set_cookie("jwt_token", value=jwtToken, httponly=True, secure=True)

@@ -347,11 +347,12 @@ class ListAllUser(APIView):
         try:
             username = request.query_params.get('username')
             if username:
-                username = ' '.join(username.split())  # Tratamento para username com espaços
-                listPlayer = Player.objects.exclude(username__iexact=username)
+                playerExclude = Player.objects.filter(username=username)
+                if not playerExclude.exists():
+                    raise Player.DoesNotExist
+                listPlayer = Player.objects.exclude(id=playerExclude.first().id)
             else:
                 listPlayer = Player.objects.all()
-            
             serializer = PlayerInfoSerializer(listPlayer, many=True)
             return Response(serializer.data)
 

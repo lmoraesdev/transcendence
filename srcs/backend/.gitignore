@@ -3,7 +3,6 @@
 /djangoapp/project/local_settings.py
 __localcode
 /data/
-services/**/static/*
 
 # Django #
 *.log

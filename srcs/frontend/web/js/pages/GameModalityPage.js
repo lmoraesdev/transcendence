@@ -5,29 +5,29 @@ import { runPongFourGame } from '../game/pongFour.js';
 import router from '../router/router.js';
 
 const GameModalityPage = () => {
-    const gameModalityHTML = `
-        <template id="game-modality-template">
-            <div 
-                class="bg-white border border-2 border-dark text-center mx-4 my-auto p-3 rounded-5 d-flex flex-column z-2 align-items-center justify-content-center">
-                <h1 class="fs-2 my-2">Choose game mode to start</h1>
-                <div class="d-flex justify-content-around w-100 p-3">
-                    <div class="text-center">
-                        <button class="bt game-mode-button game-mode-1"></button>
-                        <p class="game-mode-text">Solo Game</p>
-                    </div>
-                    <div class="text-center">
-                        <button class="bt game-mode-button game-mode-2"></button>
-                        <p class="game-mode-text">Multiplayer</p>
-                    </div>
-                    <div class="text-center">
-                        <button class="bt game-mode-button game-mode-3"></button>
-                        <p class="game-mode-text">Tournament</p>
-                    </div>                
-                </div>
-                <div id="modalGame"></div>
-            </div>    
-        </template>
-    `;
+  const gameModalityHTML = `
+      <template id="game-modality-template">
+          <div
+              class="bg-white border border-2 border-dark text-center mx-4 my-auto p-3 rounded-5 d-flex flex-column z-2 align-items-center justify-content-center">
+              <h1 class="fs-2 my-2">Choose game mode to start</h1>
+              <div class="d-flex justify-content-around w-100 p-3">
+                  <div class="text-center">
+                      <button class="bt game-mode-button game-mode-1"></button>
+                      <p class="game-mode-text">Solo Game</p>
+                  </div>
+                  <div class="text-center">
+                      <button class="bt game-mode-button game-mode-2"></button>
+                      <p class="game-mode-text">Multiplayer</p>
+                  </div>
+                  <div class="text-center">
+                      <button class="bt game-mode-button game-mode-3"></button>
+                      <p class="game-mode-text">Tournament</p>
+                  </div>
+              </div>
+              <div id="modalGame"></div>
+          </div>
+      </template>
+  `;
 
   const templateGameModality = document.createElement('div');
 

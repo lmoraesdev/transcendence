@@ -1,90 +1,58 @@
-.login-container {
-  justify-content: space-between;
-  align-items: center;
+.bt:link,
+.bt:visited {
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 15px 40px;
+    display: inline-block;
+    border-radius: 100px;
+    transition: all .2s;
 }
 
-.login-img img {
-  object-position: center;
-  width: 500px;
-  height: 500px;
+.bt:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
-  
-/* Mobile */
-@media (max-width: 576px) {
-  .login-container {
-    flex-direction: column;
-  }
 
-  .login-img {
-    display: none;
-  }
-  
-  .login-img img {
+.bt:active {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.bt::after {
+    content: "";
+    display: inline-block;
+    height: 100%;
     width: 100%;
-    height: auto;
-    margin-bottom: 20px;
-  }
-
-  .login-content {
-    width: 100%;
-    padding: 10px;
-  }
+    border-radius: 100px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    transition: all .4s;
 }
-  
-/* Tablets */
-@media (min-width: 577px) and (max-width: 768px) {
-  .login-container {
-    flex-direction: column;
-  }
 
-  .login-img {
-    display: none;
-  }
-  
-  .login-img img {
-    width: 100%;
-    height: auto;
-    margin-bottom: 20px;
-  }
-
-  .login-content {
-    width: 80%;
-    padding: 15px;
-  }
+.bt-white::after {
+    background-color: #fff;
 }
-  
-/* Laptops */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .login-container {
-    flex-direction: row;
-    justify-content: center;
-  }
 
-  .login-img img {
-    width: 400px;
-    height: 400px;
-  }
-
-  .login-content {
-    width: 60%;
-    padding: 20px;
-  }
+.bt:hover::after {
+    transform: scaleX(1.4) scaleY(1.6);
+    opacity: 0;
 }
-  
-/* Desktops */
-@media (min-width: 1025px) {
-  .login-container {
-    flex-direction: row;
-  }
 
-  .login-img img {
-    width: 500px;
-    height: 500px;
-  }
-
-  .login-content {
-    width: 50%;
-    padding: 25px;
-  }
+.bt-animated {
+    animation: moveInBottom 5s ease-out;
+    animation-fill-mode: backwards;
 }
-  
+
+@keyframes moveInBottom {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0px);
+    }
+}
