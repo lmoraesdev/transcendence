@@ -9,7 +9,6 @@ import TournamentPage from '../pages/TournamentPage.js';
 import TwofaPage from '../pages/TwofaPage.js';
 import HomePage from '../pages/HomePage.js';
 
-import { checkAndRefreshToken } from '../services/auth.js';
 import { wsFour } from "../game/pongFour.js";
 import { wsTwo } from "../game/pongTwo.js";
 
@@ -27,9 +26,7 @@ const routes = {
 }
 
 const router = {
-  init: async () => {
-
-    await checkAndRefreshToken();
+  init: () => {
 
     window.addEventListener("popstate", (event) => {
       event.preventDefault();
@@ -76,11 +73,11 @@ const router = {
         pathname = "/login/";
       }
       router.go(pathname, window.location.search, "replace");
-    };*/
+    };
     ws.onerror = (error) => console.error(`WebSocket error: ${error}`);
   },
 
-  go: async (route, query, state) => {
+  go: (route, query, state) => {
     const contentElement = document.getElementById("main");
 
     const loadingIndicator = `
@@ -93,8 +90,6 @@ const router = {
 
     const previousContent = contentElement.innerHTML;
     contentElement.innerHTML = loadingIndicator;
-
-    await checkAndRefreshToken();
 
     if (state === "add" && location.pathname !== route)
       history.pushState({ route, query }, "", route + query);
