@@ -437,7 +437,17 @@ class MatchesHistory(APIView):
                 "status": 500,
                 "message": str(e),
             })
+
+
+# class MatchesSoloHistory(APIView):
+#     @method_decorator(jwtCookieRequired)
+#     def get(self, request):
+
+
+#     @method_decorator(jwtCookieRequired)
+#     def post(self, request):
         
+
 class ListAllUser(APIView):
 
     @method_decorator(jwtCookieRequired)

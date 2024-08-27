@@ -8,6 +8,7 @@ urlpatterns = [
     path('avatar/', views.PlayerAvatarUpload.as_view(), name='playerAvatarUploadView'),
     path('friendship/', views.PlayerFriendship.as_view(), name='playerFriendshipView'),
     path('matches/', views.MatchesHistory.as_view(), name='matchesHistoryView'),
+    # path('matches/solo/', views.)
     path('listAllPlayers/', views.ListAllUser.as_view(), name='listAllPlayers'),
 ]
 
