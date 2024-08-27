@@ -4,16 +4,13 @@ import fetching from "../helpers/fetching.js";
 
 const dashboardContainer = document.getElementById("stats-dashboard");
 
-const getStoredStats = () => {
-  return {
-    playerScore: parseInt(localStorage.getItem("scorePlayer")) || 0,
-    computerScore: parseInt(localStorage.getItem("scoreComputer")) || 0,
-  };
-};
+const getStoredStats = () => ({
+  playerScore: parseInt(localStorage.getItem("scorePlayer")) || 0,
+  computerScore: parseInt(localStorage.getItem("scoreComputer")) || 0,
+});
 
 const displayStats = () => {
   const stats = getStoredStats();
-
   dashboardContainer.innerHTML = `
     <h2>Estatísticas do Jogo</h2>
     <p>Pontuação do Jogador: ${stats.playerScore}</p>

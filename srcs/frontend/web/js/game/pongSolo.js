@@ -15,7 +15,7 @@ const KeyS = 83;
 const getName = async () => {
   try {
     const res = await fetching(`https://${window.ft_transcendence_host}/player/`);
-    return `${res.player.firstName} Won!` || "You Win!";
+    return res.player.firstName ? `${res.player.firstName} Won!` : "You Win!";
   } catch (error) {
     console.error("Erro ao buscar o nome do jogador:", error);
     return "You Win!";
@@ -29,7 +29,7 @@ export function getSoundStatus() {
 export async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
   let scorePlayer = ptsPlayer;
   let scoreComputer = ptsComputer;
-  let namePlayer = await getName();
+  const namePlayer = await getName();
 
   canvas.width = 1920;
   canvas.height = 1080;
@@ -55,14 +55,12 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
   reboundSound.addEventListener("canplaythrough", () => console.log("Som de rebote carregado."));
 
   let lastUpdateTime = Date.now();
-  let ai = new AI(5);
-  let aiPerformance = { hits: 0, misses: 0 };
+  const ai = new AI(5);
+  const aiPerformance = { hits: 0, misses: 0 };
 
-  function playSound(sound) {
-    if (!getSoundStatus()) {
-      sound.play();
-    }
-  }
+  const playSound = (sound) => {
+    if (!getSoundStatus()) sound.play();
+  };
 
   gameLoopSolo(canvas, ctx, ball, paddlePlayer, paddleComputer);
 
@@ -70,12 +68,12 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
   window.onkeyup = (e) => (KeyPressedSolo[e.keyCode] = false);
 
   window.addEventListener("keydown", (e) => {
-    if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(e.code) > -1) {
+    if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)) {
       e.preventDefault();
     }
   });
 
-  function BallPaddleCollision(ball, paddle) {
+  const BallPaddleCollision = (ball, paddle) => {
     const dx = Math.abs(ball.positionX - paddle.Center()[0]);
     const dy = Math.abs(ball.positionY - paddle.Center()[1]);
     if (dx <= ball.size + paddle.sizeX / 2 && dy <= ball.size + paddle.sizeY / 2) {
@@ -95,18 +93,18 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
     } else {
       aiPerformance.misses++;
     }
-  }
+  };
 
-  function paddleCollision(canvas, paddle) {
+  const paddleCollision = (canvas, paddle) => {
     if (paddle.positionY + paddle.sizeY > canvas.height) {
       paddle.positionY = canvas.height - paddle.sizeY;
     }
     if (paddle.positionY < 0) {
       paddle.positionY = 0;
     }
-  }
+  };
 
-  function ballCollision(canvas, ball, ctx, paddlePlayer, paddleComputer) {
+  const ballCollision = (canvas, ball, ctx, paddlePlayer, paddleComputer) => {
     if (ball.positionX + ball.size >= canvas.width || ball.positionX - ball.size <= 0) {
       return reset(ball, canvas, ctx, paddlePlayer, paddleComputer);
     }
@@ -114,7 +112,7 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
       ball.speedY *= -1;
     }
     return false;
-  }
+  };
 
   const reset = async (ball, canvas, ctx, paddlePlayer, paddleComputer) => {
     ball.positionX = canvas.width / 2;
@@ -125,13 +123,13 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
     paddleComputer.positionY = canvas.height / 2 - 100;
 
     if (ball.speedX < 0) {
-      scoreComputer += 1;
+      scoreComputer++;
       localStorage.setItem("scoreComputer", scoreComputer);
       ball.speedX = -4;
       ai.adjustDifficulty(false);
       aiPerformance.misses = 0;
     } else {
-      scorePlayer += 1;
+      scorePlayer++;
       localStorage.setItem("scorePlayer", scorePlayer);
       ball.speedX = 4;
       ai.adjustDifficulty(true);
@@ -150,11 +148,12 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
       localStorage.clear();
       window.location.reload();
     }
-    updateStats();
+
+    await updateStats(); // Aguarda a atualização das estatísticas antes de continuar
     return true;
   };
 
-  function gameLoopSolo(canvas, ctx, ball, paddlePlayer, paddleComputer) {
+  const gameLoopSolo = (canvas, ctx, ball, paddlePlayer, paddleComputer) => {
     const now = Date.now();
     const deltaTime = now - lastUpdateTime;
     lastUpdateTime = now;
@@ -201,5 +200,5 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
     loopIdSolo = window.requestAnimationFrame(() =>
       gameLoopSolo(canvas, ctx, ball, paddlePlayer, paddleComputer),
     );
-  }
+  };
 }
