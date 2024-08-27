@@ -1,19 +1,20 @@
 import fetching from '../../helpers/fetching.js';
+import router from '../../router/router.js';
 
 const Navbar = async () => {
   const navbarHTML = `
     <template id="navbar-template">
-      <nav id="navbar" class="d-flex p-4 navbar hidden">
+      <nav id="navbar" class="d-flex p-4 navbar">
         <div>
           <img src="/web/images/logo_pong.png" alt="logo pong" />
         </div>
-        <button 
-          class="navbar-toggler" 
-          type="button" 
-          data-bs-toggle="collapse" 
-          data-bs-target="#navbarSupportedContent" 
-          aria-controls="navbarSupportedContent" 
-          aria-expanded="false" 
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
           aria-label="Toggle navigation"
         >
           &#9776;
@@ -42,23 +43,27 @@ const Navbar = async () => {
   navbarElement.appendChild(component);
 
   document.getElementById('home').addEventListener('click', () => {
-    fetching(`https://${window.ft_transcendence_host}/leaderboard`);
+    router.go("/home/", "/home/", false);
   });
 
   document.getElementById('leaderboard').addEventListener('click', () => {
-    window.location.href = `https://${window.ft_transcendence_host}/home`;
+    router.go("/leaderboard/", "/leaderboard/", false);
   });
 
   document.getElementById('profile').addEventListener('click', () => {
-    window.location.href = `https://${window.ft_transcendence_host}/profile`;
+    router.go("/profile/", "/profile/", false);
   });
 
   document.getElementById('settings').addEventListener('click', () => {
-    fetching(`https://${window.ft_transcendence_host}/settings`);
+    router.go("/settings/", "/settings/", false);
   });
 
-  document.getElementById('logout').addEventListener('click', () => {
-    window.location.href = `https://${window.ft_transcendence_host}/authentication/loggout/`;
+  document.getElementById('logout').addEventListener('click', async () => {
+    await fetch(`https://${window.ft_transcendence_host}/authentication/loggout/`)
+      .then(function (response) {
+        return response.text();
+    });
+    router.go("/login/", "/login/", false);
   });
 
 };

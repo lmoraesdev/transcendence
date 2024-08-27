@@ -41,7 +41,7 @@ window.addEventListener("DOMContentLoaded", () => {
   Navbar();
   Footer();
 
-  const navbarElement = document.getElementById("main-bar");
+  const navbarElement = document.getElementById("navbar");
 
   if (navbarElement)
     navbarElement.classList.add('hidden');
