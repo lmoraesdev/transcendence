@@ -74,7 +74,10 @@ def createPlayer(data: Dict[str, str]) -> Player:
             lastName = lastName,
             avatar = avatar
         )
-
-        return Player.objects.get(email=email)
+        #logger.debug("Novo jogador criado: %s", player)
+        #logger.debug("PLayer: %s", player)
+        #return Player.objects.get(email=email)
+        return player
     except Exception as e:
-        return Response({"statusCode": 500, 'error': f"Error creating player: {str(e)}"})
+        logger.error(f"Error creating player: {str(e)}")
+        #return Response({"statusCode": 500, 'error': f"Error creating player: {str(e)}"})

@@ -1,10 +1,13 @@
-import fetching from "../helpers/fetching.js";
+import fetching from "../../helpers/fetching.js";
+import router from "../../router/router.js";
 
-const TwofaInput = () => {
+/*const TwofaInput = () => {
   const twofaInputHTML = `
-    <template id="twofa-input">
+    <template id="twofa-input" class="twofa-content-button d-grid p-5 gap-2 col-6 m-auto">
       <input type="number">
-      <button class="btn btn-lg p-2 rounded-4">SEND</button>
+      <button class="btn btn-primary text-center fw-bold">
+        Validate and connect 2FA
+      </button>
     </template>
   `;
   
@@ -42,7 +45,7 @@ const TwofaInput = () => {
         if (res.statusCode === 200) {
           input.value = "";
           if (res.redirected)
-            window.location.href = `https://${window.ft_transcendence_host}/home/`;
+            router.go('/home/', '', false);
           else {
             const popup_twofa = document.querySelector(".popup-twofa");
             const popup_twofa_qrcode = document.querySelector(".popup-twofa-qrcode");
@@ -63,4 +66,31 @@ const TwofaInput = () => {
   });
 };
 
-export default TwofaInput;
+export default TwofaInput;*/
+
+const TwoFAInput = () => {
+  const inputContainer = document.createElement('div');
+  inputContainer.classList.add(
+    'twofa-input-container',
+    'd-grid',
+    'px-5'
+  );
+
+  const labelText = document.createElement('p');
+  labelText.textContent = 'Enter 2FA security code:';
+  labelText.classList.add('text-muted', 'mb-0');
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.classList.add('form-control', 'twofa-input', 'mb-2');
+  input.placeholder = 'Enter 2FA Code';
+  input.maxLength = 6;
+
+  inputContainer.appendChild(labelText);
+  inputContainer.appendChild(input);
+  
+  return inputContainer;
+};
+
+export default TwoFAInput;
+

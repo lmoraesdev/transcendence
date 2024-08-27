@@ -1,0 +1,9 @@
+<svg 
+  class="img-42" 
+  version="1.1" viewBox="0 0 1896 1420" width="80" height="80" 
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path transform="translate(0)" d="m0 0h1896v1420h-1896z" fill="#ffffff00"/>
+  <path transform="translate(798,290)" d="m0 0h210l-6 7-12 11-17 17-1 2h-2l-2 4-8 7-19 19-5 6-8 7-51 51-5 6-8 7-273 273v1l416 1v379h-209l-1-209h-415l-4-1v-131l1-40 13-12 389-389 5-4 6-7h2l2-4z" fill="#fff"/>
+  <path transform="translate(1097,290)" d="m0 0h420v210l-125 125h-2v2l-29 29-8 7-5 5-6 7-7 6-21 21-6 7-1 207 8-7 81-81 8-7 8-9 8-7 96-96 2 3-1 206h-420v-208l7-8 201-201 1-2v-207l-5 4-7 8-195 195h-2z" fill="#fff"/>
+</svg>
