@@ -12,14 +12,14 @@ const FriendsList = () => {
             <button class="btn btn-lg fw-bold requests-btn">Requests</button>
           </li>
           <li>
-            <button 
+            <button
               class="btn btn-lg fw-bold invites-btn"
             >
               Invites
             </button>
           </li>
           <li>
-            <button 
+            <button
               class="btn btn-lg fw-bold search-btn"
             >
               Search
@@ -36,18 +36,45 @@ const FriendsList = () => {
     templateContainer.innerHTML = friendsListHTML;
     document.body.appendChild(templateContainer);
   }
-  
+
   const template  = document.getElementById("friends-list");
   const component = template.content.cloneNode(true);
 
   const friendsList = document.querySelector('#friendsList');
   friendsList.appendChild(component);
   friendsList.classList.add(
-    "d-flex", 
-    "justify-content-center", 
-    "flex-column", 
+    "d-flex",
+    "justify-content-center",
+    "flex-column",
     "gap-2"
   );
+
+  const showCards = (friend_card_type) => {
+    const friend_cards = friendsList.querySelector(".friend-cards");
+    friend_cards.innerHTML = "";
+
+    if (friend_card_type === "search") {
+      friend_cards.appendChild(document.createElement("search-list"));
+      return;
+    }
+
+    fetching(
+      `https://${window.ft_transcendence_host}/player/friendship/?target=${friend_card_type}`,
+    ).then((req) => {
+      const arr = req.friendships;
+      for (let i = 0; i < arr.length; i++) {
+        const friend_card_elem = document.createElement("friend-card");
+        friend_card_elem.setAttribute("friend-card-type", friend_card_type);
+        friend_card_elem.setAttribute("player-id", arr[i].id);
+        friend_card_elem.setAttribute("first-name", arr[i].first_name);
+        friend_card_elem.setAttribute("last-name", arr[i].last_name);
+        friend_card_elem.setAttribute("username", arr[i].username);
+        friend_card_elem.setAttribute("avatar", arr[i].avatar);
+        friend_card_elem.setAttribute("status", arr[i].status);
+        friend_cards.appendChild(friend_card_elem);
+      }
+    });
+  }
 
   const nav          = friendsList.querySelector("nav");
   const friends_btn  = nav.querySelector(".friends-btn");
@@ -90,33 +117,6 @@ const FriendsList = () => {
     search_btn.classList.add("active");
     showCards("search");
   });
-
-  const showCards = (friend_card_type) => {
-    const friend_cards = friendsList.querySelector(".friend-cards");
-    friend_cards.innerHTML = "";
-
-    if (friend_card_type === "search") {
-      friend_cards.appendChild(document.createElement("search-list"));
-      return;
-    }
-
-    fetching(
-      `https://${window.ft_transcendence_host}/player/friendship/?target=${friend_card_type}`,
-    ).then((req) => {
-      const arr = req.friendships;
-      for (let i = 0; i < arr.length; i++) {
-        const friend_card_elem = document.createElement("friend-card");
-        friend_card_elem.setAttribute("friend-card-type", friend_card_type);
-        friend_card_elem.setAttribute("player-id", arr[i].id);
-        friend_card_elem.setAttribute("first-name", arr[i].first_name);
-        friend_card_elem.setAttribute("last-name", arr[i].last_name);
-        friend_card_elem.setAttribute("username", arr[i].username);
-        friend_card_elem.setAttribute("avatar", arr[i].avatar);
-        friend_card_elem.setAttribute("status", arr[i].status);
-        friend_cards.appendChild(friend_card_elem);
-      }
-    });
-  }
-};
+}
 
 export default FriendsList;

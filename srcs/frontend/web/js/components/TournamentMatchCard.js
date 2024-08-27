@@ -35,7 +35,7 @@ const TournamentMatchCard = () => {
 
   const btn = tournamentMatchCard.querySelector("button");
   btn.addEventListener("click", () => {
-    router.go("/game/", `?game=PG&mode=two&match=${tournamentMatchCard.getAttribute("match-id")}`, "add");
+    router.go("/game/", `?game=PG&mode=two&match=${tournamentMatchCard.getAttribute("match-id")}`, false);
   });
 
 };
