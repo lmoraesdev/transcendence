@@ -12,14 +12,14 @@ const FriendsList = () => {
             <button class="btn btn-lg fw-bold requests-btn">Requests</button>
           </li>
           <li>
-            <button 
+            <button
               class="btn btn-lg fw-bold invites-btn"
             >
               Invites
             </button>
           </li>
           <li>
-            <button 
+            <button
               class="btn btn-lg fw-bold search-btn"
             >
               Search
@@ -36,16 +36,16 @@ const FriendsList = () => {
     templateContainer.innerHTML = friendsListHTML;
     document.body.appendChild(templateContainer);
   }
-  
+
   const template  = document.getElementById("friends-list");
   const component = template.content.cloneNode(true);
 
   const friendsList = document.querySelector('#friendsList');
   friendsList.appendChild(component);
   friendsList.classList.add(
-    "d-flex", 
-    "justify-content-center", 
-    "flex-column", 
+    "d-flex",
+    "justify-content-center",
+    "flex-column",
     "gap-2"
   );
 
@@ -117,6 +117,6 @@ const FriendsList = () => {
     search_btn.classList.add("active");
     showCards("search");
   });
-};
+}
 
 export default FriendsList;

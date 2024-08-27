@@ -1,4 +1,3 @@
-import fetching from '../../helpers/fetching.js';
 import router from '../../router/router.js';
 
 const Navbar = async () => {
