@@ -52,14 +52,14 @@ const LoginPage = async () => {
     label: 'Login with 42',
     iconSVG: '<img src="/web/images/42_logo.svg" class="img-fluid" style="width:45px; height: 30px;">',
     customClasses: ['mb-2'],
-    link: "/authentication/intra/",
+    link: `https://${window.ft_transcendence_host}/authentication/intra/`,
   });
 
   const buttonGoogle = ButtonLogin({
     label: 'Login with Google',
     iconSVG: '<img src="/web/images/googlelogo.png" class="img-fluid" style="width:35px; height: 30px;">',
     customClasses: [],
-    link: "/authentication/google/",
+    link: `https://${window.ft_transcendence_host}/authentication/google/`,
   });
 
   buttonsContainer.appendChild(button42);

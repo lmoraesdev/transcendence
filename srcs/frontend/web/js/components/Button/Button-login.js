@@ -16,8 +16,7 @@ const ButtonLogin = ({ label, iconSVG, customClasses = [], onClick, link }) => {
     buttonContainer.addEventListener('click', onClick);
   } else if (link) {
     buttonContainer.addEventListener('click', () => {
-      const [route, query] = link.split('?');
-      router.go(route, query ? `?${query}` : '', false);    
+      window.location.href = link;    
     });
   }
 
