@@ -41,11 +41,10 @@ window.addEventListener("DOMContentLoaded", () => {
   Navbar();
   Footer();
 
-  const navbarElement = document.querySelector('.navbar');
+  const navbarElement = document.getElementById("navbar");
 
   if (navbarElement)
-    //navbarElement.classList.add('hidden');
-    navbarElement.style.display = "none !important";
+    navbarElement.classList.add('hidden');
 
   router.init();
 });
