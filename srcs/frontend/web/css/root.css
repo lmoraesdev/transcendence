@@ -1,4 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Audiowide&display=swap');
+/*@import url('https://fonts.googleapis.com/css2?family=Audiowide&display=swap');
+*/
+@import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&display=swap');
 
 * {
   margin: 0;
@@ -24,26 +26,34 @@
   --color-font-white: #fffbeb;
   --color-font-grey: #495579;
   --color-font-black: #1a1a1a;
+
+  --color-background-black: #1a1a1a;
 }
 
-#root {
-  background: radial-gradient(circle,#E4CF16, #D4AF37, #E5B76E, #FFD700);
-  min-height: 100vh;
-  font-family: "Audiowide", sans-serif;
+body, html, #root {
+  height: 100%;
+ /*font-family: "Audiowide", sans-serif;*/
+  font-family: "Red Hat Display", sans-serif;
+  color: var(--color-font-white);
+  background: var(--color-background-black);
 }
+
 
 .background {
   z-index: 2;
 }
 
 .my-page {
-  display: flex;
+  height: 100%;
   flex-direction: column;
-  justify-content: space-between;
 }
 
 img {
   object-fit: cover;
+}
+
+.hidden {
+  display: none !important;
 }
 
 .loading {

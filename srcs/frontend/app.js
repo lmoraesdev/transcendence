@@ -1,7 +1,7 @@
 import router from "./web/js/router/router.js";
 
 // Components
-import Navbar from "./web/js/components/Navbar.js";
+import Navbar from "./web/js/components/NavBar/NavBar.js";
 import Footer from "./web/js/components/Footer.js";
 
 Object.defineProperty(window, "ft_transcendence_host", {
@@ -26,9 +26,9 @@ function setProperty(key, value) {
 localStorage.setItem("colorizer", color || "yellow");
 if (color === "blue") {
   localStorage.setItem("colorizer", "blue");
-setProperty("--color-primary", "#2cacff30");
-setProperty("--color-primary-solid", "#0f3c5a");
-setProperty("--color-primary-light", "#2cacff");
+  setProperty("--color-primary", "#2cacff30");
+  setProperty("--color-primary-solid", "#0f3c5a");
+  setProperty("--color-primary-light", "#2cacff");
 } else {
   localStorage.setItem("colorizer", "yellow");
   setProperty("--color-primary", "#f8ec9030");
@@ -41,10 +41,10 @@ window.addEventListener("DOMContentLoaded", () => {
   Navbar();
   Footer();
 
-  const navbarElement = document.getElementById("main-bar");
+  const navbarElement = document.getElementById("navbar");
 
   if (navbarElement)
-    navbarElement.style.visibility = "hidden";
+    navbarElement.classList.add('hidden');
 
   router.init();
 });
