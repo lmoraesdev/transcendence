@@ -27,7 +27,8 @@ const routes = {
 }
 
 const router = {
-  init: async () => {
+  init: () => {
+
     window.addEventListener("popstate", (event) => {
       event.preventDefault();
 
@@ -57,7 +58,7 @@ const router = {
     router.go(location.pathname, location.pathname, true);
   },
 
-  go: async (route, query, shouldReplace) => {
+  go: (route, query, shouldReplace) => {
     const contentElement = document.getElementById("main");
 
     const loadingIndicator = `
