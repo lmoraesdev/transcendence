@@ -83,7 +83,7 @@ const router = {
     const contentElement = document.getElementById("main");
 
     const loadingIndicator = `
-      <div class="loading">
+      <div class="loading">git add 
         <div class="spinner-grow m-2" role="status">
         </div>
         <span>Loading...</span>
