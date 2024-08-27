@@ -3,7 +3,7 @@ import logging
 import urllib.parse
 from pprint import pformat
 from .serializers import PlayerInfoSerializer, PlayerSettingsInfoSerializer
-from .models import  Friendship, Player, PlayerMatch, PlayerSettings
+from .models import  Friendship, Player, PlayerMatch, PlayerSettings, Training
 from .decorators import jwtCookieRequired
 from django.db.models import Q
 from django.conf import settings
@@ -361,15 +361,15 @@ class PlayerFriendship(APIView):
                     "message": "User not found",
                 })
             except Friendship.DoesNotExist:
-                    return Response({
-                        "status": 404,
-                        "message": "Friend request not found",
-                    })
+                return Response({
+                    "status": 404,
+                    "message": "Friend request not found",
+                })
             except Exception as e:
-                    return Response({
-                        "status": 500,
-                        "message": str(e),
-                    })
+                return Response({
+                    "status": 500,
+                    "message": str(e),
+                })
 
         @method_decorator(jwtCookieRequired)
         def delete(self, request):
@@ -439,14 +439,67 @@ class MatchesHistory(APIView):
             })
 
 
-# class MatchesSoloHistory(APIView):
-#     @method_decorator(jwtCookieRequired)
-#     def get(self, request):
+class TrainingHistory(APIView):
+    @method_decorator(jwtCookieRequired)
+    def get(self, request): 
+        try:
+            player = Player.objects.get(id=request.decoded_token['id'])
+            trainings = Training.objects.filter(playerId=player).order_by('-id')
+            trainingResponse = []
+            for training in trainings:
+                trainingResponse.append({
+                    "id": training.id,
+                    "playerWin": training.playerWin,
+                    "playerScore": training.playerScore,
+                    "botScore": training.botScore,
+                    "score": training.score
+                })
+            return Response({
+                "status": 200,
+                "training": trainingResponse
+            })
+        except Player.DoesNotExist:
+            return Response({
+                "status": 404,
+                "message": "User not found",
+            })
+        except Exception as e:
+            return Response({
+                "status": 500,
+                "message": str(e),
+            })
 
+    @method_decorator(jwtCookieRequired)
+    def post(self, request):
+        try:
+            id = request.decoded_token['id']
+            player = Player.objects.get(id=id)
 
-#     @method_decorator(jwtCookieRequired)
-#     def post(self, request):
-        
+            trainingData = request.data.get('training')
+
+            training = Training.objects.create(
+                playerId = player,
+                playerWin = trainingData["playerWin"],
+                playerScore = trainingData["playerScore"],
+                botScore = trainingData["botScore"],
+                score = trainingData["score"],
+            )
+
+            return Response({
+                "status": 200,
+                "training": training
+            })
+        except Player.DoesNotExist:
+            return Response({
+                "status": 404,
+                "message": "User not found",
+            })
+        except Exception as e:
+            return Response({
+                "status": 500,
+                "message": str(e),
+            })
+
 
 class ListAllUser(APIView):
 
@@ -455,8 +508,11 @@ class ListAllUser(APIView):
         try:
             username = request.query_params.get('username')
             if username:
-                username = ' '.join(username.split())  # Tratamento para username com espaços
-                listPlayer = Player.objects.exclude(username__iexact=username)
+                username = ' '.join(username.split())
+                playerExclude = Player.objects.filter(username=username)
+                if not playerExclude.exists():
+                    raise Player.DoesNotExist
+                listPlayer = Player.objects.exclude(id=playerExclude.first().id)
             else:
                 listPlayer = Player.objects.all()
             

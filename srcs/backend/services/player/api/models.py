@@ -70,6 +70,14 @@ class Tournament(models.Model):
     def __str__(self):
         return f"Tournament : {self.id}"
 
+class Training(models.Model):
+    id = models.BigAutoField(primary_key=True, auto_created=True)
+    playerId = models.ForeignKey(Player, on_delete=models.CASCADE, null=False, blank=False)
+    playerWin = models.BooleanField(default=False, null=False, blank=False)
+    playerScore = models.IntegerField(default=0, null=False, blank=False)
+    botScore = models.IntegerField(default=0, null=False, blank=False)
+    score = models.IntegerField(default=0, null=False, blank=False)
+
 class Match(models.Model):
     class Game(Enum):
         PONG = "PG"
@@ -168,3 +176,4 @@ class PlayerSettings(models.Model):
     colorBlind = models.CharField(max_length=15, choices=COLOR_BLIND_CHOICE, default=ColorBlind.NONE.value)
     language = models.CharField(max_length=2, choices=LANGUAGE_CHOICE, default=Language.INGLES.value)
     iaLevel = models.CharField(max_length=3, choices=IA_LEVE_CHOICE, default=IaLevel.EASY.value)
+
