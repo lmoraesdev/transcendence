@@ -45,7 +45,6 @@ const LoginPage = async () => {
 
   parentElement.innerHTML  = "";
   parentElement.appendChild(component);
-  parentElement.classList.add("my-page");
 
   const buttonsContainer = parentElement.querySelector('.login-content-buttons');
 

@@ -4,6 +4,7 @@ import Leaderboard from '../pages/LeaderboardPage.js';
 import LoginPage from '../pages/LoginPage.js';
 import NotfoundPage from '../pages/NotfoundPage.js';
 import ProfilePage from '../pages/ProfilePage.js';
+import ProfileSetup from '../pages/ProfileSetup.js'
 import SettingPage from '../pages/SettingPage.js';
 import TournamentPage from '../pages/TournamentPage.js';
 import TwofaPage from '../pages/TwofaPage.js';
@@ -22,6 +23,7 @@ const routes = {
   "/game-modality/": showNav(GameModalityPage),
   "/leaderboard/": showNav(Leaderboard),
   "/profile/": showNav(ProfilePage),
+  "/profile-setup/": showNav(ProfileSetup),
   "/settings/": showNav(SettingPage),
   "/tournaments/": showNav(TournamentPage),
 }
@@ -62,7 +64,7 @@ const router = {
     const contentElement = document.getElementById("main");
 
     const loadingIndicator = `
-      <div class="loading">
+      <div class="loading">git add
         <div class="spinner-grow m-2" role="status">
         </div>
         <span>Loading...</span>

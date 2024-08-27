@@ -22,6 +22,8 @@
 @import "./components/TournamentPlayers.css";
 @import "./components/TournamentPopup.css";
 @import "./components/TwofaInput.css";
+@import "./components/Buttons.css";
+@import "./components/ProfileData.css";
 
 /* Pages */
 @import "./pages/GamePage.css";
