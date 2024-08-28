@@ -3,7 +3,7 @@ import logging
 import urllib.parse
 from pprint import pformat
 from .serializers import PlayerInfoSerializer, PlayerSettingsInfoSerializer
-from .models import  Friendship, Player, PlayerMatch, PlayerSettings, Training
+from .models import  Friendship, Player, PlayerMatch, PlayerSettings, Training, TrainingPlayer, IaStatistics, IaState
 from .decorators import jwtCookieRequired
 from django.db.models import Q
 from django.conf import settings
@@ -446,14 +446,62 @@ class TrainingHistory(APIView):
             player = Player.objects.get(id=request.decoded_token['id'])
             trainings = Training.objects.filter(playerId=player).order_by('-id')
             trainingResponse = []
+
+            playerTrainings = []
+            playerTrainingMatchs = 0
+            playerTrainingWin = 0
+            
+            iaTrainings = []
+            iaTrainingMatchs = 0
+            iaTrainingWin = 0
             for training in trainings:
-                trainingResponse.append({
-                    "id": training.id,
-                    "playerWin": training.playerWin,
-                    "playerScore": training.playerScore,
-                    "botScore": training.botScore,
-                    "score": training.score
+                playerTraining = TrainingPlayer.objects.get(trainingId=training)
+                playerTrainings.append({
+                    "win": playerTraining.win,
+                    "accuracy": playerTraining.accuracy,
+                    "totalPoints": playerTraining.totalPoints,
+                    "playerPerformance": playerTraining.playerPerformance,
+                    "correctBlocks": playerTraining.correctBlocks,
+                    "totalBlocks": playerTraining.totalBlocks,
                 })
+                playerTrainingMatchs += 1
+                if (playerTraining.win is True):
+                    playerTrainingWin += 1
+
+                iaTraining = IaStatistics.objects.get(trainingId=training)
+
+                states = []
+                iaStates = IaState.objects.get(iaStatisticsId=iaTraining)
+                for state in iaStates:
+                    states.append({
+                        "state": state.stage,
+                        "action1": state.action1,
+                        "action2": state.action2,
+                        "action3": state.action3,
+                    })
+
+                iaTrainings.append({
+                    "win": iaTraining.win,
+                    "accuracy": iaTraining.accuracy,
+                    "totalPoints": iaTraining.totalPoints,
+                    "playerPerformance": iaTraining.playerPerformance,
+                    "correctBlocks": iaTraining.correctBlocks,
+                    "totalBlocks": iaTraining.totalBlocks,
+                    "states": states
+                })
+                iaTrainingMatchs += 1
+                if (iaTraining.win is True):
+                    iaTrainingWin += 1
+
+            trainingResponse.append({
+                "id": training.id,
+                "PlayerTraining": playerTrainings,
+                "playerTrainingMatchs": playerTrainingMatchs,
+                "playerTrainingWin": playerTrainingWin,
+                "IaTraining": iaTrainings,
+                "iaTrainingMatchs": iaTrainingMatchs,
+                "iaTrainingWin": iaTrainingWin,
+            })
             return Response({
                 "status": 200,
                 "training": trainingResponse
@@ -473,28 +521,73 @@ class TrainingHistory(APIView):
     def post(self, request):
         try:
             id = request.decoded_token['id']
+            logger.info(f"Received request from player ID: {id}")
+
             player = Player.objects.get(id=id)
+            logger.info(f"Player found: {player.username}")
+
+            logger.debug(f"Request\n{pformat(request.data)}")
 
             trainingData = request.data.get('training')
+            logger.debug(f"Training data received: {trainingData}")
 
-            training = Training.objects.create(
-                playerId = player,
-                playerWin = trainingData["playerWin"],
-                playerScore = trainingData["playerScore"],
-                botScore = trainingData["botScore"],
-                score = trainingData["score"],
+            if trainingData is None:
+                raise ValueError("Training data is missing from the request.")
+
+            training = Training.objects.create(playerId=player)
+            logger.info(f"Training session created with ID: {training.id}")
+
+            logger.debug(f"trainingData {pformat(trainingData)}")
+            trainingPlayer = TrainingPlayer.objects.create(
+                trainingId=training,
+                win=trainingData["PlayerTraining"]["win"],
+                accuracy=trainingData["PlayerTraining"]["accuracy"],
+                totalPoints=trainingData["PlayerTraining"]["totalPoints"],
+                playerPerformance=trainingData["PlayerTraining"]["playerPerformance"],
+                correctBlocks=trainingData["PlayerTraining"]["correctBlocks"],
+                totalBlocks=trainingData["PlayerTraining"]["totalBlocks"],
             )
+            logger.info(f"TrainingPlayer created: {trainingPlayer}")
 
+            iaStatistics = IaStatistics.objects.create(
+                trainingId=training,
+                win=trainingData["IaTraining"]["win"],
+                accuracy=trainingData["IaTraining"]["accuracy"],
+                totalPoints=trainingData["IaTraining"]["totalPoints"],
+                playerPerformance=trainingData["IaTraining"]["playerPerformance"],
+                correctBlocks=trainingData["IaTraining"]["correctBlocks"],
+                totalBlocks=trainingData["IaTraining"]["totalBlocks"],
+            )
+            logger.info(f"IaStatistics created: {iaStatistics}")
+
+            for state in trainingData["IaTraining"]["states"]:
+                iaState = IaState.objects.create(
+                    iaStatisticsId=iaStatistics,
+                    stage=state["state"],
+                    action1=state["action1"],
+                    action2=state["action2"],
+                    action3=state["action3"],
+                )
+                logger.info(f"IaState created for state '{state['state']}': {iaState}")
+
+            logger.info(f"Training session {training.id} successfully created.")
             return Response({
                 "status": 200,
-                "training": training
+                "training": training.id
             })
         except Player.DoesNotExist:
+            logger.error(f"Player with ID {id} not found.")
             return Response({
                 "status": 404,
                 "message": "User not found",
             })
+        except ValueError as ve:
+            return Response({
+                "status": 400,
+                "message": str(ve),
+            })
         except Exception as e:
+            logger.exception(f"An error occurred during training creation: {e}")
             return Response({
                 "status": 500,
                 "message": str(e),
