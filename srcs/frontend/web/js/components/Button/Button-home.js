@@ -3,13 +3,13 @@ import router from '../../router/router.js';
 const ButtonHome = ({ label, customClasses = [], onClick, link }) => {
     const buttonContainer = document.createElement('button');
     buttonContainer.classList.add(
-      'btn', 
+      'btn',
       'text-start',
       ...customClasses
     );
     buttonContainer.type = 'button';
     buttonContainer.innerHTML = `${label}`;
-  
+
     if (typeof onClick === 'function') {
       buttonContainer.addEventListener('click', onClick);
     } else if (link) {
@@ -18,7 +18,7 @@ const ButtonHome = ({ label, customClasses = [], onClick, link }) => {
         router.go(route, query ? `?${query}` : '', false);
       });
     }
-  
+
     return buttonContainer;
 };
 
