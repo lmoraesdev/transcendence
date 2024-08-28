@@ -89,10 +89,10 @@ const GamePage = () => {
   });
 
   //const gameHeader_query = new URLSearchParams(window.location.search).get("game");
-  const game_type_query  = new URLSearchParams(window.location.search).get("mode");
-  const game_match_query = new URLSearchParams(window.location.search).get("match");
+  const game_type_query  = new URLSearchParams(history.state.query).get("mode");
+  const game_match_query = new URLSearchParams(history.state.query).get("match");
   let match_id = game_match_query ? Number(game_match_query) : null;
- 
+
   let gameRunning = false;
   let gamePaused = false;
 
@@ -209,7 +209,7 @@ const GamePage = () => {
 
   if (avatarElement && nameElement) {
     fetching(`https://${window.ft_transcendence_host}/player/`).then((res) => {
-      
+
       avatarElement.src = res.player.avatar ? res.player.avatar : '/web/images/profile.png';
       nameElement.textContent = res.player.firstName ? res.player.firstName : "";
     });
