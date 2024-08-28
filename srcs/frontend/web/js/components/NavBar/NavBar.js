@@ -20,7 +20,7 @@ const Navbar = async () => {
         </button>
         <div id="navbarSupportedContent" class="navbar-menu collapse navbar-collapse justify-content-around align-items-center w-100">
           <button class="btn btn-outline-warning" id="home">Home</button>
-          <button class="btn btn-outline-warning" id="leaderboard">Leaderboard</button>
+          <button class="btn btn-outline-warning" id="statistics">Statistics</button>
           <button class="btn btn-outline-warning" id="profile">Profile</button>
           <button class="btn btn-outline-warning" id="settings">Settings</button>
           <button class="btn btn-outline-warning" id="logout">Logout</button>
@@ -45,8 +45,8 @@ const Navbar = async () => {
     router.go("/home/", "/home/", false);
   });
 
-  document.getElementById('leaderboard').addEventListener('click', () => {
-    router.go("/leaderboard/", "/leaderboard/", false);
+  document.getElementById('statistics').addEventListener('click', () => {
+    router.go("/statistics/", "/statistics/", false);
   });
 
   document.getElementById('profile').addEventListener('click', () => {
