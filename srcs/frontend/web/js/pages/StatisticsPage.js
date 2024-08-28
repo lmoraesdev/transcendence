@@ -5,7 +5,7 @@ const { truncateUsername } = helpers;
 const StatisticsPage = async () => {
   const statisticHTML = `
     <template id="statistic-template">
-      <section class="statistic text-black bg-white mx-4 border border-2 border-dark h-100 p-0">
+      <section class="statistic text-black bg-white border border-2 border-dark h-100 p-0">
         <header class="statistic-header d-flex align-items-center justify-content-center my-4">
           <h1 class="text-center fs-5 mx-0">Statistics</h1>
         </header>
@@ -23,9 +23,7 @@ const StatisticsPage = async () => {
                   <th>Nickname</th>
                 </tr>
               </thead>
-              <tbody id="statistic-body">
-                <!-- Rows will be populated here dynamically -->
-              </tbody>
+              <tbody id="statistic-body"></tbody>
             </table>
           </div>
           <nav class="pagination-container d-flex justify-content-center mt-4">
@@ -56,6 +54,9 @@ const StatisticsPage = async () => {
     const response = await fetch(`https://${window.ft_transcendence_host}/player/listAllPlayers/`);
     const players = await response.json();
 
+    // Utilizara a base do número total de vitórias (vitórias vs jogadores + vitórias vs IA) para ordenar os jogadore
+    players.sort((a, b) => (b.victory + b.victoryVsAI) - (a.victory + a.victoryVsAI));
+
     const tbody = document.getElementById("statistic-body");
     const pageNumberElement = document.getElementById("page-number");
     const prevPageButton = document.getElementById("prev-page");
@@ -70,21 +71,21 @@ const StatisticsPage = async () => {
       const start = (page - 1) * itemsPerPage;
       const end = start + itemsPerPage;
       const pageItems = players.slice(start, end);
-      
+
       pageItems.forEach((player, index) => {
         const row = document.createElement('tr');
         row.innerHTML = `
-          <td>${player.victory - player.defeat}</td>
+          <td>${player.victory + player.victoryVsAI ? player.victory + player.victoryVsAI: "N/A" }</td>
           <td>${start + index + 1}º</td>
-          <td>${player.champion}</td>
-          <td>${player.victory}</td>
-          <td>2</td> <!-- Ajustar qunado o as propriedades do enpoint forem definidas -->
+          <td>${player.champion || 'N/A'}</td>
+          <td>${player.victory ? player.victory : "0" }</td>
+          <td>${player.victoryVsAI || '0'}</td> <!-- Ajustar quando as propriedades do endpoint forem definidas -->
           <td>${player.status === 'OF' ? 'Offline' : 'Online'}</td>
           <td>${truncateUsername(player.username)}</td>
         `;
         tbody.appendChild(row);
       });
-      
+
       pageNumberElement.textContent = `Page ${page}`;
       prevPageButton.disabled = page === 1;
       nextPageButton.disabled = page === totalPages;
