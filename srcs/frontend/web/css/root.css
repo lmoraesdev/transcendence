@@ -32,20 +32,25 @@
 
 body, html, #root {
   height: 100%;
+  margin: 0;
  /*font-family: "Audiowide", sans-serif;*/
   font-family: "Red Hat Display", sans-serif;
   color: var(--color-font-white);
   background: var(--color-background-black);
 }
 
-
-.background {
-  z-index: 2;
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.my-page {
-  height: 100%;
-  flex-direction: column;
+#main {
+  flex-grow: 1;
+}
+
+footer.my-foot {
+  padding: 0.5rem;
 }
 
 img {
