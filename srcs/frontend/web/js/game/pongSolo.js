@@ -1,6 +1,6 @@
 import fetching from "../helpers/fetching.js";
 import { soundEnabled } from "../helpers/soundControl.js";
-import { AI } from "../IA/ai.js";
+import { AI } from "../ia/ia.js";
 
 let loopIdSolo;
 let isPaused = false;

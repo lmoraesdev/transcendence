@@ -76,7 +76,7 @@ const ProfilePage = () => {
   fetching(`https://${window.ft_transcendence_host}/player/`).then((res) => {
     const playerData = res.player;
 
-    //parentElement.querySelector(".avatar").src = playerData.avatar ? playerData.avatar : "/web/images/profile.png";
+    parentElement.querySelector(".avatar").src = playerData.avatar ? playerData.avatar : "/web/images/profile.png";
     parentElement.querySelector(".player-data .username").innerText = playerData.username || "";
     parentElement.querySelector(".player-data .first-name").innerText = playerData.first_name || "";
     parentElement.querySelector(".player-data .last-name").innerText = playerData.last_name || "";

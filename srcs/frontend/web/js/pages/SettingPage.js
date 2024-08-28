@@ -1,79 +1,85 @@
 import fetching from '../helpers/fetching.js';
 import { toggleSound } from '../helpers/soundControl.js';
+import TwofaInput from "../components/Input/TwofaInput.js";
 
 const SettingPage = () => {
   const settingHTML = `
     <template id="setting-template">
-      <main class="container-fluid p-3 d-flex flex-column align-items-center gap-5 mb-2">
-        <div class="text-bg-light rounded-3 p-3 w-100">
-          <h1 class="setting-header  py-2 rounded-3 fs-5 text-center display-1 fw-bold">
-            Settings
-          </h1>
-          <div class=" d-block flex-wrap  align-items-center gap-2 p-2 rounded-3">
-            <div class="setting-avatar d-flex justify-content-center align-items-center gap-1">
-              <input type="file" id="input-avatar" accept="image/jpeg, image/png, image/jpg">
-              <label class="change-avatar mb-2 d-flex justify-content-center align-items-center rounded-3 border border-1 border-white" for="input-avatar">
-                <img
-                  src="/web/images/image-edit.svg"
-                  style="object-fit: cover; cursor: pointer; width: 170px; height: 170px;"
-                  class="avatar img-thumbnail rounded-circle border border-1 border-black"
-                  alt="avatar"
-                  referrerpolicy="no-referrer"
-                >
-              </label>
-            </div>
-            <h2 class="text-center fs-6 fw-bold m-0 px-4 py-2">Change avatar</h2>
+      <section class="container-fluid p-3">
+        <header class="text-center">
+          <h1 class="display-5 fw-bold mb-4">Settings</h1>
+        </header>
+
+        <section class="mb-4 text-center">
+          <div class="position-relative mx-auto mb-2">
+            <input type="file" id="input-avatar" class="d-none" accept="image/jpeg, image/png, image/jpg">
+            <label for="input-avatar" class="position-relative d-block mx-auto">
+              <img
+                src="/web/images/image-edit.svg"
+                class="avatar img-thumbnail rounded-circle"
+                style="width: 150px; height: 150px; cursor: pointer;"
+                alt="avatar"
+                referrerpolicy="no-referrer"
+              >
+            </label>
           </div>
-          <div class=" justify-content-around d-flex flex-wrap  align-items-center gap-2 p-2 rounded-3">
-            <h2 class="text-center fs-6 fw-bold m-0 px-3 py-2">Change Username</h2>
-            <div class="setting-username d-flex flex-wrap justify-content-center align-items-center gap-1">
-              <input type="text" class="input-username bg-body-tertiary border border-black rounded-3 p-3 fs-5">
-              <button class="btn btn-primary button-username rounded-3 p-3">Submit</button>
-            </div>
+          <h2 class="fs-6 fw-bold">Change avatar</h2>
+        </section>
+
+        <section class="mb-4">
+          <div class="d-flex flex-wrap justify-content-center align-items-center gap-2">
+            <h2 class="fs-6 fw-bold m-0">Change Username</h2>
+            <input type="text" class="input-username form-control w-auto" placeholder="Username">
+            <button class="button-username btn btn-primary">Submit</button>
           </div>
-          <div class=" justify-content-around d-flex flex-wrap  align-items-center gap-2 p-2 rounded-3">
-            <h2 class="text-center fs-6 fw-bold m-0 px-3 py-2">Change First Name</h2>
-            <div class="setting-first-name d-flex flex-wrap justify-content-center align-items-center gap-1">
-              <input type="text" class="input-first-name bg-body-tertiary border border-black rounded-3 p-3 fs-5">
-              <button class="btn btn-primary button-first-name rounded-3 p-3">Submit</button>
-            </div>
+        </section>
+
+        <section class="mb-4">
+          <div class="d-flex flex-wrap justify-content-center align-items-center gap-2">
+            <h2 class="fs-6 fw-bold m-0">Change First Name</h2>
+            <input type="text" class="input-first-name form-control w-auto" placeholder="First Name">
+            <button class="button-first-name btn btn-primary">Submit</button>
           </div>
-          <div class=" justify-content-around d-flex flex-wrap  align-items-center gap-2 p-2 rounded-3">
-            <h2 class="text-center fs-6 fw-bold m-0 px-3 py-2">Change Last Name</h2>
-            <div class="setting-last-name d-flex flex-wrap justify-content-center align-items-center gap-1">
-              <input type="text" class="input-last-name bg-body-tertiary border border-black rounded-3 p-3 fs-5">
-              <button class="btn btn-primary button-last-name rounded-3 p-3">Submit</button>
-            </div>
+        </section>
+
+        <section class="mb-4">
+          <div class="d-flex flex-wrap justify-content-center align-items-center gap-2">
+            <h2 class="fs-6 fw-bold m-0">Change Last Name</h2>
+            <input type="text" class="input-last-name form-control w-auto" placeholder="Last Name">
+            <button class="button-last-name btn btn-primary">Submit</button>
           </div>
-          <div class=" justify-content-around d-flex flex-wrap  align-items-center gap-2 p-2 rounded-3">
-            <h2 class="text-center fs-6 fw-bold m-0 px-3 py-2">Two Factor Authentication</h2>
-            <div class="setting-twofa p-2 rounded-3">
-              <div class=" justify-content-around d-flex flex-wrap  align-items-center gap-2 p-2 rounded-3">
-                <div class="form-check form-switch">
-                  <label class="form-check-label" for="toggle-sound-btn">
-                  <input class="form-check-input" type="checkbox" role="switch" id="toggle-sound-btn"></label>
-                </div>
-              </div>
-              <div class="popup-twofa flex-column justify-content-center align-items-center">
-                <div class="d-flex flex-column justify-content-center align-items-center rounded-3 gap-5 p-5">
-                  <button class="popup-twofa-close btn btn-primary-close btn btn-primary-close-white align-self-end"></button>
-                  <div class="popup-twofa-qrcode d-flex justify-content-center align-items-center"></div>
-                  <div class="d-flex justify-content-center align-items-center">
-                    <twofa-input></twofa-input>
-                  </div>
-                </div>
+        </section>
+
+        <section class="twofa-section justify-content-around d-flex flex-wrap align-items-center gap-2 p-2 rounded-3">
+          <h2 class="text-center fs-6 fw-bold m-0 px-3 py-2">Two Factor Authentication</h2>
+          <div class="setting-twofa p-2 rounded-3">
+            <div class="toggle-switch justify-content-around d-flex flex-wrap align-items-center gap-2 p-2 rounded-3">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="toggle-twofa-btn">
+                <label class="form-check-label" for="toggle-sound-btn"></label>
               </div>
             </div>
+
+            <div class="popup-twofa d-none top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-black bg-opacity-50">
+              <div class="bg-light p-4 rounded-3">
+                <button class="btn-close top-0 end-0 m-2" aria-label="Close"></button>
+                <h5>Connect Authentication App</h5>
+                <h6>Open your Two-Factor Authentication (2FA) App</h6>
+                <div class="popup-twofa-qrcode border rounded-3 p-3 my-4 mx-auto"></div>
+                <div class="twofa-input text-center"></div>
+              </div>
+            </div>            
           </div>
-          <div class=" justify-content-around d-flex flex-wrap  align-items-center gap-2 p-2 rounded-3">
-            <h2 class="text-center fs-6 fw-bold m-0 px-3 py-2">Enable or Disable Sound</h2>
-            <div class="form-check form-switch">
-              <label class="form-check-label" for="toggle-sound-btn">
-              <input class="form-check-input" type="checkbox" role="switch" id="toggle-sound-btn"></label>
-            </div>
+        </section>
+
+        <section class="text-center justify-content-around d-flex align-items-center">
+          <h2 class="fs-6 fw-bold">Enable or Disable Sound</h2>
+          <div class="form-check form-switch d-inline-block mt-2">
+            <input class="form-check-input" type="checkbox" role="switch" id="toggle-sound-btn">
           </div>
-        </div>
-      </main>
+        </section>
+
+      </section>
     </template>
   `;
 
@@ -84,25 +90,27 @@ const SettingPage = () => {
     document.body.appendChild(templateLogin);
   }
 
-  const template  = document.getElementById("setting-template");
+  const template = document.getElementById("setting-template");
   const component = template.content.cloneNode(true);
   const parentElement = document.getElementById("main");
 
-  parentElement.innerHTML  = "";
+  parentElement.innerHTML = "";
   parentElement.appendChild(component);
 
-  const avatar = parentElement.querySelector(".setting-avatar .avatar");
+  parentElement.classList.add(
+    'text-black',
+    'bg-white',
+  );
+
+  const twofaContainer = parentElement.querySelector('.twofa-input');
+  twofaContainer.appendChild(TwofaInput());
+
+  const avatar = parentElement.querySelector(".avatar");
   const input_avatar = parentElement.querySelector("#input-avatar");
-  const input_username = parentElement.querySelector(".input-username");
-  const button_username = parentElement.querySelector(".button-username");
-  const input_first_name = parentElement.querySelector(".input-first-name");
-  const button_first_name = parentElement.querySelector(".button-first-name");
-  const input_last_name = parentElement.querySelector(".input-last-name");
-  const button_last_name = parentElement.querySelector(".button-last-name");
-  const checkbox_twofa = parentElement.querySelector(".setting-twofa input[type=checkbox]");
+  const checkbox_twofa = parentElement.querySelector("#toggle-twofa-btn");
   const popup_twofa = parentElement.querySelector(".popup-twofa");
   const popup_twofa_qrcode = parentElement.querySelector(".popup-twofa-qrcode");
-  const popup_twofa_close = parentElement.querySelector(".popup-twofa-close");
+  const popup_twofa_close = parentElement.querySelector(".btn-close");
   const checkbox_sound = parentElement.querySelector('#toggle-sound-btn');
 
   checkbox_sound.addEventListener('click', () => {
@@ -110,10 +118,10 @@ const SettingPage = () => {
   })
 
   fetching(`https://${window.ft_transcendence_host}/player/`).then((res) => {
-    avatar.src = res.player.avatar;
-    input_username.placeholder = res.player.username;
-    input_first_name.placeholder = res.player.firstName;
-    input_last_name.placeholder = res.player.lastName;
+    avatar.src = res.player.avatar ? res.player.avatar : "/web/images/profile.png";
+    document.querySelector(".input-username").placeholder = res.player.username;
+    document.querySelector(".input-first-name").placeholder = res.player.firstName;
+    document.querySelector(".input-last-name").placeholder = res.player.lastName;
     checkbox_twofa.checked = res.player.twoFactor;
   });
 
@@ -124,62 +132,41 @@ const SettingPage = () => {
     formData.append("avatar", avatarImage);
     fetching(`https://${window.ft_transcendence_host}/player/avatar/`, "POST", formData);
   };
-  button_username.onclick = (event) => {
-    player_post_changes("username", input_username);
+
+  const submitFieldChange = (field, inputElem) => {
+    const value = field === "two_factor" ? inputElem.checked : inputElem.value;
+    fetching(`https://${window.ft_transcendence_host}/player/`, "PATCH", {
+      field,
+      value,
+    }).then(() => {
+      if (field !== "two_factor") inputElem.placeholder = inputElem.value;
+      inputElem.value = "";
+    });
   };
-  button_first_name.onclick = (event) => {
-    player_post_changes("first_name", input_first_name);
-  };
-  button_last_name.onclick = (event) => {
-    player_post_changes("last_name", input_last_name);
-  };
-  checkbox_twofa.onchange = (event) => {
+
+  document.querySelector(".button-username").onclick = () => submitFieldChange("username", document.querySelector(".input-username"));
+  document.querySelector(".button-first-name").onclick = () => submitFieldChange("first_name", document.querySelector(".input-first-name"));
+  document.querySelector(".button-last-name").onclick = () => submitFieldChange("last_name", document.querySelector(".input-last-name"));
+
+  checkbox_twofa.onchange = () => {
     if (checkbox_twofa.checked) {
       fetch(`https://${window.ft_transcendence_host}/authentication/2FA/qrcode/`)
         .then((res) => res.blob())
-        .then((blob) => set_qrcode(blob));
+        .then((blob) => {
+          popup_twofa_qrcode.innerHTML = `<img src="${URL.createObjectURL(blob)}" class="img-fluid" alt="qrCode">`;
+          popup_twofa.classList.remove('d-none');
+        });
     } else {
-      player_post_changes("two_factor", checkbox_twofa);
+      submitFieldChange("two_factor", checkbox_twofa);
     }
   };
 
-  popup_twofa_close.onclick = (event) => {
+  popup_twofa_close.onclick = () => {
     checkbox_twofa.checked = !checkbox_twofa.checked;
-    popup_twofa.querySelector("twofa-input input[type=number]").value = "";
+    popup_twofa.querySelector(".twofa-input input[type=number]").value = "";
     popup_twofa_qrcode.innerHTML = "";
-    popup_twofa.style.display = "none";
+    popup_twofa.classList.add('d-none');
   };
-
-  const player_post_changes = (field, input_elem) => {
-    let value;
-    if (field === "two_factor") {
-      value = input_elem.checked;
-    } else {
-      value = input_elem.value;
-      input_elem.placeholder = value;
-      input_elem.value = "";
-    }
-    fetching(
-      `https://${window.ft_transcendence_host}/player/`,
-      "POST",
-      JSON.stringify({ player: { [field]: value } }),
-      { "Content-Type": "application/json" },
-    ).then((res) => {
-      alert(res.message);
-    });
-  }
-
-  const set_qrcode = (blob) => {
-    const url = URL.createObjectURL(blob);
-    const img = new Image();
-
-    img.src = url;
-    img.style.borderRadius = "1rem";
-    img.onload = () => {
-      popup_twofa.style.display = "flex";
-      popup_twofa_qrcode.appendChild(img);
-    };
-  }
 };
 
 export default SettingPage;
