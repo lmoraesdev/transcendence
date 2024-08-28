@@ -18,7 +18,6 @@ export class AI {
     this.explorationDecay = 0.995;
     this.minExplorationRate = 0.01;
 
-    // Métricas detalhadas para a IA e para o jogador
     this.metrics = {
       player: {
         accuracy: 0,
@@ -40,8 +39,8 @@ export class AI {
       },
     };
 
-    // Ajusta configurações iniciais com base no nível de dificuldade
-    this.adjustAISettings(this.difficulty);
+    // Ajusta a dificuldade com base no nível inicial
+    this.adjustDifficulty();
   }
 
   getState(ball, paddle) {
@@ -181,7 +180,7 @@ export class AI {
     }
   }
 
-  async updateTrainingMetrics() {
+  async loadTraining() {
     try {
       const { qtable, player, ai } = await fetching(
         `https://${window.ft_transcendence_host}/player/training/`,
@@ -190,7 +189,7 @@ export class AI {
       this.metrics.player = player; // Atualiza métricas do jogador
       this.metrics.ai = ai; // Atualiza métricas da IA
     } catch (error) {
-      console.error("Erro ao atualizar métricas de treinamento:", error);
+      console.error("Erro ao carregar dados de treinamento:", error);
     }
   }
 }
