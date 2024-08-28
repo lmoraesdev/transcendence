@@ -35,3 +35,4 @@ class PlayerSettingsInfoSerializer(serializers.ModelSerializer):
             "language",
             "iaLevel",
         ]
+

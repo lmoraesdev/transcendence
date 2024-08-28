@@ -73,10 +73,34 @@ class Tournament(models.Model):
 class Training(models.Model):
     id = models.BigAutoField(primary_key=True, auto_created=True)
     playerId = models.ForeignKey(Player, on_delete=models.CASCADE, null=False, blank=False)
-    playerWin = models.BooleanField(default=False, null=False, blank=False)
-    playerScore = models.IntegerField(default=0, null=False, blank=False)
-    botScore = models.IntegerField(default=0, null=False, blank=False)
-    score = models.IntegerField(default=0, null=False, blank=False)
+
+class TrainingPlayer(models.Model):
+    id = models.BigAutoField(primary_key=True, auto_created=True)
+    trainingId = models.ForeignKey(Training, on_delete=models.CASCADE, null=False, blank=False)
+    win = models.BooleanField(null=False, blank=False)
+    accuracy = models.DecimalField(default=0, max_digits=5, decimal_places=2, null=False, blank=False)
+    totalPoints = models.IntegerField(default=0, null=False, blank=False)
+    playerPerformance = models.DecimalField(default=0, max_digits=5, decimal_places=2, null=False, blank=False)
+    correctBlocks = models.IntegerField(default=0, null=False, blank=False)
+    totalBlocks = models.IntegerField(default=0, null=False, blank=False)
+    
+class IaStatistics(models.Model):
+    id = models.BigAutoField(primary_key=True, auto_created=True)
+    trainingId = models.ForeignKey(Training, on_delete=models.CASCADE, null=False, blank=False)
+    win = models.BooleanField(null=False, blank=False)
+    accuracy = models.DecimalField(default=0, max_digits=5, decimal_places=2, null=False, blank=False)
+    totalPoints = models.IntegerField(default=0, null=False, blank=False)
+    playerPerformance = models.DecimalField(default=0, max_digits=5, decimal_places=2, null=False, blank=False)
+    correctBlocks = models.IntegerField(default=0, null=False, blank=False)
+    totalBlocks = models.IntegerField(default=0, null=False, blank=False)
+
+class IaState(models.Model):
+    id = models.BigAutoField(primary_key=True, auto_created=True)
+    iaStatisticsId = models.ForeignKey(IaStatistics, on_delete=models.CASCADE, null=False, blank=False)
+    stage = models.IntegerField(default=1, null=False, blank=False)
+    action1 = models.DecimalField(default=0, max_digits=5, decimal_places=2, null=False, blank=False)
+    action2 = models.DecimalField(default=0, max_digits=5, decimal_places=2, null=False, blank=False)
+    action3 = models.DecimalField(default=0, max_digits=5, decimal_places=2, null=False, blank=False)
 
 class Match(models.Model):
     class Game(Enum):
