@@ -1,14 +1,19 @@
 import fetching from "../helpers/fetching.js";
 import { soundEnabled } from "../helpers/soundControl.js";
+import { AI } from "../IA/ai.js";
 
 let loopIdSolo;
-const KeyPressedSolo = [];
-const KeyUP = 38;
-const KeyDOWN = 40;
-const KeyW = 87;
-const KeyS = 83;
-let gamePaused = false;
-let gamePausedState = {};
+let isPaused = false;
+let isGameOver = false;
+let ai;
+let scorePlayer = 0;
+let scoreComputer = 0;
+const KeyPressedSolo = {
+  87: false, // W
+  83: false, // S
+  38: false, // UP
+  40: false, // DOWN
+};
 
 // Função para obter o nome do jogador
 const getName = async () => {
@@ -21,19 +26,26 @@ const getName = async () => {
   }
 };
 
-// Função para verificar o status do som
-export function getSoundStatus() {
-  return localStorage.getItem("disableSound") === "true";
-}
-
 // Função principal para rodar o jogo Pong Solo
 async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
-  let scorePlayer = ptsPlayer;
-  let scoreComputer = ptsComputer;
+  scorePlayer = ptsPlayer;
+  scoreComputer = ptsComputer;
   let namePlayer = await getName();
 
   canvas.width = 1920;
   canvas.height = 1080;
+
+  // Configuração inicial da IA
+  try {
+    const response = await fetching("/player/");
+    const data = await response.json();
+    const level = data.playerSettings.iaLevel || "medium";
+    ai = new AI(level);
+    await ai.loadTraining();
+  } catch (error) {
+    console.error("Erro ao obter o nível da IA:", error);
+    ai = new AI("medium"); // Fallback para nível médio
+  }
 
   // Criar objetos do jogo
   let ball = createBall([4, 4], [canvas.width / 2, canvas.height / 2], 20);
@@ -51,23 +63,6 @@ async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
     "https://assets.mixkit.co/active_storage/sfx/2073/2073-preview.mp3",
   );
 
-  // Carregar áudio
-  gameOverSound.addEventListener("canplaythrough", () =>
-    console.log("Som de game over carregado."),
-  );
-  winGameSound.addEventListener("canplaythrough", () => console.log("Som de vitória carregado."));
-  reboundSound.addEventListener("canplaythrough", () => console.log("Som de rebote carregado."));
-
-  let lastUpdateTime = Date.now();
-  let aiIntelligence = 5;
-  let aiPerformance = { hits: 0, misses: 0 };
-
-  function playSound(sound) {
-    if (!getSoundStatus()) {
-      sound.play();
-    }
-  }
-
   // Função para desenhar a quadra
   function drawCourt(ctx, canvas) {
     ctx.fillStyle = "black";
@@ -81,40 +76,6 @@ async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
     ctx.moveTo(canvas.width / 2, 0);
     ctx.lineTo(canvas.width / 2, canvas.height);
     ctx.stroke();
-
-    // Áreas de serviço
-    ctx.beginPath();
-    ctx.rect(canvas.width / 2 - 50, 0, 100, canvas.height);
-    ctx.stroke();
-  }
-
-  function BallPaddleCollision(ball, paddle) {
-    const dx = Math.abs(ball.positionX - paddle.Center()[0]);
-    const dy = Math.abs(ball.positionY - paddle.Center()[1]);
-    if (dx <= ball.size + paddle.sizeX / 2 && dy <= ball.size + paddle.sizeY / 2) {
-      if (
-        (ball.speedX > 0 && ball.positionX >= paddle.Center()[0]) ||
-        (ball.speedX < 0 && ball.positionX <= paddle.Center()[0])
-      ) {
-        return;
-      }
-      ball.speedX *= -1;
-      playSound(reboundSound);
-      ball.speedX *= 1.1;
-      ball.speedY *= 1.1;
-      aiPerformance.hits++;
-    } else {
-      aiPerformance.misses++;
-    }
-  }
-
-  function paddleCollision(canvas, paddle) {
-    if (paddle.positionY + paddle.sizeY > canvas.height) {
-      paddle.positionY = canvas.height - paddle.sizeY;
-    }
-    if (paddle.positionY < 0) {
-      paddle.positionY = 0;
-    }
   }
 
   function ballCollision(canvas, ball, ctx, paddlePlayer, paddleComputer) {
@@ -139,14 +100,10 @@ async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
       scoreComputer += 1;
       localStorage.setItem("scoreComputer", scoreComputer);
       ball.speedX = -4;
-      aiIntelligence = Math.max(1, aiIntelligence - 1);
-      aiPerformance.misses = 0;
     } else {
       scorePlayer += 1;
       localStorage.setItem("scorePlayer", scorePlayer);
       ball.speedX = 4;
-      aiIntelligence = Math.min(10, aiIntelligence + 1);
-      aiPerformance.hits = 0;
     }
 
     if (scorePlayer === 7 || scoreComputer === 7) {
@@ -176,34 +133,8 @@ async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
     return false;
   };
 
-  function predictBallPosition(ball, paddle) {
-    const timeToReachPaddle = (paddle.positionX - ball.positionX) / ball.speedX;
-    const predictedY = ball.positionY + ball.speedY * timeToReachPaddle;
-    return predictedY;
-  }
-
-  function simulateKeyPressForComputer(ball, paddle) {
-    const predictedY = predictBallPosition(ball, paddle);
-    const paddleCenterY = paddle.positionY + paddle.sizeY / 2;
-
-    if (predictedY < paddleCenterY - 10) {
-      paddle.positionY -= paddle.speedY;
-    } else if (predictedY > paddleCenterY + 10) {
-      paddle.positionY += paddle.speedY;
-    }
-  }
-
   function updateComputerPaddle(ball, paddle) {
-    const currentTime = Date.now();
-    const deltaTime = currentTime - lastUpdateTime;
-
-    if (deltaTime >= 1000 / 60) {
-      simulateKeyPressForComputer(ball, paddle);
-      paddleCollision(canvas, paddle);
-      lastUpdateTime = currentTime;
-    }
-
-    aiIntelligence = 10;
+    ai.update(ball, paddle);
   }
 
   function Score(ctx, canvas, scorePlayer, scoreComputer) {
@@ -215,7 +146,7 @@ async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
   }
 
   function gameLoopSolo() {
-    if (gamePaused) return; // Pausa o jogo se estiver em pausa
+    if (isPaused || isGameOver) return; // Pausa o jogo se estiver em pausa ou finalizado
 
     loopIdSolo = window.requestAnimationFrame(gameLoopSolo);
 
@@ -234,81 +165,51 @@ async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
     paddlePlayer.render(ctx);
     paddleComputer.render(ctx);
     Score(ctx, canvas, scorePlayer, scoreComputer);
-    BallPaddleCollision(ball, paddlePlayer);
-    BallPaddleCollision(ball, paddleComputer);
     updateComputerPaddle(ball, paddleComputer);
   }
 
-  // Adicionar eventos de teclado
-  window.onkeydown = (e) => (KeyPressedSolo[e.keyCode] = true);
-  window.onkeyup = (e) => (KeyPressedSolo[e.keyCode] = false);
-
-  // Iniciar o loop do jogo
-  gameLoopSolo();
-
   // Controle do jogador
   window.addEventListener("keydown", (e) => {
-    if (gamePaused) return;
-    switch (e.keyCode) {
-      case KeyW:
-        paddlePlayer.positionY -= paddlePlayer.speedY;
-        break;
-      case KeyS:
-        paddlePlayer.positionY += paddlePlayer.speedY;
-        break;
-      case KeyUP:
-        paddleComputer.positionY -= paddleComputer.speedY;
-        break;
-      case KeyDOWN:
-        paddleComputer.positionY += paddleComputer.speedY;
-        break;
-    }
+    if (isPaused) return;
+    KeyPressedSolo[e.keyCode] = true;
+
+    if (KeyPressedSolo[KeyW]) paddlePlayer.positionY -= paddlePlayer.speedY;
+    if (KeyPressedSolo[KeyS]) paddlePlayer.positionY += paddlePlayer.speedY;
+    if (KeyPressedSolo[KeyUP]) paddleComputer.positionY -= paddleComputer.speedY;
+    if (KeyPressedSolo[KeyDOWN]) paddleComputer.positionY += paddleComputer.speedY;
+
     paddleCollision(canvas, paddlePlayer);
     paddleCollision(canvas, paddleComputer);
   });
-}
 
-// Exportar funções para controle do jogo
-export function pauseGame() {
-  gamePaused = true;
-  gamePausedState = {
-    ball: { ...ball },
-    paddlePlayer: { ...paddlePlayer },
-    paddleComputer: { ...paddleComputer },
-    scorePlayer,
-    scoreComputer,
-    aiIntelligence,
-  };
-  window.cancelAnimationFrame(loopIdSolo);
-}
+  window.addEventListener("keyup", (e) => {
+    KeyPressedSolo[e.keyCode] = false;
+  });
 
-export function resumeGame() {
-  gamePaused = false;
-  ball = gamePausedState.ball;
-  paddlePlayer = gamePausedState.paddlePlayer;
-  paddleComputer = gamePausedState.paddleComputer;
-  scorePlayer = gamePausedState.scorePlayer;
-  scoreComputer = gamePausedState.scoreComputer;
-  aiIntelligence = gamePausedState.aiIntelligence;
-
+  // Iniciar o loop do jogo
   gameLoopSolo();
 }
 
-export function restartGame() {
-  window.cancelAnimationFrame(loopIdSolo);
+// Função para pausar o jogo
+function pauseGame() {
+  isPaused = true;
+}
+
+// Função para retomar o jogo
+function resumeGame() {
+  isPaused = false;
+  gameLoopSolo();
+}
+
+// Função para reiniciar o jogo
+function restartGame() {
+  isPaused = false;
+  isGameOver = false;
   scorePlayer = 0;
   scoreComputer = 0;
-  aiIntelligence = 5;
   localStorage.removeItem("scorePlayer");
   localStorage.removeItem("scoreComputer");
-  gamePaused = false;
-
-  ball.positionX = canvas.width / 2;
-  ball.positionY = canvas.height / 2;
-  paddlePlayer.positionX = 60;
-  paddlePlayer.positionY = canvas.height / 2 - 100;
-  paddleComputer.positionX = canvas.width - 100;
-  paddleComputer.positionY = canvas.height / 2 - 100;
-
-  gameLoopSolo();
+  runPongSoloGame();
 }
+
+export { runPongSoloGame, pauseGame, resumeGame, restartGame };
