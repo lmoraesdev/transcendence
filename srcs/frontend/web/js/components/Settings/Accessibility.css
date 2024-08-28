@@ -1,0 +1,99 @@
+div.dropdown {
+    padding: 20px;
+    top: 200px
+  }
+  
+  div.dropdown-menu {
+      position: absolute;
+      top: 58px;
+      left: 193px;
+      z-index: 1000;
+      float: left;
+      min-width: 10rem;
+      padding: 1rem;
+      font-size: 1rem;
+      color: #212529 !important;
+      text-align: left;
+      list-style: none;
+      background-color: #fff;
+      background-clip: padding-box;
+      border: none;
+      border-radius: 0.2rem;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      
+  }
+
+  .dropdown-item{
+    text-decoration: none;
+    color: #212529 !important;
+    border: 1px solid #b1b0b0;
+    padding: 10px;
+    background-color: rgb(243, 242, 242);
+  }
+  
+  button#accessibility:active {
+    border: none;
+  }
+  
+  button#accessibility:focus {
+    box-shadow: none;
+  }
+  
+  svg#acessibility-icon {
+    color: #004b97;
+  }
+  
+  #dropdown-toolbar {
+    position: fixed;
+    font-size: 16px !important;
+    line-height: 1.4;
+    z-index: 9999
+  }
+  
+  #dropdown-toolbar {
+    right: -180px;
+    -webkit-transition: right 750ms cubic-bezier(.23, 1, .32, 1);
+    -moz-transition: right 750ms cubic-bezier(.23, 1, .32, 1);
+    -o-transition: right 750ms cubic-bezier(.23, 1, .32, 1);
+    transition: right 750ms cubic-bezier(.23, 1, .32, 1)
+  }
+  
+  #dropdown-toolbar {
+    right: 0
+  }
+  
+  #dropdown-toolbar.dropdown-toolbar-toggle {
+    right: 180px
+  }
+  
+  #dropdown-toolbar.dropdown-toolbar-left {
+    left: -180px;
+    -webkit-transition: left 750ms cubic-bezier(.23, 1, .32, 1);
+    -moz-transition: left 750ms cubic-bezier(.23, 1, .32, 1);
+    -o-transition: left 750ms cubic-bezier(.23, 1, .32, 1);
+    transition: left 750ms cubic-bezier(.23, 1, .32, 1)
+  }
+  
+  #dropdown-toolbar.dropdown-toolbar-left.dropdown-toolbar-open {
+    left: 0
+  }
+  
+  #dropdown-toolbar.dropdown-toolbar-left .dropdown-toolbar-toggle {
+    left: 180px
+  }
+  
+  
+  #dropdown-toolbar .dropdown-toolbar-toggle {
+    position: absolute
+  }
+  
+  #dropdown-toolbar .dropdown-toolbar-toggle a {
+    display: inline-block;
+    font-size: 200%;
+    line-height: 0;
+    padding: 10px;
+    -webkit-box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1)
+  }
