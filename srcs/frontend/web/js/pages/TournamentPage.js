@@ -1,4 +1,5 @@
 import fetching from "../helpers/fetching.js";
+import Modal from "../components/Modal.js";
 
 const TournamentPage = () => {
   const tournamentHTML = `
@@ -19,12 +20,10 @@ const TournamentPage = () => {
           <tournament-players></tournament-players>
           <tournament-matches></tournament-matches>
         </section>
+        <div id="modalGame"></div>
       </main>
     </template>
   `;
-
-  /*tournament-actions: Criar e participar de torneios.
-   tournament-current: Torneio atual, incluindo jogadores e partidas. */
 
   const templateContainer = document.createElement('div');
 
@@ -33,27 +32,24 @@ const TournamentPage = () => {
     document.body.appendChild(templateContainer);
   }
 
-  const template  = document.getElementById("tournament-template");
+  const template = document.getElementById("tournament-template");
   const component = template.content.cloneNode(true);
   const parentElement = document.getElementById("main");
 
-  parentElement.innerHTML  = "";
+  parentElement.innerHTML = "";
   parentElement.appendChild(component);
 
   const tournament_actions = parentElement.querySelector(".tournament-actions");
-  const tournament_current = parentElement.querySelector(".tournament-current");
-  const tournament_players = tournament_current.querySelector("tournament-players");
-  const tournament_players_list = tournament_players.querySelector(".tournament-players-list");
-  const tournament_players_start = tournament_players.querySelector(".start");
-  const tournament_players_leave = tournament_players.querySelector(".leave");
-  const tournament_matches = tournament_current.querySelector("tournament-matches");
   const create_btn = tournament_actions.querySelector(".tournament-create button");
   const tournament_list = parentElement.querySelector(".tournament-list");
+
+  Modal();
 
   fetching(`https://${window.ft_transcendence_host}/tournament/`).then((data) => {
     if (!data.current_tournament || data.current_tournament.status === "FN") {
       tournament_actions.classList.remove("d-none");
       tournament_actions.classList.add("d-flex");
+
       if (data.tournaments) {
         for (const tournament of data.tournaments) {
           const tournament_card = document.createElement("tournament-card");
@@ -65,85 +61,20 @@ const TournamentPage = () => {
             tournament_popup.setAttribute("popup-type", "JOIN");
             tournament_popup.setAttribute("tournament-id", tournament.id);
             tournament_popup.setAttribute("tournament-name", tournament.name);
-            parentElement.appendChild(tournament_popup);
+            parentElement.append(tournament_popup);
+            tournament_popup.classList.add("d-flex");
+            tournament_popup.classList.remove("d-none");
           });
-        }
-      } else {
-        tournament_list.textContent = "No tournaments available";
-      }
-      create_btn.addEventListener("click", () => {
-        const tournament_popup = document.createElement("tournament-popup");
-        tournament_popup.setAttribute("popup-type", "CREATE");
-        tournament_popup.setAttribute("tournament-id", null);
-        tournament_popup.setAttribute("tournament-name", null);
-        parentElement.appendChild(tournament_popup);
-      });
-    }
-    if (data.current_tournament) {
-      tournament_current.classList.remove("d-none");
-      tournament_current.classList.add("d-flex");
-      if (data.current_tournament.status === "PN") {
-        tournament_players.classList.remove("d-none");
-        tournament_players.classList.add("d-flex");
-        for (const player of data.players) {
-          const player_elem = document.createElement("tournament-player-card");
-          player_elem.setAttribute("alias-name", player.alias_name);
-          player_elem.setAttribute("avatar", player.avatar);
-          player_elem.setAttribute("status", "PN");
-          tournament_players_list.append(player_elem);
-        }
-        if (data.current_tournament.creator === true) {
-          tournament_players_start.classList.remove("d-none");
-          tournament_players_start.classList.add("d-block");
-        }
-        tournament_players_start.addEventListener("click", () => {
-          fetching(
-            `https://${window.ft_transcendence_host}/tournament/`,
-            "POST",
-            JSON.stringify({ action: "start", tournament_id: data.current_tournament.id }),
-            { "Content-Type": "application/json" },
-          ).then((data) => {
-            if (data.status === 200) {
-              window.location.reload();
-            } else {
-              alert(data.message);
-            }
-          });
-        });
-        tournament_players_leave.addEventListener("click", () => {
-          fetching(
-            `https://${window.ft_transcendence_host}/tournament/`,
-            "POST",
-            JSON.stringify({ action: "leave", tournament_id: data.current_tournament.id }),
-            { "Content-Type": "application/json" },
-          ).then((data) => {
-            window.location.reload();
-          });
-        });
-      } else {
-        tournament_matches.classList.remove("d-none");
-        tournament_matches.classList.add("d-flex");
-        const match_elems = parentElement.querySelectorAll("tournament-match-card");
-        for (let i = 0; i < 7; ++i) {
-          const match = data.current_tournament.matches[i];
-          const match_elem = match_elems[i];
-          if (match) {
-            match_elem.setAttribute("match-id", match.id);
-            if (match.current) {
-              match_elem.querySelector("button").classList.remove("d-none");
-            }
-            for (let j = 0; j < 2; ++j) {
-              const player = match.players[j];
-              const player_elem = match_elem.querySelector(`.player${j + 1}`);
-              player_elem.querySelector("h6").textContent = player.player.tournament_name;
-              player_elem.querySelector("img").src = player.player.avatar;
-              if (match.state === "PLY")
-                player_elem.querySelector("h3").textContent = player.score;
-            }
-          }
         }
       }
+    } else {
+      tournament_actions.classList.add("d-none");
+      tournament_actions.classList.remove("d-flex");
     }
+  });
+
+  create_btn.addEventListener("click", () => {
+    window.showModal();
   });
 };
 

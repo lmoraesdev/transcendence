@@ -1,3 +1,29 @@
+
+const setFocus = (element, description) => {
+  if (element) {
+    element.focus();
+    if (description) {
+      const liveRegion = document.createElement('div');
+      liveRegion.setAttribute('aria-live', 'assertive');
+      liveRegion.setAttribute('role', 'alert');
+      liveRegion.className = 'sr-only'; 
+      liveRegion.textContent = description;
+      document.body.appendChild(liveRegion);
+      setTimeout(() => document.body.removeChild(liveRegion), 1000);
+    }
+  }
+};
+
+const truncateUsername = (username) => {
+  const maxLength = 10;
+  
+  if (username.length > maxLength) {
+    return username.slice(0, maxLength - 3) + '...';
+  }
+  
+  return username;
+}
+
 const getRandom = (min, max) => {
   return Math.random() * (max - min) + min;
 };
@@ -41,5 +67,7 @@ export default {
   getRandom,
   createTemplate,
   animateSVGElements,
-  createSafeElement
+  createSafeElement,
+  truncateUsername,
+  setFocus
 };

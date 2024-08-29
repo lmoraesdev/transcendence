@@ -1,6 +1,6 @@
 import GameModalityPage from '../pages/GameModalityPage.js';
 import GamePage from '../pages/GamePage.js';
-import Leaderboard from '../pages/LeaderboardPage.js';
+import StatisticsPage from '../pages/StatisticsPage.js';
 import LoginPage from '../pages/LoginPage.js';
 import NotfoundPage from '../pages/NotfoundPage.js';
 import ProfilePage from '../pages/ProfilePage.js';
@@ -21,7 +21,7 @@ const routes = {
   "/home/": showNav(HomePage),
   "/game/": hideNav(GamePage),
   "/game-modality/": showNav(GameModalityPage),
-  "/leaderboard/": showNav(Leaderboard),
+  "/statistics/": showNav(StatisticsPage),
   "/profile/": showNav(ProfilePage),
   "/profile-setup/": showNav(ProfileSetup),
   "/settings/": showNav(SettingPage),

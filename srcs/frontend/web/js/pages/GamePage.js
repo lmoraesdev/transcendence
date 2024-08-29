@@ -90,8 +90,8 @@ const GamePage = () => {
   });
 
   //const gameHeader_query = new URLSearchParams(window.location.search).get("game");
-  const game_type_query = new URLSearchParams(window.location.search).get("mode");
-  const game_match_query = new URLSearchParams(window.location.search).get("match");
+  const game_type_query  = new URLSearchParams(history.state.query).get("mode");
+  const game_match_query = new URLSearchParams(history.state.query).get("match");
   let match_id = game_match_query ? Number(game_match_query) : null;
 
   let gameRunning = false;
