@@ -1,6 +1,4 @@
 import TwofaInput from "../components/Input/TwofaInput.js";
-import fetching from '../helpers/fetching.js';
-import router from '../router/router.js';
 
 const TwofaPage = () => {
 
