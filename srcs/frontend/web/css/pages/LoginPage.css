@@ -16,7 +16,7 @@
   }
 
   .login-img {
-    display: none;
+    display: none !important;
   }
   
   .login-img img {
@@ -38,7 +38,7 @@
   }
 
   .login-img {
-    display: none;
+    display: none !important;
   }
   
   .login-img img {

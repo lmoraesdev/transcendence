@@ -1,0 +1,38 @@
+#dropdown-toolbar, 
+.acessibility {
+  position: absolute;
+  left: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 9999;
+}
+
+#acessibility-icon {
+  fill: #a0ceedca;
+  transition: fill 0.3s ease;
+}
+
+#acessibility-icon:hover {
+  fill: #2cacff;
+}
+
+.dropdown-menu.show {
+  display: block !important;
+}
+.high-contrast {
+  filter: contrast(2);
+}
+
+.grayscale {
+  filter: grayscale(100%);
+}
+
+.high-contrast-ac {
+  filter: contrast(200%);
+}
+
+.negative-contrast {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+  
