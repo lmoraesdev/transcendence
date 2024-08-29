@@ -7,13 +7,15 @@ const { truncateUsername, setFocus  } = helpers;
 const HomePage = () => {
   const templateHTML = `
     <template id="home-template">
-      <section class="home-content-buttons d-grid gap-2 col m-2" aria-labelledby="game-mode-heading">
-        <h1 id="game-mode-heading" class="text-dark text-center fs-4 my-5">Choose game mode to start</h1>
-      </section>
-      <section class="d-block col m-2">
-        <p class="text-dark text-center fs-4 my-3" id="players-heading">All players</p>
-        <div id="all-players" class="d-flex flex-column col-6 mx-auto" role="list" aria-labelledby="players-heading"></div>
-      </section>
+      <main class="text-black bg-white container-fluid d-flex justify-content-center gap-5 p-4 h-100">
+        <section class="home-content-buttons d-grid gap-2 col m-2" aria-labelledby="game-mode-heading">
+          <h1 id="game-mode-heading" class="text-dark text-center fs-4 my-5">Choose game mode to start</h1>
+        </section>
+        <section class="d-block col m-2">
+          <p class="text-dark text-center fs-4 my-3" id="players-heading">All players</p>
+          <div id="all-players" class="d-flex flex-column col-6 mx-auto" role="list" aria-labelledby="players-heading"></div>
+        </section>
+      </main>
     </template>
   `;
 
@@ -30,13 +32,6 @@ const HomePage = () => {
 
   parentElement.innerHTML = "";
   parentElement.appendChild(component);
-
-  parentElement.classList.add(
-    'bg-white',
-    'p-4',
-    'h-100',
-    'd-flex'
-  );
 
   const allPlayersContainer = document.getElementById('all-players');
   

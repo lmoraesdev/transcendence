@@ -5,7 +5,7 @@ const { truncateUsername, setFocus } = helpers;
 const StatisticsPage = async () => {
   const statisticHTML = `
     <template id="statistic-template">
-      <section class="statistic text-black bg-white border border-2 border-dark h-100 p-0" role="region" aria-labelledby="statistic-header">
+      <section class="statistic text-black bg-white h-100 p-0" role="region" aria-labelledby="statistic-header">
         <header id="statistic-header" class="statistic-header d-flex align-items-center justify-content-center my-4">
           <h1 class="text-center fs-5 mx-0">Statistics</h1>
         </header>
