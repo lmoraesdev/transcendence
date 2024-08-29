@@ -193,10 +193,10 @@ async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
     ctx.fillText(scoreComputer, (3 * canvas.width) / 4, 50);
   }
 
-  function gameLoopSolo() {
+  function gameLoop() {
     if (isPaused || isGameOver) return;
 
-    loopIdSolo = window.requestAnimationFrame(gameLoopSolo);
+    loopIdSolo = window.requestAnimationFrame(gameLoop);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -211,6 +211,8 @@ async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
     paddleComputer.render(ctx);
     Score(ctx, canvas, scorePlayer, scoreComputer);
     updateComputerPaddle(ball, paddleComputer);
+
+    loopIdSolo = requestAnimationFrame(gameLoop);
   }
 
   window.onkeydown = (e) => {
@@ -220,8 +222,7 @@ async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
   window.onkeyup = (e) => {
     KeyPressedSolo[e.keyCode] = false;
   };
-
-  gameLoopSolo();
+  gameLoop();
 }
 
 // Função auxiliar para reproduzir som com tratamento de erros
@@ -253,21 +254,30 @@ function paddleCollision(canvas, paddle, ball) {
 
 // Função para pausar o jogo
 function pauseGame() {
-  isPaused = true;
+  if (!isPaused) {
+    cancelAnimationFrame(loopIdSolo);
+    isPaused = true;
+  }
 }
 
 // Função para retomar o jogo
-function resumeGame() {
+function restartGame(canvas, ctx) {
+  cancelAnimationFrame(loopIdSolo);
   isPaused = false;
-  gameLoopSolo(); // Reinicie o loop de jogo se estiver pausado
+  isGameOver = false;
+  scorePlayer = 0; // Reiniciar a pontuação do jogador
+  scoreComputer = 0; // Reiniciar a pontuação do computador
+
+  // Reiniciar o jogo com nova instância
+  runPongSoloGame(canvas, ctx);
 }
 
 // Função para reiniciar o jogo
-function restartGame(canvas, ctx, ptsPlayer, ptsComputer) {
-  window.cancelAnimationFrame(loopIdSolo);
-  isPaused = false;
-  isGameOver = false;
-  runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer);
+function resumeGame() {
+  if (isPaused) {
+    isPaused = false;
+    loopIdSolo = requestAnimationFrame(runPongSoloGame); // Continua o loop do jogo
+  }
 }
 
 export { runPongSoloGame, pauseGame, resumeGame, restartGame };
