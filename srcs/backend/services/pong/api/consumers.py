@@ -427,7 +427,6 @@ class Pong(AsyncWebsocketConsumer):
     async def pong_message(self, event):
         if (event['message'] == 'ball'
                 and self.getRoomId() in rooms):
-            logger.debug(f"ta enviado o dentro do if ({self.getRoomId()})")
             await self.send(text_data=json.dumps(
                 rooms[self.getRoomId()]
             ))
@@ -466,7 +465,10 @@ class Pong(AsyncWebsocketConsumer):
     
     def getRoomId(self):
         try:
-            url_route_kwargs = self.scope['url_route']['kwargs']            
+            logger.debug(f"self in getRoomId {pformat(self)}")
+            logger.debug(f"self scope {pformat(self.scope)}")
+            url_route_kwargs = self.scope['url_route']['kwargs']
+            logger.debug(f"url_route_kwargs {pformat(url_route_kwargs)}")
             room_id_data = url_route_kwargs.get('room_id')
             if isinstance(room_id_data, str):
                 room_id_dict = json.loads(room_id_data)
