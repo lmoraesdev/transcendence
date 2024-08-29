@@ -1,35 +1,37 @@
 import helpers from '../helpers/helpers.js';
 
-const { truncateUsername } = helpers;
+const { truncateUsername, setFocus } = helpers;
 
 const StatisticsPage = async () => {
   const statisticHTML = `
     <template id="statistic-template">
-      <section class="statistic text-black bg-white border border-2 border-dark h-100 p-0">
-        <header class="statistic-header d-flex align-items-center justify-content-center my-4">
+      <section class="statistic text-black bg-white h-100 p-0" role="region" aria-labelledby="statistic-header">
+        <header id="statistic-header" class="statistic-header d-flex align-items-center justify-content-center my-4">
           <h1 class="text-center fs-5 mx-0">Statistics</h1>
         </header>
-        <main class="statistic-content">
+        <main class="statistic-content" role="main">
           <div class="table-responsive">
-            <table class="table w-100 text-center">
+            <table class="table w-100 text-center" aria-describedby="table-description">
               <thead>
                 <tr>
-                  <th>Score</th>
-                  <th>Ranking</th>
-                  <th>Champion</th>
-                  <th>Wins vs Players</th>
-                  <th>Wins vs AI</th>
-                  <th>Status</th>
-                  <th>Nickname</th>
+                  <th scope="col">Score</th>
+                  <th scope="col">Ranking</th>
+                  <th scope="col">Champion</th>
+                  <th scope="col">Wins vs Players</th>
+                  <th scope="col">Wins vs AI</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Nickname</th>
                 </tr>
               </thead>
-              <tbody id="statistic-body"></tbody>
+              <tbody id="statistic-body" role="rowgroup"></tbody>
             </table>
+            <p id="table-description" class="visually-hidden">Table showing player statistics including score, ranking, champion status, and number of wins.</p>
           </div>
-          <nav class="pagination-container d-flex justify-content-center mt-4">
-            <button id="prev-page" class="btn btn-dark mx-2" disabled>Previous</button>
-            <span id="page-number" class="mx-2">Page 1</span>
-            <button id="next-page" class="btn btn-dark mx-2">Next</button>
+          <nav class="pagination-container d-flex justify-content-center mt-4" role="navigation" aria-labelledby="pagination-label">
+            <h2 id="pagination-label" class="visually-hidden">Pagination controls</h2>
+            <button id="prev-page" class="btn btn-dark mx-2" aria-label="Previous page" disabled>Previous</button>
+            <span id="page-number" class="mx-2" aria-live="polite">Page 1</span>
+            <button id="next-page" class="btn btn-dark mx-2" aria-label="Next page">Next</button>
           </nav>
         </main>
       </section>
@@ -74,12 +76,13 @@ const StatisticsPage = async () => {
 
       pageItems.forEach((player, index) => {
         const row = document.createElement('tr');
+        row.setAttribute('role', 'row');
         row.innerHTML = `
-          <td>${player.victory + player.victoryVsAI ? player.victory + player.victoryVsAI: "N/A" }</td>
+          <td>${player.victory + player.victoryVsAI ? player.victory + player.victoryVsAI : "N/A"}</td>
           <td>${start + index + 1}º</td>
           <td>${player.champion || 'N/A'}</td>
-          <td>${player.victory ? player.victory : "0" }</td>
-          <td>${player.victoryVsAI || '0'}</td> <!-- Ajustar quando as propriedades do endpoint forem definidas -->
+          <td>${player.victory ? player.victory : "0"}</td>
+          <td>${player.victoryVsAI || '0'}</td>
           <td>${player.status === 'OF' ? 'Offline' : 'Online'}</td>
           <td>${truncateUsername(player.username)}</td>
         `;
@@ -89,6 +92,8 @@ const StatisticsPage = async () => {
       pageNumberElement.textContent = `Page ${page}`;
       prevPageButton.disabled = page === 1;
       nextPageButton.disabled = page === totalPages;
+
+      setFocus(pageNumberElement);
     };
 
     renderTable(currentPage);
