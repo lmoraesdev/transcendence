@@ -1,4 +1,5 @@
 import os
+import json
 import logging
 import urllib.parse
 from pprint import pformat
@@ -441,77 +442,103 @@ class MatchesHistory(APIView):
 
 class TrainingHistory(APIView):
     @method_decorator(jwtCookieRequired)
-    def get(self, request): 
+    def get(self, request):
         try:
+            logger.info("Received GET request for training data.")
             player = Player.objects.get(id=request.decoded_token['id'])
+            logger.info(f"Player found: {player.username}")
+
             trainings = Training.objects.filter(playerId=player).order_by('-id')
+            logger.debug(f"Trainings found: {len(trainings)}")
+
             trainingResponse = []
 
             playerTrainings = []
             playerTrainingMatchs = 0
             playerTrainingWin = 0
-            
+
             iaTrainings = []
             iaTrainingMatchs = 0
             iaTrainingWin = 0
-            for training in trainings:
-                playerTraining = TrainingPlayer.objects.get(trainingId=training)
-                playerTrainings.append({
-                    "win": playerTraining.win,
-                    "accuracy": playerTraining.accuracy,
-                    "totalPoints": playerTraining.totalPoints,
-                    "playerPerformance": playerTraining.playerPerformance,
-                    "correctBlocks": playerTraining.correctBlocks,
-                    "totalBlocks": playerTraining.totalBlocks,
-                })
-                playerTrainingMatchs += 1
-                if (playerTraining.win is True):
-                    playerTrainingWin += 1
 
-                iaTraining = IaStatistics.objects.get(trainingId=training)
-
-                states = []
-                iaStates = IaState.objects.get(iaStatisticsId=iaTraining)
-                for state in iaStates:
-                    states.append({
-                        "state": state.stage,
-                        "action1": state.action1,
-                        "action2": state.action2,
-                        "action3": state.action3,
+            if trainings:
+                for training in trainings:
+                    logger.info(f"Processing training with ID: {training.id}")
+                    
+                    playerTraining = TrainingPlayer.objects.get(trainingId=training)
+                    logger.debug(f"Player training data: {playerTraining}")
+                    
+                    playerTrainings.append({
+                        "win": playerTraining.win,
+                        "accuracy": playerTraining.accuracy,
+                        "totalPoints": playerTraining.totalPoints,
+                        "playerPerformance": playerTraining.playerPerformance,
+                        "correctBlocks": playerTraining.correctBlocks,
+                        "totalBlocks": playerTraining.totalBlocks,
                     })
+                    
+                    playerTrainingMatchs += 1
+                    if playerTraining.win:
+                        playerTrainingWin += 1
 
-                iaTrainings.append({
-                    "win": iaTraining.win,
-                    "accuracy": iaTraining.accuracy,
-                    "totalPoints": iaTraining.totalPoints,
-                    "playerPerformance": iaTraining.playerPerformance,
-                    "correctBlocks": iaTraining.correctBlocks,
-                    "totalBlocks": iaTraining.totalBlocks,
-                    "states": states
+                    iaTraining = IaStatistics.objects.get(trainingId=training)
+                    logger.debug(f"IA training data: {iaTraining}")
+
+                    states = []
+                    iaStates = IaState.objects.filter(iaStatisticsId=iaTraining)
+                    logger.debug(f"IA states found: {len(iaStates)}")
+
+                    for state in iaStates:
+                        logger.debug(f"Processing IA state: {state.stage}")
+                        states.append({
+                            "state": state.stage,
+                            "action1": state.action1,
+                            "action2": state.action2,
+                            "action3": state.action3,
+                        })
+
+                    iaTrainings.append({
+                        "win": iaTraining.win,
+                        "accuracy": iaTraining.accuracy,
+                        "totalPoints": iaTraining.totalPoints,
+                        "playerPerformance": iaTraining.playerPerformance,
+                        "correctBlocks": iaTraining.correctBlocks,
+                        "totalBlocks": iaTraining.totalBlocks,
+                        "states": states
+                    })
+                    
+                    iaTrainingMatchs += 1
+                    if iaTraining.win:
+                        iaTrainingWin += 1
+
+                trainingResponse.append({
+                    "id": training.id,
+                    "PlayerTraining": playerTrainings,
+                    "playerTrainingMatchs": playerTrainingMatchs,
+                    "playerTrainingWin": playerTrainingWin,
+                    "IaTraining": iaTrainings,
+                    "iaTrainingMatchs": iaTrainingMatchs,
+                    "iaTrainingWin": iaTrainingWin,
                 })
-                iaTrainingMatchs += 1
-                if (iaTraining.win is True):
-                    iaTrainingWin += 1
-
-            trainingResponse.append({
-                "id": training.id,
-                "PlayerTraining": playerTrainings,
-                "playerTrainingMatchs": playerTrainingMatchs,
-                "playerTrainingWin": playerTrainingWin,
-                "IaTraining": iaTrainings,
-                "iaTrainingMatchs": iaTrainingMatchs,
-                "iaTrainingWin": iaTrainingWin,
-            })
+                logger.info(f"Training response prepared: {trainingResponse}")
             return Response({
                 "status": 200,
                 "training": trainingResponse
             })
         except Player.DoesNotExist:
+            logger.error("Player not found.")
             return Response({
                 "status": 404,
                 "message": "User not found",
             })
+        except Training.DoesNotExist:
+            logger.error("Training not found.")
+            return Response({
+                "status": 405,
+                "message": "Training not found",
+            })
         except Exception as e:
+            logger.exception(f"An error occurred: {e}")
             return Response({
                 "status": 500,
                 "message": str(e),
@@ -528,7 +555,14 @@ class TrainingHistory(APIView):
 
             logger.debug(f"Request\n{pformat(request.data)}")
 
-            trainingData = request.data.get('training')
+            if '_content' in request.data:
+                content = request.data['_content']
+                # Parse o conteúdo JSON
+                data = json.loads(content)
+            else:
+                raise ValueError("No '_content' key found in request data.")
+
+            trainingData = data.get('training')
             logger.debug(f"Training data received: {trainingData}")
 
             if trainingData is None:
@@ -561,14 +595,17 @@ class TrainingHistory(APIView):
             logger.info(f"IaStatistics created: {iaStatistics}")
 
             for state in trainingData["IaTraining"]["states"]:
-                iaState = IaState.objects.create(
-                    iaStatisticsId=iaStatistics,
-                    stage=state["state"],
-                    action1=state["action1"],
-                    action2=state["action2"],
-                    action3=state["action3"],
-                )
-                logger.info(f"IaState created for state '{state['state']}': {iaState}")
+                try:
+                    iaState = IaState.objects.create(
+                        iaStatisticsId=iaStatistics,
+                        stage=state["state"],
+                        action1=state["action1"],
+                        action2=state["action2"],
+                        action3=state["action3"],
+                    )
+                    logger.info(f"IaState created for state '{state['state']}': {iaState}")
+                except Exception as e:
+                    logger.exception(f"Failed to create IaState for state '{state['state']}': {e}")
 
             logger.info(f"Training session {training.id} successfully created.")
             return Response({
