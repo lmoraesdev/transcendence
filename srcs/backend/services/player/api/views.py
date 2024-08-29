@@ -555,14 +555,7 @@ class TrainingHistory(APIView):
 
             logger.debug(f"Request\n{pformat(request.data)}")
 
-            if '_content' in request.data:
-                content = request.data['_content']
-                # Parse o conteúdo JSON
-                data = json.loads(content)
-            else:
-                raise ValueError("No '_content' key found in request data.")
-
-            trainingData = data.get('training')
+            trainingData = request.data.get('training')
             logger.debug(f"Training data received: {trainingData}")
 
             if trainingData is None:
