@@ -13,6 +13,8 @@ from django.core.files.storage import default_storage
 from django.utils.decorators import method_decorator
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import status
+from django.db import transaction
 
 logger = logging.getLogger('custom_logger')
 
@@ -235,8 +237,6 @@ class PlayerAvatarUpload(APIView):
     @method_decorator(jwtCookieRequired)
     def post(self, request):
         try:
-            logger.debug(f"request: {pformat(request)}")
-            logger.debug(f"BASE_DIR: {settings.BASE_DIR}\nPLAYER_DIR: {settings.PLAYER_DIR}\nSERVICES_DIR: {settings.SERVICES_DIR}\nSTATIC_URL: {settings.STATIC_URL}\nSTATIC_ROOT: {settings.STATIC_ROOT}\nMEDIA_URL: {settings.MEDIA_URL}\nMEDIA_ROOT: {settings.MEDIA_ROOT}\n")
             id = request.decoded_token['id']
             file = request.FILES['avatar']
             filePath = os.path.join(settings.MEDIA_ROOT, file.name)
@@ -659,3 +659,40 @@ class ListAllUser(APIView):
                 "status": 500,
                 "message": str(e),
             }, status=500)
+
+class Disable2FA(APIView):
+
+    @method_decorator(jwtCookieRequired)
+    def patch(self, request):
+        try:
+            # Obter o ID do jogador a partir do token decodificado
+            player_id = request.decoded_token['id']
+            logger.info(f"Received request from player ID: {player_id}")
+
+            # Buscar o jogador e atualizar o campo twoFactor
+            with transaction.atomic():
+                player = Player.objects.select_for_update().get(id=player_id)
+                player.twoFactor = False
+                player.save()
+
+            logger.info(f"2FA disabled for player: {player.username}")
+
+            # Retornar uma resposta de sucesso
+            return Response({
+                "status": 200,
+                "message": "2FA has been disabled successfully",
+            }, status=status.HTTP_200_OK)
+
+        except Player.DoesNotExist:
+            logger.error(f"Player with ID {player_id} not found.")
+            return Response({
+                "status": 404,
+                "message": "User not found",
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            logger.exception(f"An error occurred while disabling 2FA: {e}")
+            return Response({
+                "status": 500,
+                "message": str(e),
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
