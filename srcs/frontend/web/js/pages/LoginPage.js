@@ -2,7 +2,7 @@ import Logo from '../components/Logo.js';
 import ButtonLogin from '../components/Button/Button-login.js';
 import helpers from '../helpers/helpers.js';
 
-const { createTemplate } = helpers;
+const { createTemplate, setFocus } = helpers;
 
 const LoginPage = async () => {
 
