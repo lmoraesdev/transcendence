@@ -43,7 +43,6 @@ const TournamentPage = () => {
   const create_btn = tournament_actions.querySelector(".tournament-create button");
   const tournament_list = parentElement.querySelector(".tournament-list");
 
-  // Inicializa modal
   Modal();
 
   fetching(`https://${window.ft_transcendence_host}/tournament/`).then((data) => {

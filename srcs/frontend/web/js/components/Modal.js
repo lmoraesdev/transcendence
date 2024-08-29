@@ -38,7 +38,6 @@ const Modal = () => {
     </div>
   `;
 
-  // Adiciona o modal ao body se não existir
   let modalContainer = document.getElementById('modalGame');
   if (!modalContainer) {
     modalContainer = document.createElement('div');
@@ -47,7 +46,6 @@ const Modal = () => {
   }
   modalContainer.innerHTML = modalHTML;
 
-  // Inicializa o modal com Bootstrap
   const modalElement = document.getElementById('modalGame');
   const modal = new bootstrap.Modal(modalElement);
 
@@ -132,13 +130,10 @@ const Modal = () => {
       errorMessage.style.display = 'block';
     });
   });
-
-  // Função para exibir o modal
   const showModal = () => {
     modal.show();
   };
 
-  // Exponha a função para ser chamada externamente
   window.showModal = showModal;
 };
 
