@@ -174,8 +174,17 @@ async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 0) {
     return false;
   }
 
-  function updateComputerPaddle(ball, paddle) {
+  function updateComputerPaddle(ball, paddle, canvas) {
+    // Atualiza a lógica da IA para mover a raquete
     ai.update(ball, paddle);
+
+    // Limita a posição da raquete para que não ultrapasse os limites do canvas
+    if (paddle.positionY < 0) {
+      paddle.positionY = 0;
+    }
+    if (paddle.positionY + paddle.height > canvas.height) {
+      paddle.positionY = canvas.height - paddle.height;
+    }
   }
 
   function Score(ctx, canvas, scorePlayer, scoreComputer) {
@@ -200,7 +209,7 @@ async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 0) {
     ball.render(ctx);
     paddlePlayer.update(true, canvas);
     paddlePlayer.render(ctx);
-    updateComputerPaddle(ball, paddleComputer); // Atualiza a IA do computador
+    updateComputerPaddle(ball, paddleComputer, canvas); // Atualiza a IA do computador
     paddleComputer.render(ctx);
     Score(ctx, canvas, scorePlayer, scoreComputer);
   }
