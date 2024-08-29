@@ -1,20 +1,19 @@
 import fetching from "../helpers/fetching.js";
 import ButtonHome from "../components/Button/Button-home.js";
+import helpers from '../helpers/helpers.js';
+
+const { truncateUsername, setFocus  } = helpers;
 
 const HomePage = () => {
   const templateHTML = `
     <template id="home-template">
-      <div class="bg-white p-4  h-100 d-flex mx-auto mb-4">
-        <div class="gap-2 col m-2">
-        <div class="home-content-buttons d-grid gap-2 col m-2">
-          <h1 class="text-dark text-center fs-4 my-5">Choose game mode to start</h1>
-        </div>
-        </div>
-        <div class="d-block col m-2">
-          <p class="text-dark text-center fs-4 my-3">All players</p>
-          <div id="all-players" class="d-flex col-6 mx-auto"></div>
-        </div>
-      </div>
+      <section class="home-content-buttons d-grid gap-2 col m-2" aria-labelledby="game-mode-heading">
+        <h1 id="game-mode-heading" class="text-dark text-center fs-4 my-5">Choose game mode to start</h1>
+      </section>
+      <section class="d-block col m-2">
+        <p class="text-dark text-center fs-4 my-3" id="players-heading">All players</p>
+        <div id="all-players" class="d-flex flex-column col-6 mx-auto" role="list" aria-labelledby="players-heading"></div>
+      </section>
     </template>
   `;
 
@@ -32,6 +31,13 @@ const HomePage = () => {
   parentElement.innerHTML = "";
   parentElement.appendChild(component);
 
+  parentElement.classList.add(
+    'bg-white',
+    'p-4',
+    'h-100',
+    'd-flex'
+  );
+
   const allPlayersContainer = document.getElementById('all-players');
   
   const getAllPlayers = async () => {
@@ -44,10 +50,7 @@ const HomePage = () => {
         throw new Error('Error getting players');
       }
 
-      const players = await response.json();
-
-      //console.log('Resposta da API:', players);
-      
+      const players = await response.json();      
       
       const textWarning = document.createElement('span');
       textWarning.className = 'text-dark text-center mx-auto';
@@ -58,23 +61,24 @@ const HomePage = () => {
         textWarningDiv.className = 'd-flex text-dark mb-3';
         textWarningDiv.appendChild(textWarning); 
         allPlayersContainer.appendChild(textWarningDiv);
+        setFocus(textWarningDiv, 'No players found');
       }
 
       players.forEach(player => {
         const playerDiv = document.createElement('div');
-        playerDiv.className = 'd-flex text-dark mb-3';
+        playerDiv.className = 'd-flex text-dark mb-3 justify-content-around';
+        playerDiv.setAttribute('role', 'listitem');
+        playerDiv.setAttribute('aria-label', `Player: ${player.username}`);
 
         const img = document.createElement('img');
         img.src = player.profile ? player.profile : '/web/images/profile.png';
         img.className = 'border boder-2 border-black rounded-circle';
-        img.alt = 'avatar';
+        img.alt = `Avatar of ${player.username}`;
         img.id = 'avatar-home';
 
         const nameSpan = document.createElement('span');
         nameSpan.className = 'text-dark mx- 2 fw-bold ms-2';
-        nameSpan.textContent = player.username;
-
-        console.log(player.username);
+        nameSpan.textContent = truncateUsername(player.username);
 
         const buttonDiv = document.createElement('div');
         buttonDiv.className = 'd-flex mx-2 my-auto mt-2';
@@ -82,6 +86,8 @@ const HomePage = () => {
         addButton.className = 'btn btn-primary';
         addButton.textContent = 'Add';
         addButton.dataset.playerId = player.id;
+        addButton.setAttribute('aria-label', `Add ${player.username} as a friend`);
+        addButton.setAttribute('role', 'button');
 
         addButton.addEventListener('click', () => {
           handleAddButtonClick(player.id);
@@ -93,6 +99,7 @@ const HomePage = () => {
         playerDiv.appendChild(buttonDiv);
 
         allPlayersContainer.appendChild(playerDiv);
+        setFocus(playerDiv, `Player ${player.username} added to the list`);
       });
     } catch (error) {
       const playerDiv = document.createElement('div');
@@ -102,6 +109,9 @@ const HomePage = () => {
       textWarning.className = 'text-dark mx- 2 fw-bold ms-2';
       textWarning.textContent = 'Players not located';
       playerDiv.appendChild(textWarning);
+
+      allPlayersContainer.appendChild(playerDiv);
+      setFocus(playerDiv, 'Error loading players');
 
       console.error('Erro:', error);
     }
@@ -138,22 +148,27 @@ const HomePage = () => {
     customClasses: ['btn-light', 'shadow', 'text-dark', 'bg-body', 'rounded', 'p-4', 'mb-4'],
     link: "/game?mode=solo",
   });
+  buttonSolo.setAttribute('aria-label', 'Start a solo game');
 
   const buttonMultiplayer = ButtonHome({
     label: 'Multiplayer',
     customClasses: ['btn-light', 'shadow', 'text-dark', 'bg-body', 'rounded', 'p-4', 'mb-4'],
     link: "/game?mode=two",
   });
+  buttonMultiplayer.setAttribute('aria-label', 'Start a multiplayer game');
 
   const buttonTournamente = ButtonHome({
     label: 'Tournament',
     customClasses: ['btn-light', 'shadow', 'text-dark', 'bg-body', 'rounded', 'p-4', 'mb-4'],
     link: "/tournaments",
   });
+  buttonTournamente.setAttribute('aria-label', 'View tournaments');
   
   buttonsContainer.appendChild(buttonSolo);
   buttonsContainer.appendChild(buttonMultiplayer);
   buttonsContainer.appendChild(buttonTournamente);
+
+  setFocus(buttonsContainer, 'Choose your game mode');
 }
 
 export default HomePage;

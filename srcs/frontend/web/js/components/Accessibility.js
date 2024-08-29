@@ -107,47 +107,22 @@ const Accessibility = () => {
     dropdownMenu.classList.toggle('show', !isExpanded);
   });
 
-  document.addEventListener('click', (e) => {
-    if (e.target.matches('[data-action]')) {
-      const action = e.target.getAttribute('data-action');
-      handleAccessibilityAction(action);
-    }
-  });
-
-  const handleAccessibilityAction = (action) => {
-    switch (action) {
-      case 'resize-plus':
-        adjustTextSize('increase');
-        break;
-      case 'resize-minus':
-        adjustTextSize('decrease');
-        break;
-      case 'grayscale':
-        toggleGrayscale();
-        break;
-      case 'high-contrast':
-        toggleHighContrast();
-        break;
-      case 'negative-contrast':
-        toggleNegativeContrast();
-        break;
-      case 'readable-font':
-        dyslexia();
-        break;
-      case 'reset':
-        resetFont();
-        break;
-        default:
-        break;
-    }
-  };
-
-  const adjustTextSize = (direction) => {
+  const increaseFont = () => {
     const body = document.body;
     let currentSize = window.getComputedStyle(body, null).getPropertyValue('font-size');
     let newSize = parseFloat(currentSize);
-    newSize = direction === 'increase' ? newSize * 1.1 : newSize / 1.1;
+    newSize *=  1.1;
     body.style.fontSize = `${newSize}px`;
+   // document.body.style.fontSize = "1.25em"; // 'larger'
+  };
+
+  const decreaseFont = () => {
+    const body = document.body;
+    let currentSize = window.getComputedStyle(body, null).getPropertyValue('font-size');
+    let newSize = parseFloat(currentSize);
+    newSize /= 1.1;
+    body.style.fontSize = `${newSize}px`;
+    //document.body.style.fontSize = "0.75em"; // or 'smaller'
   };
 
   const toggleGrayscale = () => {
@@ -172,7 +147,15 @@ const Accessibility = () => {
     let elementBody = document.querySelector('body');
     elementBody.style.fontFamily = 'Red Hat Display, sans-serif';
     elementBody.style.fontSize = '15px';
-  } 
+  };
+
+  document.querySelector('[data-action="resize-plus"]').addEventListener('click', increaseFont);
+  document.querySelector('[data-action="resize-minus"]').addEventListener('click', decreaseFont);
+  document.querySelector('[data-action="grayscale"]').addEventListener('click', toggleGrayscale);
+  document.querySelector('[data-action="high-contrast"]').addEventListener('click', toggleHighContrast);
+  document.querySelector('[data-action="negative-contrast"]').addEventListener('click', toggleNegativeContrast);
+  document.querySelector('[data-action="readable-font"]').addEventListener('click', dyslexia);
+  document.querySelector('[data-action="reset"]').addEventListener('click', resetFont);
 
 };
 

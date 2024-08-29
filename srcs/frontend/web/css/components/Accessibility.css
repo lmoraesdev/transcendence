@@ -31,4 +31,8 @@
   filter: contrast(200%);
 }
 
+.negative-contrast {
+  filter: invert(1) hue-rotate(180deg);
+}
+
   
