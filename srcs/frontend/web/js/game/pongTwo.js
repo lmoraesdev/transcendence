@@ -36,7 +36,7 @@ const setPlayerData = (data) => {
 
 export const runPongTwoGame = (canvas, ctx, match_id) => {
   wsTwo = new WebSocket(
-    `wss://${window.ft_transcendence_host}/ws/matchmaking/2/${!match_id ? "" : match_id + "/"}`
+    `wss://${window.ft_transcendence_host}/ws/matchmaking/2/${!match_id ? "" : match_id + "/"}`,
   );
   canvas.width = 1920;
   canvas.height = 1080;
@@ -56,7 +56,7 @@ export const runPongTwoGame = (canvas, ctx, match_id) => {
     ctx.fillText(
       "MATCHING" + ".".repeat(i) + " ".repeat(3 - i),
       canvas.width / 2 + i,
-      canvas.height / 2
+      canvas.height / 2,
     );
     if (i === 3) i = 0;
   }, 500);
@@ -73,7 +73,9 @@ export const runPongTwoGame = (canvas, ctx, match_id) => {
 
     let alreadyInGame = false;
     wsTwo = new WebSocket(
-      `wss://${window.ft_transcendence_host}/ws/pong/${e.data}/2/${!match_id ? "" : match_id + "/"}`
+      `wss://${window.ft_transcendence_host}/ws/pong/${e.data}/2/${
+        !match_id ? "" : match_id + "/"
+      }`,
     );
 
     let pos;
@@ -156,8 +158,8 @@ export const Ball = (position, size) => {
 const RenderScore = (ctx, canvas, right, left) => {
   ctx.fillStyle = "white";
   ctx.font = "bold 60px Arial";
-  ctx.fillText(left, canvas.width / 2 - 100, 120);
   ctx.fillText(right, canvas.width / 2 + 100, 120);
+  ctx.fillText(left, canvas.width / 2 - 100, 120);
 };
 
 const gameLoop = (canvas, ctx, ball, paddle1, paddle2, pos) => {

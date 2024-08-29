@@ -11,23 +11,23 @@ run:
 	@sudo mkdir -p $(VOLUME)/wordpress
 	@sudo mkdir -p $(VOLUME)/mariadb
 	@echo "$(GREEN)** Compose Up ** $(RESET)"
-	@docker-compose --file=$(COMPOSE) up --build --detach
+	@docker compose --file=$(COMPOSE) up --build --detach
 
 up:
 	@echo "$(GREEN)** Compose Up ** $(RESET)"
-	@docker-compose --file=$(COMPOSE) up --build --detach
+	@docker compose --file=$(COMPOSE) up --build --detach
 
 down:
 	@echo "$(GREEN)** Compose down ** $(RESET)"
-	@docker-compose --file=$(COMPOSE) down --rmi all --remove-orphans -v
+	@docker compose --file=$(COMPOSE) down --rmi all --remove-orphans -v
 
 start:
 	@echo "$(GREEN)** Start containers ** $(RESET)"
-	@docker-compose --file=$(COMPOSE) start
+	@docker compose --file=$(COMPOSE) start
 
 stop:
 	@echo "$(GREEN)** Stop containers ** $(RESET)"
-	@docker-compose --file=$(COMPOSE) stop
+	@docker compose --file=$(COMPOSE) stop
 
 ls:
 	@echo "$(GREEN)**** List containers ****$(RESET)"
