@@ -1,3 +1,15 @@
+
+const truncateUsername = (username) => {
+  const maxLength = 10;
+  
+  if (username.length > maxLength) {
+    return username.slice(0, maxLength - 3) + '...';
+  }
+  
+  return username;
+}
+
+
 const getRandom = (min, max) => {
   return Math.random() * (max - min) + min;
 };
@@ -41,5 +53,6 @@ export default {
   getRandom,
   createTemplate,
   animateSVGElements,
-  createSafeElement
+  createSafeElement,
+  truncateUsername
 };
