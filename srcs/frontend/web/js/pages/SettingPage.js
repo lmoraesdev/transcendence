@@ -178,19 +178,15 @@ const SettingPage = () => {
       fetch(`https://${window.ft_transcendence_host}/authentication/2FA/qrcode/`)
         .then((res) => res.blob())
         .then((blob) => {
-          popup_twofa_qrcode.innerHTML = `<img src="${URL.createObjectURL(blob)}" class="img-fluid mx-auto d-block" alt="qrCode">`;
-          popup_twofa.classList.remove('d-none');
+          popup_twofa_qrcode.src = URL.createObjectURL(blob);
+          popup_twofa.classList.remove("d-none");
+          popup_twofa_close.addEventListener("click", () => {
+            popup_twofa.classList.add("d-none");
+          });
         });
     } else {
       submitFieldChange("two_factor", checkbox_twofa);
     }
-  };
-
-  popup_twofa_close.onclick = () => {
-    checkbox_twofa.checked = !checkbox_twofa.checked;
-    popup_twofa.querySelector("#twofa-code-input").value = "";
-    popup_twofa_qrcode.innerHTML = "";
-    popup_twofa.classList.add('d-none');
   };
 
   const form = parentElement.querySelector('form');
