@@ -1,5 +1,5 @@
 import fetching from "../helpers/fetching.js";
-import ButtonHome from "../components/Button/Button-home.js"
+import ButtonHome from "../components/Button/Button-home.js";
 
 const HomePage = () => {
   const templateHTML = `
@@ -12,9 +12,7 @@ const HomePage = () => {
         </div>
         <div class="d-block col m-2">
           <p class="text-dark text-center fs-4 my-3">All players</p>
-          <div id="all-players" class="d-flex col-6 mx-auto">
-          <!-- All Player -->
-          </div>
+          <div id="all-players" class="d-flex col-6 mx-auto"></div>
         </div>
       </div>
     </template>

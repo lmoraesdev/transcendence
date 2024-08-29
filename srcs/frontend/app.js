@@ -3,7 +3,7 @@ import router from "./web/js/router/router.js";
 // Components
 import Navbar from "./web/js/components/NavBar/NavBar.js";
 import Footer from "./web/js/components/Footer.js";
-import Accessibility from "./web/js/components/Accessibility.js"
+import Accessibility from "./web/js/components/Accessibility.js";
 
 Object.defineProperty(window, "ft_transcendence_host", {
   value: "localhost",

@@ -24,6 +24,7 @@
 @import "./components/TwofaInput.css";
 @import "./components/Buttons.css";
 @import "./components/ProfileData.css";
+@import "./components/Accessibility.css";
 
 /* Pages */
 @import "./pages/GamePage.css";
