@@ -90,7 +90,7 @@ const GamePage = () => {
   });
 
   //const gameHeader_query = new URLSearchParams(window.location.search).get("game");
-  const game_type_query  = new URLSearchParams(history.state.query).get("mode");
+  const game_type_query = new URLSearchParams(history.state.query).get("mode");
   const game_match_query = new URLSearchParams(history.state.query).get("match");
   let match_id = game_match_query ? Number(game_match_query) : null;
 
@@ -98,7 +98,6 @@ const GamePage = () => {
   let gamePaused = false;
 
   function drawOverlay() {
-    console.log("🚀 ~ drawOverlay ~ drawOverlay:", drawOverlay);
     if (gamePaused) {
       const overlay = document.getElementById("canvas-pong");
       overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
@@ -180,7 +179,6 @@ const GamePage = () => {
         resumeGameHandler(); // Retoma o jogo se estava pausado
       }
     }
-    console.log("🚀 ~ pauseButton.addEventListener ~ drawOverlay:", drawOverlay);
   });
 
   playButton.addEventListener("click", () => {
@@ -193,19 +191,14 @@ const GamePage = () => {
     } else {
       resumeGameHandler(); // Retoma o jogo em pausa
     }
-    console.log("🚀 ~ playButton.addEventListener ~ startGame:", startGame);
-    console.log("🚀 ~ playButton.addEventListener ~ drawOverlay:", drawOverlay);
   });
 
   newGame.addEventListener("click", () => {
     gameRunning = true;
-    console.log("🚀 ~ newGame.addEventListener ~ gameRunning:", gameRunning);
     gamePaused = false;
-    console.log("🚀 ~ newGame.addEventListener ~ gamePaused:", gamePaused);
     drawOverlay();
     startNewGameHandler(); // Começa um novo jogo
   });
-  console.log("🚀 ~ newGame.addEventListener ~ drawOverlay:", drawOverlay());
 
   game_exit.addEventListener("click", () => {
     if (wsTwo) wsTwo.close(1000);

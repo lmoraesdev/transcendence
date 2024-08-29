@@ -14,7 +14,6 @@ const KeyDOWN = 40;
 const KeyW = 87;
 const KeyS = 83;
 
-// Função para criar a bola
 function createBall(speed, position, size) {
   return {
     speedX: speed[0],
@@ -36,7 +35,6 @@ function createBall(speed, position, size) {
   };
 }
 
-// Função para criar a raquete
 function createPaddle(speedY, position, size) {
   return {
     speedY: speedY,
@@ -61,7 +59,6 @@ function createPaddle(speedY, position, size) {
   };
 }
 
-// Função para obter o nome do jogador
 const getName = async () => {
   try {
     const res = await fetching(`https://${window.ft_transcendence_host}/player/`);
@@ -72,7 +69,6 @@ const getName = async () => {
   }
 };
 
-// Função para mapear os níveis da IA
 const mapIaLevel = {
   esy: "esy",
   med: "med",
@@ -80,8 +76,7 @@ const mapIaLevel = {
   imp: "imp",
 };
 
-// Função para inicializar o jogo Pong Solo
-async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
+async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 0) {
   scorePlayer = ptsPlayer;
   scoreComputer = ptsComputer;
   const namePlayer = await getName();
@@ -152,7 +147,7 @@ async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
     }
 
     if (scorePlayer === 7 || scoreComputer === 7) {
-      window.cancelAnimationFrame(loopIdSolo);
+      cancelAnimationFrame(loopIdSolo);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.font = "100px monospace";
       ctx.textAlign = "center";
@@ -180,9 +175,7 @@ async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
   }
 
   function updateComputerPaddle(ball, paddle) {
-    if (ai) {
-      ai.update(ball, paddle);
-    }
+    ai.update(ball, paddle);
   }
 
   function Score(ctx, canvas, scorePlayer, scoreComputer) {
@@ -206,13 +199,10 @@ async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
     ballCollision(ball, ctx, paddlePlayer, paddleComputer);
     ball.render(ctx);
     paddlePlayer.update(true, canvas);
-    paddleComputer.update(false, canvas);
     paddlePlayer.render(ctx);
+    updateComputerPaddle(ball, paddleComputer); // Atualiza a IA do computador
     paddleComputer.render(ctx);
     Score(ctx, canvas, scorePlayer, scoreComputer);
-    updateComputerPaddle(ball, paddleComputer);
-
-    loopIdSolo = requestAnimationFrame(gameLoop);
   }
 
   window.onkeydown = (e) => {
@@ -222,10 +212,10 @@ async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
   window.onkeyup = (e) => {
     KeyPressedSolo[e.keyCode] = false;
   };
+
   gameLoop();
 }
 
-// Função auxiliar para reproduzir som com tratamento de erros
 async function playSound(sound) {
   if (soundEnabled) {
     try {
@@ -240,43 +230,29 @@ async function playSound(sound) {
   }
 }
 
-function paddleCollision(canvas, paddle, ball) {
-  if (
-    ball.positionX + ball.size >= paddle.positionX &&
-    ball.positionX - ball.size <= paddle.positionX + paddle.width &&
-    ball.positionY + ball.size >= paddle.positionY &&
-    ball.positionY - ball.size <= paddle.positionY + paddle.height
-  ) {
-    ball.speedX *= -1;
-    playSound(sounds.rebound); // Alterado para usar o sistema de som
-  }
-}
-
-// Função para pausar o jogo
 function pauseGame() {
-  if (!isPaused) {
+  if (!isPaused && !isGameOver) {
     cancelAnimationFrame(loopIdSolo);
     isPaused = true;
   }
 }
 
-// Função para retomar o jogo
-function restartGame(canvas, ctx) {
-  cancelAnimationFrame(loopIdSolo);
-  isPaused = false;
-  isGameOver = false;
-  scorePlayer = 0; // Reiniciar a pontuação do jogador
-  scoreComputer = 0; // Reiniciar a pontuação do computador
-
-  // Reiniciar o jogo com nova instância
-  runPongSoloGame(canvas, ctx);
+function resumeGame() {
+  if (isPaused && !isGameOver) {
+    loopIdSolo = window.requestAnimationFrame(gameLoop);
+    isPaused = false;
+  }
 }
 
-// Função para reiniciar o jogo
-function resumeGame() {
-  if (isPaused) {
+function restartGame(canvas, ctx) {
+  if (isGameOver) {
+    cancelAnimationFrame(loopIdSolo);
     isPaused = false;
-    loopIdSolo = requestAnimationFrame(runPongSoloGame); // Continua o loop do jogo
+    isGameOver = false;
+    scorePlayer = 0;
+    scoreComputer = 0;
+
+    runPongSoloGame(canvas, ctx, scorePlayer, scoreComputer);
   }
 }
 
