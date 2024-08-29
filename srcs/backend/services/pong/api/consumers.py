@@ -335,7 +335,7 @@ class Pong(AsyncWebsocketConsumer):
         speed = ballDirection(self.capacity)
         logger.debug(f"salas: {pformat(rooms[room_id])}")
         if (eliminated):
-            padd = "padd_right" if rooms[room_id]['ball']['speedX'] > 0 else "padd_left"
+            padd = "padd_left" if rooms[room_id]['ball']['speedX'] > 0 else "padd_right"
             logger.debug(f"padd = {padd}")
             logger.debug(f"sala atual: {pformat(rooms[room_id][padd])}")
             rooms[room_id][padd]['info']['score'] += 1
@@ -436,8 +436,8 @@ class Pong(AsyncWebsocketConsumer):
             ))
 
     async def disconnect(self, close_code):
-        logger.debug(f"disconnect called with close_code: {close_code}\nself: {pformat(self)}")
-        logger.debug(f"url_route: {pformat(self.scope['url_route'])}")
+        # logger.debug(f"disconnect called with close_code: {close_code}\nself: {pformat(self)}")
+        # logger.debug(f"url_route: {pformat(self.scope['url_route'])}")
         message = None
         room_id = self.getRoomId()
         if (room_id):
@@ -465,10 +465,10 @@ class Pong(AsyncWebsocketConsumer):
     
     def getRoomId(self):
         try:
-            logger.debug(f"self in getRoomId {pformat(self)}")
-            logger.debug(f"self scope {pformat(self.scope)}")
+            # logger.debug(f"self in getRoomId {pformat(self)}")
+            # logger.debug(f"self scope {pformat(self.scope)}")
             url_route_kwargs = self.scope['url_route']['kwargs']
-            logger.debug(f"url_route_kwargs {pformat(url_route_kwargs)}")
+            # logger.debug(f"url_route_kwargs {pformat(url_route_kwargs)}")
             room_id_data = url_route_kwargs.get('room_id')
             if isinstance(room_id_data, str):
                 room_id_dict = json.loads(room_id_data)
