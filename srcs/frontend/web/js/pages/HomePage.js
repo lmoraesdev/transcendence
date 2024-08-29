@@ -83,6 +83,11 @@ const HomePage = () => {
         const addButton = document.createElement('button');
         addButton.className = 'btn btn-primary';
         addButton.textContent = 'Add';
+        addButton.dataset.playerId = player.id;
+
+        addButton.addEventListener('click', () => {
+          handleAddButtonClick(player.id);
+        });
 
         buttonDiv.appendChild(addButton);
         playerDiv.appendChild(img);
@@ -104,8 +109,29 @@ const HomePage = () => {
     }
   }
 
-  getAllPlayers();
+  const handleAddButtonClick = async (playerId) => {
+    try {
+      const response = await fetch(`https://${window.ft_transcendence_host}/player/friendship/`, {
+        method: 'POST',
+        headers: {
+         'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ target_id: playerId }),
+      });
 
+      const data = await response.json();
+      if (response.ok) {
+        alert(data.message);
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error("Error sending friend request:", error);
+    }
+  };
+
+  getAllPlayers();
+  
   const buttonsContainer = parentElement.querySelector('.home-content-buttons');
 
   // Vou ajustar o link correto dos botões abaixo

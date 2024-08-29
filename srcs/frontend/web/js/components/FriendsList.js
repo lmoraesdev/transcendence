@@ -1,4 +1,5 @@
 import fetching from "../helpers/fetching.js";
+import FriendCard from '../components/FriendCard.js';
 
 const FriendsList = () => {
   const friendsListHTML = `
@@ -6,22 +7,22 @@ const FriendsList = () => {
       <nav class="friends-tabs">
         <ul class="d-flex justify-content-center align-items-center flex-wrap p-0 m-0 gap-1">
           <li>
-            <button class="btn btn-lg fw-bold friends-btn active">Friends</button>
+            <button class="px-2 friends-btn friends-list-btn">
+              Friends
+            </button>
           </li>
           <li>
-            <button class="btn btn-lg fw-bold requests-btn">Requests</button>
+            <button class="px-2 requests-btn friends-list-btn">
+              Requests
+            </button>
           </li>
           <li>
-            <button
-              class="btn btn-lg fw-bold invites-btn"
-            >
+            <button class="px-2 invites-btn friends-list-btn">
               Invites
             </button>
           </li>
           <li>
-            <button
-              class="btn btn-lg fw-bold search-btn"
-            >
+            <button class="px-2 search-btn friends-list-btn">
               Search
             </button>
           </li>
@@ -117,6 +118,8 @@ const FriendsList = () => {
     search_btn.classList.add("active");
     showCards("search");
   });
+
+  FriendCard();
 }
 
 export default FriendsList;
