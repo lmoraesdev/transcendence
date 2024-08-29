@@ -68,7 +68,7 @@ const SettingPage = () => {
                 <div class="popup-twofa-qrcode border rounded-3 p-3 my-4 mx-auto"></div>
                 <div class="twofa-input text-center"></div>
               </div>
-            </div>            
+            </div>
           </div>
         </section>
 
@@ -135,12 +135,25 @@ const SettingPage = () => {
 
   const submitFieldChange = (field, inputElem) => {
     const value = field === "two_factor" ? inputElem.checked : inputElem.value;
-    fetching(`https://${window.ft_transcendence_host}/player/`, "PATCH", {
-      field,
-      value,
-    }).then(() => {
-      if (field !== "two_factor") inputElem.placeholder = inputElem.value;
-      inputElem.value = "";
+
+    fetch(`https://${window.ft_transcendence_host}/player/`, {
+      method: 'POST',
+      headers: {
+       'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ field, value }),
+    }).then((res) => {
+      if (field !== "two_factor")
+      {
+        inputElem.placeholder = inputElem.value;
+        inputElem.value = "";
+      } else {
+        inputElem.value = "off";
+      }
+
+      console.log("Success:", res);
+    }).catch((reason) => {
+      console.log("Error:", reason);
     });
   };
 
@@ -153,7 +166,7 @@ const SettingPage = () => {
       fetch(`https://${window.ft_transcendence_host}/authentication/2FA/qrcode/`)
         .then((res) => res.blob())
         .then((blob) => {
-          popup_twofa_qrcode.innerHTML = `<img src="${URL.createObjectURL(blob)}" class="img-fluid" alt="qrCode">`;
+          popup_twofa_qrcode.innerHTML = `<img src="${URL.createObjectURL(blob)}" class="img-fluid mx-auto d-block" alt="qrCode">`;
           popup_twofa.classList.remove('d-none');
         });
     } else {
@@ -163,7 +176,7 @@ const SettingPage = () => {
 
   popup_twofa_close.onclick = () => {
     checkbox_twofa.checked = !checkbox_twofa.checked;
-    popup_twofa.querySelector(".twofa-input input[type=number]").value = "";
+    popup_twofa.querySelector("#twofa-code-input").value = "";
     popup_twofa_qrcode.innerHTML = "";
     popup_twofa.classList.add('d-none');
   };
