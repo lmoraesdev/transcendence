@@ -10,6 +10,7 @@ urlpatterns = [
     path('matches/', views.MatchesHistory.as_view(), name='matchesHistoryView'),
     path('training/', views.TrainingHistory.as_view(), name="trainingHistoryView"),
     path('listAllPlayers/', views.ListAllUser.as_view(), name='listAllPlayers'),
+    path('2FA/disable/', views.Disable2FA.as_view(), name="disable2FA"),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
