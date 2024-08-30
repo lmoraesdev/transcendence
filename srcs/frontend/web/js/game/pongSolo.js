@@ -28,6 +28,10 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
   let scoreComputer = ptsComputer;
   let namePlayer = await getName();
 
+  // Recupera vitórias anteriores
+  let playerWins = parseInt(localStorage.getItem("playerWins")) || 0;
+  let computerWins = parseInt(localStorage.getItem("computerWins")) || 0;
+
   canvas.width = 1920;
   canvas.height = 1080;
 
@@ -54,8 +58,7 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
   const FPS = 75;
   const INTERVAL = 1000 / FPS;
   let lastUpdateTime = Date.now();
-  let ai = new AI(5);
-  let aiPerformance = { hits: 0, misses: 0 };
+  let ai = new AI(1);
 
   function playSound(sound) {
     if (!getSoundStatus()) {
@@ -77,9 +80,6 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
       playSound(reboundSound);
       ball.speedX *= 1.1;
       ball.speedY *= 1.1;
-      aiPerformance.hits++;
-    } else {
-      aiPerformance.misses++;
     }
   }
 
@@ -115,13 +115,11 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
       localStorage.setItem("scoreComputer", scoreComputer);
       ball.speedX = -4;
       ai.adjustDifficulty(false);
-      aiPerformance.misses = 0;
     } else {
       scorePlayer += 1;
       localStorage.setItem("scorePlayer", scorePlayer);
       ball.speedX = 4;
       ai.adjustDifficulty(true);
-      aiPerformance.hits = 0;
     }
 
     if (scorePlayer === 7 || scoreComputer === 7) {
@@ -137,8 +135,12 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
 
       try {
         if (scoreComputer === 7) {
+          computerWins += 1;
+          localStorage.setItem("computerWins", computerWins);
           await playSound(gameOverSound);
         } else if (scorePlayer === 7) {
+          playerWins += 1;
+          localStorage.setItem("playerWins", playerWins);
           await playSound(winGameSound);
         }
       } catch (error) {
@@ -226,11 +228,8 @@ const createPaddle = (speed, position, size) => ({
   },
 
   render(ctx) {
-    ctx.fillStyle = "whitesmoke"; // Cor da raquete
-    ctx.beginPath();
-    ctx.roundRect(this.positionX, this.positionY, this.sizeX, this.sizeY, 20);
-    ctx.stroke();
-    ctx.fill();
+    ctx.fillStyle = "white";
+    ctx.fillRect(this.positionX, this.positionY, this.sizeX, this.sizeY);
   },
 
   Center() {
@@ -239,11 +238,11 @@ const createPaddle = (speed, position, size) => ({
 });
 
 const createBall = (speed, position, size) => ({
-  speedX: speed[0] / 1.0, // Reduzir a velocidade para não parecer rápida
-  speedY: speed[1] / 1.0, // Reduzir a velocidade para não parecer rápida
+  speedX: speed[0],
+  speedY: speed[1],
   positionX: position[0],
   positionY: position[1],
-  size: size,
+  size,
 
   update() {
     this.positionX += this.speedX;
@@ -251,10 +250,10 @@ const createBall = (speed, position, size) => ({
   },
 
   render(ctx) {
-    ctx.fillStyle = "white";
     ctx.beginPath();
     ctx.arc(this.positionX, this.positionY, this.size, 0, Math.PI * 2);
-    ctx.closePath();
+    ctx.fillStyle = "white";
     ctx.fill();
+    ctx.closePath();
   },
 });
