@@ -4,7 +4,6 @@
 /* Components */
 @import "./components/Stars.css";
 @import "./components/Footer.css";
-@import "./components/Modal.css";
 @import "./components/FriendCard.css";
 @import "./components/FriendCardPopup.css";
 @import "./components/FriendsList.css";

@@ -8,7 +8,7 @@ class PlayerSerializer(serializers.ModelSerializer):
         fields = ("id", "username", "avatar")
 
 class PlayerMatchSerializer(serializers.ModelSerializer):
-    player = serializers.SerializerMethodField()
+    player = serializers.SerializerMethodField(method_name='getPlayer')
 
     class Meta:
         model = PlayerMatch
@@ -20,8 +20,8 @@ class PlayerMatchSerializer(serializers.ModelSerializer):
         return serializer.data
     
 class MatchSerializer(serializers.ModelSerializer):
-    players = serializers.SerializerMethodField()
-    current = serializers.SerializerMethodField()
+    players = serializers.SerializerMethodField(method_name='getPlayers')
+    current = serializers.SerializerMethodField(method_name='getCurrent')
 
     class Meta:
         model = Match
@@ -29,7 +29,7 @@ class MatchSerializer(serializers.ModelSerializer):
 
     def getCurrent(self, match):
         player = self.context.get("player")
-        if (match.status == Match.Status.PLAYING.value):
+        if match.status == Match.Status.PLAYING.value:
             return False
         current = PlayerMatch.objects.filter(matchId=match, playerId=player).exists()
         return current
@@ -40,9 +40,9 @@ class MatchSerializer(serializers.ModelSerializer):
         return serializer.data
 
 class TournamentSerializer(serializers.ModelSerializer):
-    matches = serializers.SerializerMethodField();
-    creator = serializers.SerializerMethodField();
-    playersQuantity = serializers.SerializerMethodField();
+    matches = serializers.SerializerMethodField(method_name='getMatches')
+    creator = serializers.SerializerMethodField(method_name='getCreator')
+    playersQuantity = serializers.SerializerMethodField(method_name='getPlayerCount')
 
     class Meta:
         model = Tournament
@@ -53,7 +53,7 @@ class TournamentSerializer(serializers.ModelSerializer):
         serializer = MatchSerializer(matches, context={"player": self.context.get("player")}, many=True)
         return serializer.data
     
-    def  getPlayers(self, tournament):
+    def getPlayers(self, tournament):
         playerTournaments = PlayerTournament.objects.filter(tournamentId=tournament)
         players = []
         for playerTournament in playerTournaments:

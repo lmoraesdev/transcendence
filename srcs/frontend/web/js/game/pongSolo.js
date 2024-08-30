@@ -28,7 +28,7 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 
   let scoreComputer = ptsComputer;
   let namePlayer = await getName();
 
-  // Recupera vitórias anteriores
+  // get banco
   let playerWins = parseInt(localStorage.getItem("playerWins")) || 0;
   let computerWins = parseInt(localStorage.getItem("computerWins")) || 0;
 
@@ -130,6 +130,7 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 
         canvas.height / 2,
       );
 
+      //Banco de dados aqui
       try {
         if (scoreComputer === 7) {
           computerWins += 1;
@@ -172,7 +173,7 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 
     BallPaddleCollision(ball, paddleComputer);
     ballCollision(canvas, ball, ctx, paddlePlayer, paddleComputer);
 
-    ai.update(ball, paddleComputer, canvas.height);
+    ai.update(ball, paddleComputer, canvas.height, computerWins, playerWins);
 
     paddlePlayer.positionY += (KeyPressedSolo[KeyW] ? -10 : 0) + (KeyPressedSolo[KeyS] ? 10 : 0);
     paddleComputer.positionY = ball.positionY - paddleComputer.sizeY / 2;

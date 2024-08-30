@@ -1,4 +1,3 @@
-import Modal from '../components/Modal.js';
 import { runPongCoopGame } from '../game/pongCoop.js';
 import { runPongTwoGame, Ball, Paddle, keys } from '../game/pongTwo.js';
 import { runPongFourGame } from '../game/pongFour.js';

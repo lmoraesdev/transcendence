@@ -51,7 +51,7 @@ def intraCallbackOAuth(request):
     )
     if not userToken.ok:
         return Response({"statusCode": 401, "detail": "No access token in the token response"})
-    
+
     playerData = {
         "email": userToken.json()['email'],
         "username": userToken.json()['login'],
@@ -64,7 +64,7 @@ def intraCallbackOAuth(request):
         return redirect(f"https://{settings.BASE_URL}/login/", permanent=True)
     jwtToken = generateJwt(player.id, player.twoFactor)
     response = redirect(f"https://{settings.BASE_URL}/{'twofa' if player.twoFactor else 'home'}/", permanent=True)
-    response.set_cookie("jwt_token", value=jwtToken, httponly=True, secure=True)
+    response.set_cookie("jwt_token", value=jwtToken, httponly=True, secure=True, samesite='Lax')
     return response
 
 @api_view(['GET'])
@@ -73,11 +73,11 @@ def loggoutUser(request):
     if request.token is not None:
         cache.set(request.token, True, timeout=None)
         response = redirect(f"https://{settings.BASE_URL}/login/", permanent=True)
-        response.delete_cookie("jwt_token")
+        response.delete_cookie("jwt_token", samesite='Lax')
         return response
     else:
         return Response({"statusCode": 400, "detail": "No valid access token found"})
-    
+
 @api_view(['GET'])
 def OAuthGoogle(request):
     SCOPES = [
@@ -136,7 +136,7 @@ def googleCallbackOAuth(request):
 
     jwtToken = generateJwt(player.id, player.twoFactor)
     response = redirect(f"https://{settings.BASE_URL}/{'twofa' if player.twoFactor else 'home'}/", permanent=True)
-    response.set_cookie("jwt_token", value=jwtToken, httponly=True, secure=True)
+    response.set_cookie("jwt_token", value=jwtToken, httponly=True, secure=True, samesite='Lax')
     return response
 
 @api_view(['GET'])
@@ -158,21 +158,21 @@ def qrCode2FA(request):
 @api_view(["POST"])
 def verify2FA(request):
     logger.debug("Iniciando verificação 2FA")
-    
+
     code = request.data.get("code")
     if not code:
         logger.error("Código 2FA não fornecido na requisição.")
         return Response({"statusCode": 400, "error": "2FA code not provided"})
 
     logger.debug(f"Código 2FA recebido: {code}")
-    
+
     jwtToken = request.COOKIES.get("jwt_token")
     if not jwtToken:
         logger.error("Token JWT não encontrado nos cookies.")
         return Response({"statusCode": 401, "error": "JWT token not found in cookies"})
 
     logger.debug(f"Token JWT recebido: {jwtToken}")
-    
+
     try:
         decodedToken = jwt.decode(jwtToken, settings.SECRET_KEY, algorithms=["HS256"])
         logger.debug(f"Token JWT decodificado: {decodedToken}")
@@ -223,7 +223,7 @@ def verify2FA(request):
         try:
             jwtToken = generateJwt(playerId, False)
             response = Response({"statusCode": 200, "message": "Successfully verified", "redirected": True})
-            response.set_cookie("jwt_token", value=jwtToken, httponly=True, secure=True)
+            response.set_cookie("jwt_token", value=jwtToken, httponly=True, secure=True, samesite='Lax')
             logger.debug(f"Token JWT renovado e cookie atualizado para o player ID: {playerId}")
             return response
         except Exception as e:
