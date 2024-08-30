@@ -77,7 +77,7 @@ const TournamentPage = () => {
         body: JSON.stringify({
           action: 'create',
           name: input_name.value.trim(),
-          id: players.id
+          id: players.player.id
         }),
         credentials: 'include'
       })
