@@ -464,10 +464,10 @@ class TrainingHistory(APIView):
             if trainings:
                 for training in trainings:
                     logger.info(f"Processing training with ID: {training.id}")
-                    
+
                     playerTraining = TrainingPlayer.objects.get(trainingId=training)
                     logger.debug(f"Player training data: {playerTraining}")
-                    
+
                     playerTrainings.append({
                         "win": playerTraining.win,
                         "accuracy": playerTraining.accuracy,
@@ -476,7 +476,7 @@ class TrainingHistory(APIView):
                         "correctBlocks": playerTraining.correctBlocks,
                         "totalBlocks": playerTraining.totalBlocks,
                     })
-                    
+
                     playerTrainingMatchs += 1
                     if playerTraining.win:
                         playerTrainingWin += 1
@@ -506,7 +506,7 @@ class TrainingHistory(APIView):
                         "totalBlocks": iaTraining.totalBlocks,
                         "states": states
                     })
-                    
+
                     iaTrainingMatchs += 1
                     if iaTraining.win:
                         iaTrainingWin += 1
@@ -555,14 +555,14 @@ class TrainingHistory(APIView):
 
             logger.debug(f"Request\n{pformat(request.data)}")
 
-            if '_content' in request.data:
-                content = request.data['_content']
-                # Parse o conteúdo JSON
-                data = json.loads(content)
-            else:
-                raise ValueError("No '_content' key found in request data.")
+            # if '_content' in request.data:
+            #     content = request.data['_content']
+            #     # Parse o conteúdo JSON
+            #     data = json.loads(content)
+            # else:
+            #     raise ValueError("No '_content' key found in request data.")
 
-            trainingData = data.get('training')
+            trainingData = request.data.get('training')
             logger.debug(f"Training data received: {trainingData}")
 
             if trainingData is None:
@@ -645,7 +645,7 @@ class ListAllUser(APIView):
                 listPlayer = Player.objects.exclude(id=playerExclude.first().id)
             else:
                 listPlayer = Player.objects.all()
-            
+
             serializer = PlayerInfoSerializer(listPlayer, many=True)
             return Response(serializer.data)
 

@@ -1,126 +1,100 @@
+import { AI } from "../ia/ia.js";
 import fetching from "../helpers/fetching.js";
 import { soundEnabled } from "../helpers/soundControl.js";
-import { AI } from "../ia/ia.js";
 
 let loopIdSolo;
-let isPaused = false;
-let isGameOver = false;
-let ai;
-let scorePlayer = 0;
-let scoreComputer = 0;
 const KeyPressedSolo = [];
 const KeyUP = 38;
 const KeyDOWN = 40;
 const KeyW = 87;
 const KeyS = 83;
 
-function createBall(speed, position, size) {
-  return {
-    speedX: speed[0],
-    speedY: speed[1],
-    positionX: position[0],
-    positionY: position[1],
-    size: size,
-    update() {
-      this.positionX += this.speedX;
-      this.positionY += this.speedY;
-    },
-    render(ctx) {
-      ctx.beginPath();
-      ctx.arc(this.positionX, this.positionY, this.size, 0, Math.PI * 2);
-      ctx.fillStyle = "white";
-      ctx.fill();
-      ctx.closePath();
-    },
-  };
-}
-
-function createPaddle(speedY, position, size) {
-  return {
-    speedY: speedY,
-    positionX: position[0],
-    positionY: position[1],
-    width: size[0],
-    height: size[1],
-    update(isPlayer, canvas) {
-      if (isPlayer) {
-        if (KeyPressedSolo[KeyS] && this.positionY < canvas.height - this.height) {
-          this.positionY += this.speedY;
-        }
-        if (KeyPressedSolo[KeyW] && this.positionY > 0) {
-          this.positionY -= this.speedY;
-        }
-      }
-    },
-    render(ctx) {
-      ctx.fillStyle = "white";
-      ctx.fillRect(this.positionX, this.positionY, this.width, this.height);
-    },
-  };
-}
-
 const getName = async () => {
   try {
     const res = await fetching(`https://${window.ft_transcendence_host}/player/`);
-    return `${res.player.firstName} Won!` || "You Win!";
+    return `${res.player.firstName || "Player"} Won!`;
   } catch (error) {
     console.error("Erro ao buscar o nome do jogador:", error);
     return "You Win!";
   }
 };
 
-const mapIaLevel = {
-  esy: "esy",
-  med: "med",
-  hrd: "hrd",
-  imp: "imp",
-};
+export function getSoundStatus() {
+  return localStorage.getItem("disableSound") === "true";
+}
 
-async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 0) {
-  scorePlayer = ptsPlayer;
-  scoreComputer = ptsComputer;
-  const namePlayer = await getName();
+export async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
+  let scorePlayer = ptsPlayer;
+  let scoreComputer = ptsComputer;
+  let namePlayer = await getName();
 
   canvas.width = 1920;
   canvas.height = 1080;
-
-  try {
-    const response = await fetching(`https://${window.ft_transcendence_host}/player/`);
-    const apiLevel = response.playerSettings.iaLevel || "med";
-    const level = mapIaLevel[apiLevel] || "med";
-    ai = new AI(level);
-    await ai.loadTraining();
-  } catch (error) {
-    console.error("Erro ao obter o nível da IA:", error);
-    ai = new AI("med");
-  }
 
   const ball = createBall([4, 4], [canvas.width / 2, canvas.height / 2], 20);
   const paddlePlayer = createPaddle(10, [60, canvas.height / 2 - 100], [40, 200]);
   const paddleComputer = createPaddle(10, [canvas.width - 100, canvas.height / 2 - 100], [40, 200]);
 
-  const sounds = {
-    gameOver: new Audio("https://assets.mixkit.co/active_storage/sfx/2042/2042-preview.mp3"),
-    winGame: new Audio("https://assets.mixkit.co/active_storage/sfx/2065/2065-preview.mp3"),
-    rebound: new Audio("https://assets.mixkit.co/active_storage/sfx/2073/2073-preview.mp3"),
-  };
+  const gameOverSound = new Audio(
+    "https://assets.mixkit.co/active_storage/sfx/2042/2042-preview.mp3",
+  );
+  const winGameSound = new Audio(
+    "https://assets.mixkit.co/active_storage/sfx/2065/2065-preview.mp3",
+  );
+  const reboundSound = new Audio(
+    "https://assets.mixkit.co/active_storage/sfx/2073/2073-preview.mp3",
+  );
 
-  function drawCourt(ctx, canvas) {
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  gameOverSound.addEventListener("canplaythrough", () =>
+    console.log("Som de game over carregado."),
+  );
+  winGameSound.addEventListener("canplaythrough", () => console.log("Som de vitória carregado."));
+  reboundSound.addEventListener("canplaythrough", () => console.log("Som de rebote carregado."));
 
-    ctx.strokeStyle = "white";
-    ctx.lineWidth = 5;
+  const FPS = 60;
+  const INTERVAL = 1000 / FPS;
+  let lastUpdateTime = Date.now();
+  let ai = new AI(5);
+  let aiPerformance = { hits: 0, misses: 0 };
 
-    ctx.beginPath();
-    ctx.moveTo(canvas.width / 2, 0);
-    ctx.lineTo(canvas.width / 2, canvas.height);
-    ctx.stroke();
+  function playSound(sound) {
+    if (!getSoundStatus()) {
+      sound.play();
+    }
   }
 
-  function ballCollision(ball, ctx, paddlePlayer, paddleComputer) {
+  function BallPaddleCollision(ball, paddle) {
+    const dx = Math.abs(ball.positionX - paddle.Center()[0]);
+    const dy = Math.abs(ball.positionY - paddle.Center()[1]);
+    if (dx <= ball.size + paddle.sizeX / 2 && dy <= ball.size + paddle.sizeY / 2) {
+      if (
+        (ball.speedX > 0 && ball.positionX >= paddle.Center()[0]) ||
+        (ball.speedX < 0 && ball.positionX <= paddle.Center()[0])
+      ) {
+        return;
+      }
+      ball.speedX *= -1;
+      playSound(reboundSound);
+      ball.speedX *= 1.1;
+      ball.speedY *= 1.1;
+      aiPerformance.hits++;
+    } else {
+      aiPerformance.misses++;
+    }
+  }
+
+  function paddleCollision(canvas, paddle) {
+    if (paddle.positionY + paddle.sizeY > canvas.height) {
+      paddle.positionY = canvas.height - paddle.sizeY;
+    }
+    if (paddle.positionY < 0) {
+      paddle.positionY = 0;
+    }
+  }
+
+  function ballCollision(canvas, ball, ctx, paddlePlayer, paddleComputer) {
     if (ball.positionX + ball.size >= canvas.width || ball.positionX - ball.size <= 0) {
-      return reset(ball, ctx, paddlePlayer, paddleComputer);
+      return reset(ball, canvas, ctx, paddlePlayer, paddleComputer);
     }
     if (ball.positionY + ball.size >= canvas.height || ball.positionY - ball.size <= 0) {
       ball.speedY *= -1;
@@ -128,7 +102,7 @@ async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 0) {
     return false;
   }
 
-  async function reset(ball, ctx, paddlePlayer, paddleComputer) {
+  const reset = async (ball, canvas, ctx, paddlePlayer, paddleComputer) => {
     ball.positionX = canvas.width / 2;
     ball.positionY = canvas.height / 2;
     paddlePlayer.positionX = 60;
@@ -140,14 +114,18 @@ async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 0) {
       scoreComputer += 1;
       localStorage.setItem("scoreComputer", scoreComputer);
       ball.speedX = -4;
+      ai.adjustDifficulty(false);
+      aiPerformance.misses = 0;
     } else {
       scorePlayer += 1;
       localStorage.setItem("scorePlayer", scorePlayer);
       ball.speedX = 4;
+      ai.adjustDifficulty(true);
+      aiPerformance.hits = 0;
     }
 
     if (scorePlayer === 7 || scoreComputer === 7) {
-      cancelAnimationFrame(loopIdSolo);
+      window.cancelAnimationFrame(loopIdSolo);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.font = "100px monospace";
       ctx.textAlign = "center";
@@ -159,110 +137,124 @@ async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 0) {
 
       try {
         if (scoreComputer === 7) {
-          await playSound(sounds.gameOver);
+          await playSound(gameOverSound);
         } else if (scorePlayer === 7) {
-          await playSound(sounds.winGame);
+          await playSound(winGameSound);
         }
       } catch (error) {
         console.error("Erro ao reproduzir som:", error);
       }
-      isGameOver = true;
+      localStorage.clear();
+      window.location.reload();
       return true;
     }
-
-    ball.speedY = Math.random() < 0.5 ? 4 : -4;
     return false;
-  }
-
-  function updateComputerPaddle(ball, paddle, canvas) {
-    // Atualiza a lógica da IA para mover a raquete
-    ai.update(ball, paddle);
-
-    // Limita a posição da raquete para que não ultrapasse os limites do canvas
-    if (paddle.positionY < 0) {
-      paddle.positionY = 0;
-    }
-    if (paddle.positionY + paddle.height > canvas.height) {
-      paddle.positionY = canvas.height - paddle.height;
-    }
-  }
+  };
 
   function Score(ctx, canvas, scorePlayer, scoreComputer) {
     ctx.fillStyle = "white";
-    ctx.font = "36px Arial";
+    ctx.font = "bold 60px Arial";
     ctx.textAlign = "center";
-    ctx.fillText(scorePlayer, canvas.width / 4, 50);
-    ctx.fillText(scoreComputer, (3 * canvas.width) / 4, 50);
+    ctx.fillText(scorePlayer, canvas.width / 2 - 100, 100);
+    ctx.fillText(scoreComputer, canvas.width / 2 + 100, 100);
   }
 
-  function gameLoop() {
-    if (isPaused || isGameOver) return;
+  function gameLoopSolo() {
+    const now = Date.now();
+    const deltaTime = now - lastUpdateTime;
 
-    loopIdSolo = window.requestAnimationFrame(gameLoop);
+    if (deltaTime >= INTERVAL) {
+      lastUpdateTime = now - (deltaTime % INTERVAL); // Corrige o tempo para evitar erros de desvio
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    drawCourt(ctx, canvas);
+      // Renderizar a bola e as raquetes
+      ball.render(ctx);
+      paddlePlayer.render(ctx);
+      paddleComputer.render(ctx);
 
-    ball.update();
-    ballCollision(ball, ctx, paddlePlayer, paddleComputer);
-    ball.render(ctx);
-    paddlePlayer.update(true, canvas);
-    paddlePlayer.render(ctx);
-    updateComputerPaddle(ball, paddleComputer, canvas); // Atualiza a IA do computador
-    paddleComputer.render(ctx);
-    Score(ctx, canvas, scorePlayer, scoreComputer);
-  }
+      // Atualizar a bola e as raquetes
+      ball.update();
+      BallPaddleCollision(ball, paddlePlayer);
+      BallPaddleCollision(ball, paddleComputer);
+      ballCollision(canvas, ball, ctx, paddlePlayer, paddleComputer);
 
-  window.onkeydown = (e) => {
-    KeyPressedSolo[e.keyCode] = true;
-  };
+      ai.update(ball, paddleComputer, canvas.height);
 
-  window.onkeyup = (e) => {
-    KeyPressedSolo[e.keyCode] = false;
-  };
+      paddlePlayer.positionY += (KeyPressedSolo[KeyW] ? -10 : 0) + (KeyPressedSolo[KeyS] ? 10 : 0);
+      paddleComputer.positionY = ball.positionY - paddleComputer.sizeY / 2;
 
-  gameLoop();
-}
+      paddleCollision(canvas, paddlePlayer);
+      paddleCollision(canvas, paddleComputer);
 
-async function playSound(sound) {
-  if (soundEnabled) {
-    try {
-      await new Promise((resolve, reject) => {
-        sound.play();
-        sound.onended = resolve;
-        sound.onerror = reject;
-      });
-    } catch (error) {
-      console.error("Erro ao tocar o som:", error);
+      // Desenhar a pontuação
+      Score(ctx, canvas, scorePlayer, scoreComputer);
     }
+
+    // Continuar o loop
+    loopIdSolo = window.requestAnimationFrame(gameLoopSolo);
   }
+
+  window.onkeydown = (e) => (KeyPressedSolo[e.keyCode] = true);
+  window.onkeyup = (e) => (KeyPressedSolo[e.keyCode] = false);
+
+  window.addEventListener("keydown", (e) => {
+    if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(e.code) > -1) {
+      e.preventDefault();
+    }
+  });
+
+  gameLoopSolo();
 }
 
-function pauseGame() {
-  if (!isPaused && !isGameOver) {
-    cancelAnimationFrame(loopIdSolo);
-    isPaused = true;
-  }
-}
+const createPaddle = (speed, position, size) => ({
+  speedY: speed,
+  positionX: position[0],
+  positionY: position[1],
+  sizeX: size[0],
+  sizeY: size[1],
 
-function resumeGame() {
-  if (isPaused && !isGameOver) {
-    loopIdSolo = window.requestAnimationFrame(gameLoop);
-    isPaused = false;
-  }
-}
+  update(isPlayer) {
+    if (isPlayer) {
+      if (KeyPressedSolo[KeyS]) {
+        this.positionY += this.speedY;
+      }
+      if (KeyPressedSolo[KeyW]) {
+        this.positionY -= this.speedY;
+      }
+    }
+  },
 
-function restartGame(canvas, ctx) {
-  if (isGameOver) {
-    cancelAnimationFrame(loopIdSolo);
-    isPaused = false;
-    isGameOver = false;
-    scorePlayer = 0;
-    scoreComputer = 0;
+  render(ctx) {
+    ctx.fillStyle = "whitesmoke"; // Cor da raquete
+    ctx.beginPath();
+    ctx.roundRect(this.positionX, this.positionY, this.sizeX, this.sizeY, 20);
+    ctx.stroke();
+    ctx.fill();
+  },
 
-    runPongSoloGame(canvas, ctx, scorePlayer, scoreComputer);
-  }
-}
+  Center() {
+    return [this.positionX + this.sizeX / 2, this.positionY + this.sizeY / 2];
+  },
+});
 
-export { runPongSoloGame, pauseGame, resumeGame, restartGame };
+const createBall = (speed, position, size) => ({
+  speedX: speed[0] / 1.0, // Reduzir a velocidade para não parecer rápida
+  speedY: speed[1] / 1.0, // Reduzir a velocidade para não parecer rápida
+  positionX: position[0],
+  positionY: position[1],
+  size: size,
+
+  update() {
+    this.positionX += this.speedX;
+    this.positionY += this.speedY;
+  },
+
+  render(ctx) {
+    ctx.fillStyle = "white";
+    ctx.beginPath();
+    ctx.arc(this.positionX, this.positionY, this.size, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.fill();
+  },
+});
