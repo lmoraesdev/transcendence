@@ -23,7 +23,7 @@ export function getSoundStatus() {
   return localStorage.getItem("disableSound") === "true";
 }
 
-export async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
+export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 0) {
   let scorePlayer = ptsPlayer;
   let scoreComputer = ptsComputer;
   let namePlayer = await getName();
@@ -55,9 +55,6 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
   winGameSound.addEventListener("canplaythrough", () => console.log("Som de vitória carregado."));
   reboundSound.addEventListener("canplaythrough", () => console.log("Som de rebote carregado."));
 
-  const FPS = 75;
-  const INTERVAL = 1000 / FPS;
-  let lastUpdateTime = Date.now();
   let ai = new AI(1);
 
   function playSound(sound) {
@@ -162,36 +159,29 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
   }
 
   function gameLoopSolo() {
-    const now = Date.now();
-    const deltaTime = now - lastUpdateTime;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (deltaTime >= INTERVAL) {
-      lastUpdateTime = now - (deltaTime % INTERVAL); // Corrige o tempo para evitar erros de desvio
+    // Renderizar a bola e as raquetes
+    ball.render(ctx);
+    paddlePlayer.render(ctx);
+    paddleComputer.render(ctx);
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Atualizar a bola e as raquetes
+    ball.update();
+    BallPaddleCollision(ball, paddlePlayer);
+    BallPaddleCollision(ball, paddleComputer);
+    ballCollision(canvas, ball, ctx, paddlePlayer, paddleComputer);
 
-      // Renderizar a bola e as raquetes
-      ball.render(ctx);
-      paddlePlayer.render(ctx);
-      paddleComputer.render(ctx);
+    ai.update(ball, paddleComputer, canvas.height);
 
-      // Atualizar a bola e as raquetes
-      ball.update();
-      BallPaddleCollision(ball, paddlePlayer);
-      BallPaddleCollision(ball, paddleComputer);
-      ballCollision(canvas, ball, ctx, paddlePlayer, paddleComputer);
+    paddlePlayer.positionY += (KeyPressedSolo[KeyW] ? -10 : 0) + (KeyPressedSolo[KeyS] ? 10 : 0);
+    paddleComputer.positionY = ball.positionY - paddleComputer.sizeY / 2;
 
-      ai.update(ball, paddleComputer, canvas.height);
+    paddleCollision(canvas, paddlePlayer);
+    paddleCollision(canvas, paddleComputer);
 
-      paddlePlayer.positionY += (KeyPressedSolo[KeyW] ? -10 : 0) + (KeyPressedSolo[KeyS] ? 10 : 0);
-      paddleComputer.positionY = ball.positionY - paddleComputer.sizeY / 2;
-
-      paddleCollision(canvas, paddlePlayer);
-      paddleCollision(canvas, paddleComputer);
-
-      // Desenhar a pontuação
-      Score(ctx, canvas, scorePlayer, scoreComputer);
-    }
+    // Desenhar a pontuação
+    Score(ctx, canvas, scorePlayer, scoreComputer);
 
     // Continuar o loop
     loopIdSolo = window.requestAnimationFrame(gameLoopSolo);
@@ -238,8 +228,8 @@ const createPaddle = (speed, position, size) => ({
 });
 
 const createBall = (speed, position, size) => ({
-  speedX: speed[0],
-  speedY: speed[1],
+  speedX: speed[0] / 2.5,
+  speedY: speed[1] / 2.5,
   positionX: position[0],
   positionY: position[1],
   size,

@@ -195,8 +195,8 @@ const GamePage = () => {
   newGame.addEventListener("click", () => {
     gameRunning = true;
     gamePaused = false;
-    drawOverlay();
     startNewGame();
+    drawOverlay();
   });
 
   game_exit.addEventListener("click", () => {
