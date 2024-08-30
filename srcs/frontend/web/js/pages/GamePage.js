@@ -2,7 +2,7 @@ import router from "../router/router.js";
 import { runPongTwoGame, wsTwo } from "../game/pongTwo.js";
 import { runPongFourGame, wsFour } from "../game/pongFour.js";
 import { runPongCoopGame } from "../game/pongCoop.js";
-import { runPongSoloGame, pauseGame, resumeGame, restartGame } from "../game/pongSolo.js";
+import { runPongSoloGame } from "../game/pongSolo.js";
 
 import fetching from "../helpers/fetching.js";
 
@@ -90,7 +90,7 @@ const GamePage = () => {
   });
 
   //const gameHeader_query = new URLSearchParams(window.location.search).get("game");
-  const game_type_query  = new URLSearchParams(history.state.query).get("mode");
+  const game_type_query = new URLSearchParams(history.state.query).get("mode");
   const game_match_query = new URLSearchParams(history.state.query).get("match");
   let match_id = game_match_query ? Number(game_match_query) : null;
 
@@ -98,7 +98,6 @@ const GamePage = () => {
   let gamePaused = false;
 
   function drawOverlay() {
-    console.log("🚀 ~ drawOverlay ~ drawOverlay:", drawOverlay);
     if (gamePaused) {
       const overlay = document.getElementById("canvas-pong");
       overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
@@ -154,19 +153,16 @@ const GamePage = () => {
     }
   };
 
-  const resumeGameHandler = () => {
-    if (game_type_query === "solo") {
-      const scorePlayer = localStorage.getItem("scorePlayer") || 0;
-      const scoreComputer = localStorage.getItem("scoreComputer") || 0;
-      resumeGame(); // Retoma o loop do jogo sem reiniciar
-      runPongSoloGame(canvas, ctx, Number(scorePlayer), Number(scoreComputer)); // Continua com as pontuações
-    }
+  const resumeGame = () => {
+    const scorePlayer = localStorage.getItem("scorePlayer");
+    const scoreComputer = localStorage.getItem("scoreComputer");
+    runPongSoloGame(canvas, ctx, Number(scorePlayer), Number(scoreComputer));
   };
 
-  const startNewGameHandler = () => {
+  const startNewGame = () => {
     if (game_type_query === "solo") {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      restartGame(canvas, ctx); // Reinicia o jogo com a pontuação zerada
+      runPongSoloGame(canvas, ctx, 0, 0);
     }
   };
 
@@ -175,12 +171,10 @@ const GamePage = () => {
       gamePaused = !gamePaused;
       drawOverlay();
       if (gamePaused) {
-        pauseGame(); // Pausa o jogo usando a função importada
-      } else {
-        resumeGameHandler(); // Retoma o jogo se estava pausado
+        const idSolo = localStorage.getItem("loopIdSolo");
+        window.cancelAnimationFrame(idSolo);
       }
     }
-    console.log("🚀 ~ pauseButton.addEventListener ~ drawOverlay:", drawOverlay);
   });
 
   playButton.addEventListener("click", () => {
@@ -189,23 +183,21 @@ const GamePage = () => {
       gamePaused = false;
       drawOverlay();
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      startGame(); // Inicia um novo jogo
+      startGame();
     } else {
-      resumeGameHandler(); // Retoma o jogo em pausa
+      gameRunning = true;
+      gamePaused = false;
+      drawOverlay();
+      resumeGame();
     }
-    console.log("🚀 ~ playButton.addEventListener ~ startGame:", startGame);
-    console.log("🚀 ~ playButton.addEventListener ~ drawOverlay:", drawOverlay);
   });
 
   newGame.addEventListener("click", () => {
     gameRunning = true;
-    console.log("🚀 ~ newGame.addEventListener ~ gameRunning:", gameRunning);
     gamePaused = false;
-    console.log("🚀 ~ newGame.addEventListener ~ gamePaused:", gamePaused);
+    startNewGame();
     drawOverlay();
-    startNewGameHandler(); // Começa um novo jogo
   });
-  console.log("🚀 ~ newGame.addEventListener ~ drawOverlay:", drawOverlay());
 
   game_exit.addEventListener("click", () => {
     if (wsTwo) wsTwo.close(1000);
