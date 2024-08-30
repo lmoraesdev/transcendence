@@ -1,5 +1,6 @@
 const Modal = () => {
   const modalHTML = `
+  <template id="modal-template">
     <div class="modal fade" id="modalGame" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -36,18 +37,23 @@ const Modal = () => {
         </div>
       </div>
     </div>
+    </template>
   `;
 
-  let modalContainer = document.getElementById('modalGame');
-  if (!modalContainer) {
-    modalContainer = document.createElement('div');
-    modalContainer.id = 'modalGame';
+  if (!document.querySelector('#modal-template')) {
+    const modalContainer = document.createElement('div');
+    modalContainer.innerHTML = modalHTML;
     document.body.appendChild(modalContainer);
   }
-  modalContainer.innerHTML = modalHTML;
 
-  const modalElement = document.getElementById('modalGame');
-  const modal = new bootstrap.Modal(modalElement);
+  const template = document.getElementById('modal-template');
+  const component = template.content.cloneNode(true);
+
+  const parentElement = document.querySelector('#modalGame');
+  parentElement.appendChild(component);
+
+  //const modalElement = document.getElementById('modalGame'); // Obtém a instância correta do modal
+  //const modal = new bootstrap.Modal(modalElement); // Inicializa o modal
 
   const photoInput = document.getElementById('photoInput');
   const avatarPreview = document.getElementById('avatarPreview');
@@ -130,11 +136,12 @@ const Modal = () => {
       errorMessage.style.display = 'block';
     });
   });
-  const showModal = () => {
+  
+  /*const showModal = () => {
     modal.show();
   };
 
-  window.showModal = showModal;
+  window.showModal = showModal;*/
 };
 
 export default Modal;

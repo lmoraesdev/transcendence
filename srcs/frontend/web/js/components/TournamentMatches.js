@@ -1,3 +1,6 @@
+import TournamentMatchCard from "../components/TournamentMatchCard.js";
+
+
 const TournamentMatches = () => {
   const tournamentMatchesHTML = `
     <template id="tournament-matches">
@@ -33,6 +36,8 @@ const TournamentMatches = () => {
     "justify-content-center", 
     "gap-1"
   );
+
+  TournamentMatchCard();
 };
 
 export default TournamentMatches;
