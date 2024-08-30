@@ -1,4 +1,5 @@
 import os
+import json
 import logging
 import urllib.parse
 from pprint import pformat
@@ -12,6 +13,8 @@ from django.core.files.storage import default_storage
 from django.utils.decorators import method_decorator
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import status
+from django.db import transaction
 
 logger = logging.getLogger('custom_logger')
 
@@ -234,8 +237,6 @@ class PlayerAvatarUpload(APIView):
     @method_decorator(jwtCookieRequired)
     def post(self, request):
         try:
-            logger.debug(f"request: {pformat(request)}")
-            logger.debug(f"BASE_DIR: {settings.BASE_DIR}\nPLAYER_DIR: {settings.PLAYER_DIR}\nSERVICES_DIR: {settings.SERVICES_DIR}\nSTATIC_URL: {settings.STATIC_URL}\nSTATIC_ROOT: {settings.STATIC_ROOT}\nMEDIA_URL: {settings.MEDIA_URL}\nMEDIA_ROOT: {settings.MEDIA_ROOT}\n")
             id = request.decoded_token['id']
             file = request.FILES['avatar']
             filePath = os.path.join(settings.MEDIA_ROOT, file.name)
@@ -441,77 +442,103 @@ class MatchesHistory(APIView):
 
 class TrainingHistory(APIView):
     @method_decorator(jwtCookieRequired)
-    def get(self, request): 
+    def get(self, request):
         try:
+            logger.info("Received GET request for training data.")
             player = Player.objects.get(id=request.decoded_token['id'])
+            logger.info(f"Player found: {player.username}")
+
             trainings = Training.objects.filter(playerId=player).order_by('-id')
+            logger.debug(f"Trainings found: {len(trainings)}")
+
             trainingResponse = []
 
             playerTrainings = []
             playerTrainingMatchs = 0
             playerTrainingWin = 0
-            
+
             iaTrainings = []
             iaTrainingMatchs = 0
             iaTrainingWin = 0
-            for training in trainings:
-                playerTraining = TrainingPlayer.objects.get(trainingId=training)
-                playerTrainings.append({
-                    "win": playerTraining.win,
-                    "accuracy": playerTraining.accuracy,
-                    "totalPoints": playerTraining.totalPoints,
-                    "playerPerformance": playerTraining.playerPerformance,
-                    "correctBlocks": playerTraining.correctBlocks,
-                    "totalBlocks": playerTraining.totalBlocks,
-                })
-                playerTrainingMatchs += 1
-                if (playerTraining.win is True):
-                    playerTrainingWin += 1
 
-                iaTraining = IaStatistics.objects.get(trainingId=training)
-
-                states = []
-                iaStates = IaState.objects.get(iaStatisticsId=iaTraining)
-                for state in iaStates:
-                    states.append({
-                        "state": state.stage,
-                        "action1": state.action1,
-                        "action2": state.action2,
-                        "action3": state.action3,
+            if trainings:
+                for training in trainings:
+                    logger.info(f"Processing training with ID: {training.id}")
+                    
+                    playerTraining = TrainingPlayer.objects.get(trainingId=training)
+                    logger.debug(f"Player training data: {playerTraining}")
+                    
+                    playerTrainings.append({
+                        "win": playerTraining.win,
+                        "accuracy": playerTraining.accuracy,
+                        "totalPoints": playerTraining.totalPoints,
+                        "playerPerformance": playerTraining.playerPerformance,
+                        "correctBlocks": playerTraining.correctBlocks,
+                        "totalBlocks": playerTraining.totalBlocks,
                     })
+                    
+                    playerTrainingMatchs += 1
+                    if playerTraining.win:
+                        playerTrainingWin += 1
 
-                iaTrainings.append({
-                    "win": iaTraining.win,
-                    "accuracy": iaTraining.accuracy,
-                    "totalPoints": iaTraining.totalPoints,
-                    "playerPerformance": iaTraining.playerPerformance,
-                    "correctBlocks": iaTraining.correctBlocks,
-                    "totalBlocks": iaTraining.totalBlocks,
-                    "states": states
+                    iaTraining = IaStatistics.objects.get(trainingId=training)
+                    logger.debug(f"IA training data: {iaTraining}")
+
+                    states = []
+                    iaStates = IaState.objects.filter(iaStatisticsId=iaTraining)
+                    logger.debug(f"IA states found: {len(iaStates)}")
+
+                    for state in iaStates:
+                        logger.debug(f"Processing IA state: {state.stage}")
+                        states.append({
+                            "state": state.stage,
+                            "action1": state.action1,
+                            "action2": state.action2,
+                            "action3": state.action3,
+                        })
+
+                    iaTrainings.append({
+                        "win": iaTraining.win,
+                        "accuracy": iaTraining.accuracy,
+                        "totalPoints": iaTraining.totalPoints,
+                        "playerPerformance": iaTraining.playerPerformance,
+                        "correctBlocks": iaTraining.correctBlocks,
+                        "totalBlocks": iaTraining.totalBlocks,
+                        "states": states
+                    })
+                    
+                    iaTrainingMatchs += 1
+                    if iaTraining.win:
+                        iaTrainingWin += 1
+
+                trainingResponse.append({
+                    "id": training.id,
+                    "PlayerTraining": playerTrainings,
+                    "playerTrainingMatchs": playerTrainingMatchs,
+                    "playerTrainingWin": playerTrainingWin,
+                    "IaTraining": iaTrainings,
+                    "iaTrainingMatchs": iaTrainingMatchs,
+                    "iaTrainingWin": iaTrainingWin,
                 })
-                iaTrainingMatchs += 1
-                if (iaTraining.win is True):
-                    iaTrainingWin += 1
-
-            trainingResponse.append({
-                "id": training.id,
-                "PlayerTraining": playerTrainings,
-                "playerTrainingMatchs": playerTrainingMatchs,
-                "playerTrainingWin": playerTrainingWin,
-                "IaTraining": iaTrainings,
-                "iaTrainingMatchs": iaTrainingMatchs,
-                "iaTrainingWin": iaTrainingWin,
-            })
+                logger.info(f"Training response prepared: {trainingResponse}")
             return Response({
                 "status": 200,
                 "training": trainingResponse
             })
         except Player.DoesNotExist:
+            logger.error("Player not found.")
             return Response({
                 "status": 404,
                 "message": "User not found",
             })
+        except Training.DoesNotExist:
+            logger.error("Training not found.")
+            return Response({
+                "status": 405,
+                "message": "Training not found",
+            })
         except Exception as e:
+            logger.exception(f"An error occurred: {e}")
             return Response({
                 "status": 500,
                 "message": str(e),
@@ -561,14 +588,17 @@ class TrainingHistory(APIView):
             logger.info(f"IaStatistics created: {iaStatistics}")
 
             for state in trainingData["IaTraining"]["states"]:
-                iaState = IaState.objects.create(
-                    iaStatisticsId=iaStatistics,
-                    stage=state["state"],
-                    action1=state["action1"],
-                    action2=state["action2"],
-                    action3=state["action3"],
-                )
-                logger.info(f"IaState created for state '{state['state']}': {iaState}")
+                try:
+                    iaState = IaState.objects.create(
+                        iaStatisticsId=iaStatistics,
+                        stage=state["state"],
+                        action1=state["action1"],
+                        action2=state["action2"],
+                        action3=state["action3"],
+                    )
+                    logger.info(f"IaState created for state '{state['state']}': {iaState}")
+                except Exception as e:
+                    logger.exception(f"Failed to create IaState for state '{state['state']}': {e}")
 
             logger.info(f"Training session {training.id} successfully created.")
             return Response({
@@ -622,3 +652,40 @@ class ListAllUser(APIView):
                 "status": 500,
                 "message": str(e),
             }, status=500)
+
+class Disable2FA(APIView):
+
+    @method_decorator(jwtCookieRequired)
+    def patch(self, request):
+        try:
+            # Obter o ID do jogador a partir do token decodificado
+            player_id = request.decoded_token['id']
+            logger.info(f"Received request from player ID: {player_id}")
+
+            # Buscar o jogador e atualizar o campo twoFactor
+            with transaction.atomic():
+                player = Player.objects.select_for_update().get(id=player_id)
+                player.twoFactor = False
+                player.save()
+
+            logger.info(f"2FA disabled for player: {player.username}")
+
+            # Retornar uma resposta de sucesso
+            return Response({
+                "status": 200,
+                "message": "2FA has been disabled successfully",
+            }, status=status.HTTP_200_OK)
+
+        except Player.DoesNotExist:
+            logger.error(f"Player with ID {player_id} not found.")
+            return Response({
+                "status": 404,
+                "message": "User not found",
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            logger.exception(f"An error occurred while disabling 2FA: {e}")
+            return Response({
+                "status": 500,
+                "message": str(e),
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

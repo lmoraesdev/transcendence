@@ -1,20 +1,54 @@
+import fetching from "../helpers/fetching.js";
+
+// Definindo a enumeração dos níveis de dificuldade da IA
+const IaLevel = {
+  EASY: "esy",
+  MEDIUM: "med",
+  HARD: "hrd",
+  IMPOSSIBLE: "imp",
+};
+
 export class AI {
-  constructor(difficulty = "medium") {
+  constructor(difficulty = IaLevel.EASY) {
     this.difficulty = difficulty;
-    this.qTable = {}; // Tabela de Q-Values
-    this.learningRate = 0.1; // Taxa de aprendizado
-    this.discountFactor = 0.9; // Fator de desconto
-    this.explorationRate = 0.2; // Taxa de exploração
+    this.qTable = {};
+    this.learningRate = 0.1;
+    this.discountFactor = 0.9;
+    this.explorationRate = 0.2;
+    this.explorationDecay = 0.995;
+    this.minExplorationRate = 0.01;
+
+    this.metrics = {
+      player: {
+        accuracy: 0,
+        gamesPlayed: 0,
+        wins: 0,
+        totalPoints: 0,
+        playerPerformance: 0,
+        correctBlocks: 0,
+        totalBlocks: 0,
+      },
+      ai: {
+        accuracy: 0,
+        gamesPlayed: 0,
+        wins: 0,
+        totalPoints: 0,
+        playerPerformance: 0,
+        correctBlocks: 0,
+        totalBlocks: 0,
+      },
+    };
+
+    // Ajusta a dificuldade com base no nível inicial
+    this.adjustDifficulty();
   }
 
-  // Gera um estado a partir das posições da bola e da raquete
   getState(ball, paddle) {
     const ballPos = Math.floor(ball.positionY / 10);
     const paddlePos = Math.floor(paddle.positionY / 10);
     return `${ballPos}-${paddlePos}`;
   }
 
-  // Seleciona uma ação com base na política ε-greedy
   selectAction(state) {
     if (Math.random() < this.explorationRate) {
       return ["UP", "DOWN", "STAY"][Math.floor(Math.random() * 3)];
@@ -26,7 +60,6 @@ export class AI {
     return actions[qValues.indexOf(maxQValue)];
   }
 
-  // Obtém o valor Q para um estado e ação específicos
   getQValue(state, action) {
     if (!this.qTable[state]) {
       this.qTable[state] = { UP: 0, DOWN: 0, STAY: 0 };
@@ -34,7 +67,6 @@ export class AI {
     return this.qTable[state][action] || 0;
   }
 
-  // Atualiza a tabela Q com base na recompensa recebida
   updateQTable(state, action, reward, nextState) {
     if (!this.qTable[state]) {
       this.qTable[state] = { UP: 0, DOWN: 0, STAY: 0 };
@@ -50,7 +82,6 @@ export class AI {
       qValue + this.learningRate * (reward + this.discountFactor * nextQValue - qValue);
   }
 
-  // Atualiza a IA com base na posição da bola e da raquete
   update(paddle, ball) {
     const state = this.getState(ball, paddle);
     const action = this.selectAction(state);
@@ -63,71 +94,102 @@ export class AI {
 
     const nextState = this.getState(ball, paddle);
 
-    // Atribuir recompensa ou penalidade
     let reward = 0;
     if (ball.positionX > paddle.positionX + paddle.sizeX) {
-      reward = -1; // Penalidade por a bola passar
+      reward = -1;
+      this.metrics.player.totalBlocks++;
     } else if (
       ball.positionY >= paddle.positionY &&
       ball.positionY <= paddle.positionY + paddle.sizeY
     ) {
-      reward = 1; // Recompensa por bloquear a bola
+      reward = 1;
+      this.metrics.player.correctBlocks++;
     }
 
-    // Atualizar a tabela Q
     this.updateQTable(state, action, reward, nextState);
+
+    this.metrics.player.gamesPlayed++;
+    this.metrics.player.totalPoints += reward;
+    this.metrics.player.accuracy =
+      this.metrics.player.correctBlocks /
+      (this.metrics.player.correctBlocks + this.metrics.player.totalBlocks);
+    this.metrics.player.playerPerformance =
+      this.metrics.player.totalPoints / this.metrics.player.gamesPlayed;
+
+    this.explorationRate = Math.max(
+      this.minExplorationRate,
+      this.explorationRate * this.explorationDecay,
+    );
+
+    // Atualiza as métricas da IA
+    this.metrics.ai.gamesPlayed++;
+    this.metrics.ai.totalPoints += reward;
+    this.metrics.ai.accuracy =
+      this.metrics.ai.correctBlocks / (this.metrics.ai.correctBlocks + this.metrics.ai.totalBlocks);
+    this.metrics.ai.playerPerformance = this.metrics.ai.totalPoints / this.metrics.ai.gamesPlayed;
+
+    this.adjustDifficulty();
   }
 
-  adjustDifficulty(score, playerType) {
-    if (score >= 7) {
-      this.difficulty = "hard";
-    } else if (score >= 4) {
-      this.difficulty = "medium";
+  // Ajusta a dificuldade com base nas métricas atuais
+  adjustDifficulty() {
+    if (this.metrics.ai.accuracy > 0.8 && this.metrics.ai.playerPerformance > 0.5) {
+      this.difficulty = IaLevel.IMPOSSIBLE;
+      this.explorationRate = 0.05;
+    } else if (this.metrics.ai.accuracy > 0.8) {
+      this.difficulty = IaLevel.HARD;
+      this.explorationRate = 0.1;
+    } else if (this.metrics.ai.accuracy > 0.5) {
+      this.difficulty = IaLevel.MEDIUM;
+      this.explorationRate = 0.15;
     } else {
-      this.difficulty = "easy";
-    }
-
-    if (playerType === "reset") {
-      this.explorationRate = 0.2; // Reset da taxa de exploração ao iniciar um novo jogo
+      this.difficulty = IaLevel.EASY;
+      this.explorationRate = 0.2;
     }
   }
 
-  // Salva o treinamento da IA no servidor
-  async saveTraining() {
+  async restartTraining() {
     try {
-      const response = await fetch("/player/training/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ training: this.qTable }),
-      });
-
-      if (response.ok) {
-        console.log("Treinamento salvo com sucesso");
-      } else {
-        console.error("Falha ao salvar o treinamento");
-      }
+      await fetching(
+        `https://${window.ft_transcendence_host}/player/training/`,
+        "POST",
+        JSON.stringify({
+          qtable: {}, // Reinicia a tabela Q
+          player: {
+            accuracy: 0,
+            gamesPlayed: 0,
+            wins: 0,
+            totalPoints: 0,
+            playerPerformance: 0,
+            correctBlocks: 0,
+            totalBlocks: 0,
+          },
+          ai: {
+            accuracy: 0,
+            gamesPlayed: 0,
+            wins: 0,
+            totalPoints: 0,
+            playerPerformance: 0,
+            correctBlocks: 0,
+            totalBlocks: 0,
+          },
+        }),
+      );
     } catch (error) {
-      console.error("Erro ao salvar o treinamento:", error);
+      console.error("Erro ao reinicializar o treinamento:", error);
     }
   }
 
-  // Carrega o treinamento da IA do servidor
   async loadTraining() {
     try {
-      const response = await fetch("/player/training/");
-      if (response.ok) {
-        const data = await response.json();
-        if (data.status === 200 && data.training) {
-          this.qTable = data.training;
-          console.log("Treinamento carregado com sucesso");
-        }
-      } else {
-        console.error("Falha ao carregar o treinamento");
-      }
+      const { qtable, player, ai } = await fetching(
+        `https://${window.ft_transcendence_host}/player/training/`,
+      );
+      this.qTable = qtable; // Atualiza a tabela Q
+      this.metrics.player = player; // Atualiza métricas do jogador
+      this.metrics.ai = ai; // Atualiza métricas da IA
     } catch (error) {
-      console.error("Erro ao carregar o treinamento:", error);
+      console.error("Erro ao carregar dados de treinamento:", error);
     }
   }
 }
