@@ -14,10 +14,10 @@ const Modal = () => {
               <label for="photoInput" class="d-flex justify-content-center align-items-center">
                   <input id="photoInput" type="file" name="avatar" accept="image/*" class="d-none">
                   <div class="position-relative" style="width: 170px; height: 170px;">
-                      <img id="avatarPreview" 
-                          src="https://static.vecteezy.com/system/resources/previews/047/589/492/non_2x/profile-photo-logo-sign-outline-vector.jpg" 
-                          alt="Profile Photo" 
-                          class="img-thumbnail rounded-circle w-100 h-100" 
+                      <img id="avatarPreview"
+                          src="https://static.vecteezy.com/system/resources/previews/047/589/492/non_2x/profile-photo-logo-sign-outline-vector.jpg"
+                          alt="Profile Photo"
+                          class="img-thumbnail rounded-circle w-100 h-100"
                           style="object-fit: cover; cursor: pointer;">
                   </div>
               </label>
@@ -93,7 +93,7 @@ const Modal = () => {
       username: nickname,
     };
 
-    fetch('https://localhost/player/', {
+    fetch(`https://${window.ft_transcendence_host}/player/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ const Modal = () => {
     .then(data => {
       if (data.status === 200) {
         if (photoInput.files.length > 0) {
-          return fetch('https://localhost/player/avatar/', {
+          return fetch(`https://${window.ft_transcendence_host}/player/avatar/`, {
             method: 'POST',
             body: formData,
             credentials: 'include'
@@ -136,7 +136,7 @@ const Modal = () => {
       errorMessage.style.display = 'block';
     });
   });
-  
+
   /*const showModal = () => {
     modal.show();
   };
