@@ -68,7 +68,7 @@ const SettingPage = () => {
 
                 <div class="popup-twofa d-none top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-black bg-opacity-50" role="dialog" aria-modal="true" aria-labelledby="twofa-dialog-title">
                   <div class="bg-light p-4 rounded-3">
-                    <button class="btn-close top-0 end-0 m-2" aria-label="Close Two-Factor Authentication"></button>
+                    <button id="close-button" class="btn-close top-0 end-0 m-2" aria-label="Close Two-Factor Authentication"></button>
                     <h5 id="twofa-dialog-title">Connect Authentication App</h5>
                     <h6>Open your Two-Factor Authentication (2FA) App</h6>
                     <div class="popup-twofa-qrcode border rounded-3 p-3 my-4 mx-auto" aria-live="polite">
@@ -159,11 +159,17 @@ const SettingPage = () => {
       {
         inputElem.placeholder = inputElem.value;
         inputElem.value = "";
-      } else {
-        inputElem.value = "off";
       }
+    }).catch((reason) => {
+      console.log("Error:", reason);
+    });
+  };
 
-      console.log("Success:", res);
+  const disableTwofa = (inputElem) => {
+    fetch(`https://${window.ft_transcendence_host}/player/2FA/disable/`, {
+      method: 'PATCH',
+    }).then((res) => {
+      inputElem.checked = false;
     }).catch((reason) => {
       console.log("Error:", reason);
     });
@@ -173,6 +179,11 @@ const SettingPage = () => {
   document.querySelector(".button-first-name").onclick = () => submitFieldChange("first_name", document.querySelector(".input-first-name"));
   document.querySelector(".button-last-name").onclick = () => submitFieldChange("last_name", document.querySelector(".input-last-name"));
 
+  popup_twofa_close.addEventListener("click", () => {
+    popup_twofa.classList.add("d-none");
+    checkbox_twofa.checked = false;
+  });
+
   checkbox_twofa.onchange = () => {
     if (checkbox_twofa.checked) {
       fetch(`https://${window.ft_transcendence_host}/authentication/2FA/qrcode/`)
@@ -180,12 +191,9 @@ const SettingPage = () => {
         .then((blob) => {
           popup_twofa_qrcode.src = URL.createObjectURL(blob);
           popup_twofa.classList.remove("d-none");
-          popup_twofa_close.addEventListener("click", () => {
-            popup_twofa.classList.add("d-none");
-          });
         });
     } else {
-      submitFieldChange("two_factor", checkbox_twofa);
+      disableTwofa(checkbox_twofa);
     }
   };
 

@@ -77,6 +77,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'channels',
+    'corsheaders',
     'api',
 ]
 
@@ -88,7 +89,18 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
+
+# Permitir todas as origens
+CORS_ALLOW_ALL_ORIGINS = True
+
+# Permitir todos os métodos HTTP
+CORS_ALLOW_ALL_METHODS = True
+
+# Permitir todos os cabeçalhos
+CORS_ALLOW_ALL_HEADERS = True
 
 ROOT_URLCONF = 'api.urls'
 

@@ -4,7 +4,7 @@ import logging
 import urllib.parse
 from pprint import pformat
 from .serializers import PlayerInfoSerializer, PlayerSettingsInfoSerializer
-from .models import  Friendship, Player, PlayerMatch, PlayerSettings, Training, TrainingPlayer, IaStatistics, IaState
+from .models import  Friendship, Player, PlayerMatch, PlayerSettings, Training, TrainingPlayer, IaStatistics
 from .decorators import jwtCookieRequired
 from django.db.models import Q
 from django.conf import settings
@@ -464,18 +464,11 @@ class TrainingHistory(APIView):
             if trainings:
                 for training in trainings:
                     logger.info(f"Processing training with ID: {training.id}")
-                    
+
                     playerTraining = TrainingPlayer.objects.get(trainingId=training)
                     logger.debug(f"Player training data: {playerTraining}")
                     
-                    playerTrainings.append({
-                        "win": playerTraining.win,
-                        "accuracy": playerTraining.accuracy,
-                        "totalPoints": playerTraining.totalPoints,
-                        "playerPerformance": playerTraining.playerPerformance,
-                        "correctBlocks": playerTraining.correctBlocks,
-                        "totalBlocks": playerTraining.totalBlocks,
-                    })
+                    playerTrainings.append({ "win": playerTraining.win })
                     
                     playerTrainingMatchs += 1
                     if playerTraining.win:
@@ -484,46 +477,25 @@ class TrainingHistory(APIView):
                     iaTraining = IaStatistics.objects.get(trainingId=training)
                     logger.debug(f"IA training data: {iaTraining}")
 
-                    states = []
-                    iaStates = IaState.objects.filter(iaStatisticsId=iaTraining)
-                    logger.debug(f"IA states found: {len(iaStates)}")
-
-                    for state in iaStates:
-                        logger.debug(f"Processing IA state: {state.stage}")
-                        states.append({
-                            "state": state.stage,
-                            "action1": state.action1,
-                            "action2": state.action2,
-                            "action3": state.action3,
-                        })
-
-                    iaTrainings.append({
-                        "win": iaTraining.win,
-                        "accuracy": iaTraining.accuracy,
-                        "totalPoints": iaTraining.totalPoints,
-                        "playerPerformance": iaTraining.playerPerformance,
-                        "correctBlocks": iaTraining.correctBlocks,
-                        "totalBlocks": iaTraining.totalBlocks,
-                        "states": states
-                    })
+                    iaTrainings.append({ "win": iaTraining.win })
                     
                     iaTrainingMatchs += 1
                     if iaTraining.win:
                         iaTrainingWin += 1
 
-                trainingResponse.append({
+                trainingResponse.append({ 
                     "id": training.id,
                     "PlayerTraining": playerTrainings,
-                    "playerTrainingMatchs": playerTrainingMatchs,
-                    "playerTrainingWin": playerTrainingWin,
                     "IaTraining": iaTrainings,
-                    "iaTrainingMatchs": iaTrainingMatchs,
-                    "iaTrainingWin": iaTrainingWin,
                 })
                 logger.info(f"Training response prepared: {trainingResponse}")
             return Response({
                 "status": 200,
-                "training": trainingResponse
+                "training": trainingResponse,
+                "playerTrainingMatchs": playerTrainingMatchs,
+                "playerTrainingWin": playerTrainingWin,
+                "iaTrainingMatchs": iaTrainingMatchs,
+                "iaTrainingWin": iaTrainingWin,
             })
         except Player.DoesNotExist:
             logger.error("Player not found.")
@@ -568,37 +540,14 @@ class TrainingHistory(APIView):
             trainingPlayer = TrainingPlayer.objects.create(
                 trainingId=training,
                 win=trainingData["PlayerTraining"]["win"],
-                accuracy=trainingData["PlayerTraining"]["accuracy"],
-                totalPoints=trainingData["PlayerTraining"]["totalPoints"],
-                playerPerformance=trainingData["PlayerTraining"]["playerPerformance"],
-                correctBlocks=trainingData["PlayerTraining"]["correctBlocks"],
-                totalBlocks=trainingData["PlayerTraining"]["totalBlocks"],
             )
             logger.info(f"TrainingPlayer created: {trainingPlayer}")
 
             iaStatistics = IaStatistics.objects.create(
                 trainingId=training,
                 win=trainingData["IaTraining"]["win"],
-                accuracy=trainingData["IaTraining"]["accuracy"],
-                totalPoints=trainingData["IaTraining"]["totalPoints"],
-                playerPerformance=trainingData["IaTraining"]["playerPerformance"],
-                correctBlocks=trainingData["IaTraining"]["correctBlocks"],
-                totalBlocks=trainingData["IaTraining"]["totalBlocks"],
             )
             logger.info(f"IaStatistics created: {iaStatistics}")
-
-            for state in trainingData["IaTraining"]["states"]:
-                try:
-                    iaState = IaState.objects.create(
-                        iaStatisticsId=iaStatistics,
-                        stage=state["state"],
-                        action1=state["action1"],
-                        action2=state["action2"],
-                        action3=state["action3"],
-                    )
-                    logger.info(f"IaState created for state '{state['state']}': {iaState}")
-                except Exception as e:
-                    logger.exception(f"Failed to create IaState for state '{state['state']}': {e}")
 
             logger.info(f"Training session {training.id} successfully created.")
             return Response({
@@ -638,7 +587,7 @@ class ListAllUser(APIView):
                 listPlayer = Player.objects.exclude(id=playerExclude.first().id)
             else:
                 listPlayer = Player.objects.all()
-            
+
             serializer = PlayerInfoSerializer(listPlayer, many=True)
             return Response(serializer.data)
 
