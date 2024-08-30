@@ -22,8 +22,32 @@ export class AI {
   }
 
   setDifficultyParameters() {
-    // Configurações baseadas na dificuldade
-    // ... (mesma lógica anterior)
+    if (this.difficulty >= 5) {
+      this.ignoreBallChance = 0.1; // IA ignora a bola apenas 10% do tempo (difícil)
+      this.predictionError = 30; // Menor erro de previsão
+      this.reactionDelay = 400; // Menor atraso na reação
+      this.movementRandomness = 5; // Menor variância aleatória
+    } else if (this.difficulty >= 4) {
+      this.ignoreBallChance = 0.3;
+      this.predictionError = 40;
+      this.reactionDelay = 500;
+      this.movementRandomness = 8;
+    } else if (this.difficulty >= 3) {
+      this.ignoreBallChance = 0.5;
+      this.predictionError = 50;
+      this.reactionDelay = 600;
+      this.movementRandomness = 10;
+    } else if (this.difficulty >= 2) {
+      this.ignoreBallChance = 0.7;
+      this.predictionError = 60;
+      this.reactionDelay = 700;
+      this.movementRandomness = 12;
+    } else {
+      this.ignoreBallChance = 0.9; // IA ignora a bola 90% do tempo (muito fácil)
+      this.predictionError = 70; // Grande erro de previsão
+      this.reactionDelay = 800; // Grande atraso na reação
+      this.movementRandomness = 15; // Maior variância aleatória
+    }
   }
 
   update(ball, paddle, canvasHeight, computerWins, playerWins) {
