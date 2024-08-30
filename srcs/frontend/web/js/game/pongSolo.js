@@ -137,50 +137,55 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 
         if (scoreComputer === 7) {
           // computerWins += 1;
           fetch(`https://${window.ft_transcendence_host}/player/training/`, {
-            method: 'POST',
+            method: "POST",
             headers: {
-             'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
-            body: JSON.stringify({ 
-              'training': {
-                'PlayerTraining': {
-                  'win': false
+            body: JSON.stringify({
+              training: {
+                PlayerTraining: {
+                  win: false,
                 },
-                'IaTraining': {
-                  'win': true
+                IaTraining: {
+                  win: true,
                 },
-              }
+              },
             }),
-          })
+          });
 
           await playSound(gameOverSound);
         } else if (scorePlayer === 7) {
           // playerWins += 1;
-          
+
           fetch(`https://${window.ft_transcendence_host}/player/training/`, {
-            method: 'POST',
+            method: "POST",
             headers: {
-             'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
-            body: JSON.stringify({ 
-              'training': {
-                'PlayerTraining': {
-                  'win': true
+            body: JSON.stringify({
+              training: {
+                PlayerTraining: {
+                  win: true,
                 },
-                'IaTraining': {
-                  'win': false
+                IaTraining: {
+                  win: false,
                 },
-              }
+              },
             }),
-          })
+          });
 
           await playSound(winGameSound);
         }
       } catch (error) {
         console.error("Erro ao reproduzir som:", error);
       }
+
+      // Reinicie o jogo sem recarregar a página
+      scorePlayer = 0;
+      scoreComputer = 0;
       localStorage.clear();
-      window.location.reload();
+      // Reinicia o loop do jogo
+      loopIdSolo = requestAnimationFrame(gameLoop);
       return true;
     }
     return false;
