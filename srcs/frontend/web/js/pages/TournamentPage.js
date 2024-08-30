@@ -75,6 +75,7 @@ const TournamentPage = () => {
 
     fetching(`https://${window.ft_transcendence_host}/tournament/`).then((data) => {
       if (!data || data.status !== "FN") {
+        console.log("aqui")
         TournamentCard(data.currentTournament);
         createBtn.addEventListener("click", () => {
           const tournament_popup = document.createElement("tournament-popup");

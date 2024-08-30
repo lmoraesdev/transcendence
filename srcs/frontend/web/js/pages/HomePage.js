@@ -78,7 +78,7 @@ const HomePage = () => {
         const buttonDiv = document.createElement('div');
         buttonDiv.className = 'd-flex mx-2 my-auto mt-2';
         const addButton = document.createElement('button');
-        addButton.className = 'btn btn-primary';
+        addButton.className = 'btn btn-primary fw-bold';
         addButton.textContent = 'Add';
         addButton.dataset.playerId = player.id;
         addButton.setAttribute('aria-label', `Add ${player.username} as a friend`);
@@ -137,24 +137,23 @@ const HomePage = () => {
   
   const buttonsContainer = parentElement.querySelector('.home-content-buttons');
 
-  // Vou ajustar o link correto dos botões abaixo
   const buttonSolo = ButtonHome({
     label: 'Solo',
-    customClasses: ['btn-light', 'shadow', 'text-dark', 'bg-body', 'rounded', 'p-4', 'mb-4'],
+    customClasses: ['btn-custom', 'fw-bold', 'shadow', 'text-white', 'bg-body', 'rounded', 'p-4', 'mb-4'],
     link: "/game?mode=solo",
   });
   buttonSolo.setAttribute('aria-label', 'Start a solo game');
 
   const buttonMultiplayer = ButtonHome({
     label: 'Multiplayer',
-    customClasses: ['btn-light', 'shadow', 'text-dark', 'bg-body', 'rounded', 'p-4', 'mb-4'],
+    customClasses: ['btn-custom', 'fw-bold', 'shadow', 'text-white', 'bg-body', 'rounded', 'p-4', 'mb-4'],
     link: "/game?mode=two",
   });
   buttonMultiplayer.setAttribute('aria-label', 'Start a multiplayer game');
 
   const buttonTournamente = ButtonHome({
     label: 'Tournament',
-    customClasses: ['btn-light', 'shadow', 'text-dark', 'bg-body', 'rounded', 'p-4', 'mb-4'],
+    customClasses: ['btn-custom', 'fw-bold', 'shadow', 'text-white', 'bg-body', 'rounded', 'p-4', 'mb-4'],
     link: "/tournaments",
   });
   buttonTournamente.setAttribute('aria-label', 'View tournaments');
