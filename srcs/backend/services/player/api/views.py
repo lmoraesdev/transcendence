@@ -486,16 +486,16 @@ class TrainingHistory(APIView):
                 trainingResponse.append({ 
                     "id": training.id,
                     "PlayerTraining": playerTrainings,
-                    "playerTrainingMatchs": playerTrainingMatchs,
-                    "playerTrainingWin": playerTrainingWin,
                     "IaTraining": iaTrainings,
-                    "iaTrainingMatchs": iaTrainingMatchs,
-                    "iaTrainingWin": iaTrainingWin,
                 })
                 logger.info(f"Training response prepared: {trainingResponse}")
             return Response({
                 "status": 200,
-                "training": trainingResponse
+                "training": trainingResponse,
+                "playerTrainingMatchs": playerTrainingMatchs,
+                "playerTrainingWin": playerTrainingWin,
+                "iaTrainingMatchs": iaTrainingMatchs,
+                "iaTrainingWin": iaTrainingWin,
             })
         except Player.DoesNotExist:
             logger.error("Player not found.")

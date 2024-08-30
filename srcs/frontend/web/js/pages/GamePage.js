@@ -173,6 +173,8 @@ const GamePage = () => {
       if (gamePaused) {
         const idSolo = localStorage.getItem("loopIdSolo");
         window.cancelAnimationFrame(idSolo);
+      } else {
+        //precisa despausar
       }
     }
   });
