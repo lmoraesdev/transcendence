@@ -6,3 +6,12 @@ img#avatar-home {
   width: 100px;
   height: 100px;
 }
+
+button.btn-custom {
+  background: linear-gradient(135deg, #F1BE0B, #604b03);
+  border: none;
+}
+
+button.btn-custom:hover {
+  background: linear-gradient(135deg, #DFA50A, #967407);
+}

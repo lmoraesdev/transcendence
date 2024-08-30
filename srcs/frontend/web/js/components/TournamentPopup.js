@@ -1,33 +1,43 @@
 import fetching from "../helpers/fetching.js";
+import helpers from '../helpers/helpers.js';
 
-const TournamentPopup = () => {
+const { setFocus } = helpers;
+
+const TournamentPopup = async (actionType, data) => {
   const tournamentPopupHTML = `
     <template id="tournament-popup">
-      <div class="d-flex flex-column justify-content-center align-items-center rounded-5 gap-5 p-5">
-        <button class="popup-close btn-close btn-close-white align-self-end"></button>
-        <h1 class="popup-header fw-bold"></h1>
-        <div class="alias-name d-flex flex-column justify-content-center align-items-center">
-          <h4>Your alias name</h4>
-          <input type="text" class="popup-input rounded-5 px-2" required>
-        </div>
-        <div class="tournament-name d-flex flex-column justify-content-center align-items-center">
-          <h4>Name of tournament</h4>
-          <input type="text" class="popup-input rounded-5 px-2" required>
-        </div>
-        <h2 class="popup-tournament-name p-3 rounded-5"></h2>
-        <button class="popup-btn btn"></button>
-      </div>
-    </template>  
+      <section class="bg-white text-black d-flex flex-column justify-content-center align-items-center rounded-3 gap-5 p-5" role="dialog" aria-labelledby="popup-header" aria-modal="true">
+        <header class="d-flex justify-content-end w-100">
+          <button class="popup-close btn-close btn-close-black" aria-label="Close"></button>
+        </header>
+        <h4 id="popup-header" class="popup-header fw-bold text-center"></h4>
+        <form class="w-100 d-flex flex-column gap-4" aria-describedby="popup-description">
+          <p id="popup-description" class="popup-description mb-0"></p>
+          <div class="input-group tournament-name">
+            <input
+              required
+              type="text"
+              class="popup-input form-control"
+              placeholder="Enter a name for the tournament"
+              aria-label="Tournament name" 
+              aria-describedby="tournament-name-description"
+            >
+          </div>
+          <h2 id="tournament-name-description" class="popup-tournament-name p-3 rounded-5 text-center"></h2>
+          <button type="submit" class="popup-btn btn btn-custom text-white fw-bold" aria-label="Submit form"></button>
+        </form>
+      </section>
+    </template>
   `;
 
-  const tournamentPopup = document.querySelector('#tournament-popup');
-  if (!tournamentPopup) {
-    const templateContainer = document.createElement('div');
+  if (!document.querySelector("#tournament-popup")) {
+    const templateContainer = document.createElement("div");
     templateContainer.innerHTML = tournamentPopupHTML;
     document.body.appendChild(templateContainer);
   }
 
-  const template  = document.getElementById("tournament-popup");
+  const tournamentPopup = document.createElement("tournament-popup");
+  const template = document.getElementById("tournament-popup");
   const component = template.content.cloneNode(true);
 
   tournamentPopup.appendChild(component);
@@ -37,70 +47,103 @@ const TournamentPopup = () => {
     "justify-content-center",
     "align-items-center",
     "gap-2",
+    "h-100",
+    "w-100",
+    "position-fixed",
+    "top-0",
+    "end-0"
   );
+
+  document.body.appendChild(tournamentPopup);
 
   const close_button = tournamentPopup.querySelector(".popup-close");
   const popup_header = tournamentPopup.querySelector(".popup-header");
-  const popup_input_alias_name = tournamentPopup.querySelector(".alias-name .popup-input");
+  const popup_description = tournamentPopup.querySelector(".popup-description");
   const popup_input_tournament_name = tournamentPopup.querySelector(".tournament-name .popup-input");
   const popup_tournament_name = tournamentPopup.querySelector(".popup-tournament-name");
   const popup_btn = tournamentPopup.querySelector(".popup-btn");
 
-  const popup_type = tournamentPopup.attributes["popup-type"].value;
-  const tournament_name = tournamentPopup.attributes["tournament-name"].value;
-  const tournament_id = tournamentPopup.attributes["tournament-id"].value;
-
   close_button.addEventListener("click", (event) => {
     event.preventDefault();
     tournamentPopup.parentElement.removeChild(tournamentPopup);
+    setFocus(document.body, "Popup closed");
   });
 
-  if (popup_type === "CREATE") {
+  let id;
+  try {
+    const response = await fetch(`https://${window.ft_transcendence_host}/player/`);
+    const players = await response.json();
+    id = players.player.id;
+  } catch (error) {
+    throw new Error("Error getting player id");
+  }
+
+  if (actionType === "CREATE") {
     popup_header.textContent = "Create Tournament";
+    popup_description.textContent = "Fill in the field to create a new tournament.";
     popup_tournament_name.style.display = "none";
     popup_btn.textContent = "Create";
+
+    setFocus(popup_input_tournament_name, "Create Tournament Popup opened. Please enter a tournament name.");
+
+    popup_btn.addEventListener("click", async (event) => {
+      event.preventDefault();
+
+      const payload = JSON.stringify({
+        action: "create",
+        name: data.currentTournament.name,
+        id: id,
+      });
+
+      fetching(
+        `https://${window.ft_transcendence_host}/tournament/`,
+        "POST",
+        payload,
+        { "Content-Type": "application/json" }
+      )
+        .then((data) => {
+          if (data.statusCode === 200) {
+            window.location.reload();
+          } else {
+            alert(data.message);
+          }
+        })
+        .catch((error) => {
+          console.error("Error during fetch for CREATE:", error);
+        });
+    });
+
+  } else if (actionType === "JOIN") {
+    popup_header.textContent = "Join Tournament";
+    popup_description.textContent = "To confirm your participation in the tournament below, click on the button:";
+    popup_input_tournament_name.style.display = "none";
+    popup_tournament_name.textContent = data.currentTournament.name;
+    popup_btn.textContent = "Join";
+
     popup_btn.addEventListener("click", (event) => {
       event.preventDefault();
+      const payload = JSON.stringify({
+        action: "join",
+        tournamentId: data.currentTournament.id,
+        id: id,
+      });
+
       fetching(
         `https://${window.ft_transcendence_host}/tournament/`,
         "POST",
-        JSON.stringify({
-          action: "create",
-          alias_name: popup_input_alias_name.value,
-          tournament_name: popup_input_tournament_name.value,
-          tournament_id: tournament_id,
-        }),
-        {
-          "Content-Type": "application/json",
-        },
-      ).then((data) => {
-        console.log("status code", data.statusCode);
-        if (data.statusCode === 200) window.location.reload();
-        else alert(data.message);
-      });
-    });
-  } else if (popup_type === "JOIN") {
-    popup_header.textContent = "Join Tournament";
-    popup_input_tournament_name.style.display = "none";
-    popup_tournament_name.textContent = tournament_name;
-    popup_btn.textContent = "Join";
-    popup_btn.addEventListener("click", (event) => {
-      fetching(
-        `https://${window.ft_transcendence_host}/tournament/`,
-        "POST",
-        JSON.stringify({
-          action: "join",
-          alias_name: popup_input_alias_name.value,
-          tournament_id: tournament_id,
-        }),
-        {
-          "Content-Type": "application/json",
-        },
-      ).then((data) => {
-        console.log("status code", data.statusCode);
-        if (data.statusCode === 200) window.location.reload();
-        else alert(data.message);
-      });
+        payload,
+        { "Content-Type": "application/json" }
+      )
+        .then((data) => {
+          if (data.statusCode === 200) {
+            window.location.reload();
+          } else {
+            alert(data.message);
+          }
+        })
+        .catch((error) => {
+          console.error("Error during fetch for JOIN:", error);
+        });
     });
   }
 };

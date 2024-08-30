@@ -2,122 +2,185 @@ import fetching from "../helpers/fetching.js";
 import router from "../router/router.js";
 import TournamentPlayers from "../components/TournamentPlayers.js";
 import TournamentMatches from "../components/TournamentMatches.js";
+import TournamentPopup from "../components/TournamentPopup.js";
+import TournamentCard from "../components/TournamentCard.js";
+import TournamentPlayerCard from "../components/TournamentPlayerCard.js";
+import helpers from '../helpers/helpers.js';
+
+const { truncateUsername, setFocus  } = helpers;
 
 const TournamentPage = () => {
   const tournamentHTML = `
     <template id="tournament-template">
       <main class="text-black bg-white container-fluid d-flex justify-content-around align-items-stretch gap-3 h-100">
-        <section class="tournament-actions d-none col justify-content-center align-items-center py-5 px-4 gap-5">
-          <div class="tournament-create border-end border-light-subtle d-flex flex-column justify-content-center p-4 gap-4">
+        <section class="tournament-actions flex-column justify-content-center align-items-center py-5 px-4 gap-5">
+          <div class="tournament-create d-flex flex-column justify-content-center p-4 gap-4">
             <header class="text-center">
-              <h1 class="text-center fw-bold m-0">Create a new tournament</h1>
-            </header>
-            <p class="">Fill in the field to create a new tournament.</p>
-            <div class="input-group">
-              <input 
-                type="text" 
-                class="tournament_name form-control" 
-                placeholder="Enter a name for the tournament" 
-                aria-label="tournament name" aria-describedby="basic-addon1"
-              >
-            </div>
-            <div class="d-grid gap-2">
-              <button id="createTournamentBtn" class="btn btn-primary fw-bold" type="button" disabled>
+              <h3 class="text-center m-0">Create a new tournament</h3>
+            </header>            
+            <div class="d-grid col-12 gap-2 justify-content-center">
+              <p>To create a new tournament click on the button below, create</p>
+              <button id="createTournamentBtn" class="btn btn-custom text-white fw-bold" type="button">
                 Create
               </button>
             </div>
           </div>
-          
           <div class="tournament-join d-flex flex-column justify-content-center align-items-center p-4 gap-4">
-            <h1 class="text-center fw-bold m-0">Join a tournament</h1>
+            <header class="text-center">
+              <h3 class="text-center m-0">Join a Tournament</h3>
+            </header>             
             <div class="tournament-list d-flex flex-wrap justify-content-center align-items-center gap-1"></div>
           </div>
+          <div id="tournament-container"></div>
         </section>
-        <section class="tournament-current d-none col p-5 rounded-5">
-          <h1 class="text-center fw-bold rounded-5 py-5 mb-5">Current Tournament</h1>
-          <tournament-players></tournament-players>
-          <tournament-matches></tournament-matches>
+
+        <section class="tournament-current d-none flex-column p-5 rounded-5">
+          <header class="text-center">
+            <h3 class="text-center m-0">Current Tournament</h3>
+          </header>            
+          <div id="tournament-player"></div>
+          <div id="tournament-matches"></div>
         </section>
       </main>
-    </template>
+    </template>  
   `;
 
-  const templateContainer = document.createElement('div');
+  const ensureTemplateExists = () => {
+    return new Promise((resolve) => {
+      if (!document.querySelector('#tournament-template')) {
+        const templateContainer = document.createElement('div');
+        templateContainer.innerHTML = tournamentHTML;
+        document.body.appendChild(templateContainer);
+      }
+      requestAnimationFrame(() => resolve());
+    });
+  };
 
-  if (!document.querySelector('#tournament-template')) {
-    templateContainer.innerHTML = tournamentHTML;
-    document.body.appendChild(templateContainer);
-  }
+  ensureTemplateExists().then(() => {
+    const template = document.getElementById("tournament-template");
+    const component = template.content.cloneNode(true);
+    const parentElement = document.querySelector('#main');
 
-  const template = document.getElementById("tournament-template");
-  const component = template.content.cloneNode(true);
-  const parentElement = document.getElementById("main");
+    parentElement.innerHTML = "";
+    parentElement.appendChild(component);
 
-  parentElement.innerHTML = "";
-  parentElement.appendChild(component);
+    const tournamentActions = parentElement.querySelector(".tournament-actions");
+    const tournamentCurrent = parentElement.querySelector(".tournament-current");
+    const tournamentPlayers = tournamentCurrent.querySelector("#tournament-player");
+    const tournamentPlayersStart = tournamentPlayers.querySelector(".start");
+    const tournamentPlayersLeave = tournamentPlayers.querySelector(".leave");
+    const tournamentMatches = tournamentCurrent.querySelector(".tournament-matches");  
+    const createBtn = tournamentActions.querySelector(".tournament-create button");
+    const tournamentList = document.querySelector(".tournament-list");
 
-  const tournament_actions = parentElement.querySelector(".tournament-actions");
-  const create_btn = tournament_actions.querySelector("#createTournamentBtn");
-  const tournament_list = parentElement.querySelector(".tournament-list");
-  const input_name = parentElement.querySelector(".tournament_name");
 
-  input_name.addEventListener("input", () => {
-    create_btn.disabled = input_name.value.trim() === '';
-  });
+    fetching(`https://${window.ft_transcendence_host}/tournament/`).then((data) => {
+      if (!data.currentTournament || data.currentTournament.status === "FN") {
+        console.log("aqui")
+        createBtn.addEventListener("click", () => {
+          const tournament_popup = document.createElement("tournament-popup");
+          tournament_popup.setAttribute("popup-type", "CREATE");
+          tournament_popup.setAttribute("tournament-name", null);
+          parentElement.appendChild(tournament_popup);
+          TournamentPopup("CREATE", data);
+        });
+      } else {
+        TournamentCard(data.currentTournament);
+        tournamentList.textContent = "No tournaments available";
+      }
 
-  create_btn.addEventListener("click", async () => {
-    const response = await fetch(`https://${window.ft_transcendence_host}/player/`);
-    const players = await response.json();
-    console.log(players.player.id);
-    if (input_name.value.trim()) {
-      const res = await fetch(`https://${window.ft_transcendence_host}/tournament/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: 'create',
-          name: input_name.value.trim(),
-          id: players.player.id
-        }),
-        credentials: 'include'
-      })
-    } else {
-      throw new Error('Error creating tournament');
-    }
-  });
-
-  fetching(`https://${window.ft_transcendence_host}/tournament/`).then((data) => {
-    if (!data.current_tournament || data.current_tournament.status === "FN") {
-      tournament_actions.classList.remove("d-none");
-      tournament_actions.classList.add("d-flex");
-
-      if (data.tournaments) {
-        for (const tournament of data.tournaments) {
-          const tournament_card = document.createElement("tournament-card");
-          tournament_card.setAttribute("tournament-name", tournament.name);
-          tournament_card.setAttribute("size", tournament.players_count);
-          tournament_list.append(tournament_card);
-          tournament_card.addEventListener("click", () => {
-            const tournament_popup = document.createElement("tournament-popup");
-            tournament_popup.setAttribute("popup-type", "JOIN");
-            tournament_popup.setAttribute("tournament-id", tournament.id);
-            tournament_popup.setAttribute("tournament-name", tournament.name);
-            parentElement.append(tournament_popup);
-            tournament_popup.classList.add("d-flex");
-            tournament_popup.classList.remove("d-none");
+      if (data.currentTournament.status === "PD") {
+        TournamentPlayers();
+        TournamentMatches();
+        const cardContainer = document.querySelector("#tournament-container");
+        const tournamentCard = cardContainer.querySelector(".card");
+        if (tournamentCard) {
+          tournamentCard.addEventListener("click", () => {
+            const tournamentPopup = document.createElement("tournament-popup");
+            tournamentPopup.setAttribute("popup-type", "JOIN");
+            tournamentPopup.setAttribute("tournament-id", data.id);
+            tournamentPopup.setAttribute("tournament-name", data.name);
+            parentElement.append(tournamentPopup);
+            TournamentPopup("JOIN", data);
           });
         }
       }
-    } else {
-      tournament_actions.classList.add("d-none");
-      tournament_actions.classList.remove("d-flex");
-    }
+
+      if (data.currentTournament) {
+        tournamentCurrent.classList.remove("d-none");
+        tournamentActions.classList.add("border-start");
+        tournamentActions.classList.add("border-light-subtle");
+        tournamentCurrent.classList.add("d-flex");
+        if (data.currentTournament.status === "PD") {
+          tournamentPlayers.classList.remove("d-none");
+          tournamentPlayers.classList.remove("d-flex");
+          for (const player of data.players) {
+            const playerElement = document.createElement("tournament-player-card");
+            const tournamentPlayerCard = document.querySelector('.tournament-player-card');
+            tournamentPlayerCard.querySelector(".avatar-card").src = player.avatar ? player.avatar : "/web/images/profile.png";
+            tournamentPlayerCard.querySelector(".alias-name").textContent = truncateUsername(player.username);
+            playerElement.setAttribute("status", "PD");
+            TournamentPlayerCard();
+          }
+        }
+        if (data.currentTournament.creator === true) {
+          tournamentPlayersStart.classList.remove("d-none");
+          tournamentPlayersStart.classList.add("d-block");
+        }
+        tournamentPlayersStart.addEventListener("click", () => {
+          fetching(
+            `https://${window.ft_transcendence_host}/tournament/`,
+            "POST",
+            JSON.stringify({ action: "start", tournamentId: data.currentTournament.id }),
+            { "Content-Type": "application/json" },
+          ).then((data) => {
+            if (data.status === 200) {
+              window.location.reload(); //REMOVE
+            } else {
+              alert(data.message);
+            }
+          });
+        });
+        tournamentPlayersLeave.addEventListener("click", () => {
+          fetching(
+            `https://${window.ft_transcendence_host}/tournament/`,
+            "POST",
+            JSON.stringify({ action: "leave", tournamentId: data.currentTournament.id }),
+            { "Content-Type": "application/json" },
+          ).then((data) => {
+            window.location.reload(); //REMOVE
+          });
+        });
+      } else {
+        tournamentMatches.classList.remove("d-none");
+        tournamentMatches.classList.add("d-flex");
+        const matchElements = parentElement.querySelectorAll("tournament-match-card");
+        for (let i = 0; i < 7; ++i) {
+          const match = data.currentTournament.matches[i];
+          const matchElement = matchElements[i];
+          if (match) {
+            matchElement.setAttribute("match-id", match.id);
+            if (match.current) {
+              matchElement.querySelector("button").classList.remove("d-none");
+            }
+            for (let j = 0; j < 2; ++j) {
+              const player = match.players[j];
+              const playerElement = matchElement.querySelector(`.player${j + 1}`);
+              playerElement.querySelector("h6").textContent = player.players.username;
+              playerElement.querySelector("img").src = player.players.avatar;
+              if (match.currentTournament.state === "PL")
+                playerElement.querySelector("h3").textContent = player.score;
+            }
+          }
+        }
+      }
+
+    });
+    
+  }).catch((error) => {
+    console.error('Error ensuring template was created:', error);
   });
-
-  TournamentPlayers();
-  TournamentMatches();
-
 };
 
 export default TournamentPage;
+
