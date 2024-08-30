@@ -1,6 +1,7 @@
 import fetching from "../helpers/fetching.js";
 import router from "../router/router.js";
-import TournamentPlayers from "../components/TournamentPlayers.js"
+import TournamentPlayers from "../components/TournamentPlayers.js";
+import TournamentMatches from "../components/TournamentMatches.js";
 
 const TournamentPage = () => {
   const tournamentHTML = `
@@ -67,7 +68,7 @@ const TournamentPage = () => {
   create_btn.addEventListener("click", async () => {
     const response = await fetch(`https://${window.ft_transcendence_host}/player/`);
     const players = await response.json();
-
+    console.log(players.player.id);
     if (input_name.value.trim()) {
       const res = await fetch(`https://${window.ft_transcendence_host}/tournament/`, {
         method: 'POST',
@@ -77,7 +78,7 @@ const TournamentPage = () => {
         body: JSON.stringify({
           action: 'create',
           name: input_name.value.trim(),
-          id: players.id
+          id: players.player.id
         }),
         credentials: 'include'
       })
@@ -115,6 +116,7 @@ const TournamentPage = () => {
   });
 
   TournamentPlayers();
+  TournamentMatches();
 
 };
 

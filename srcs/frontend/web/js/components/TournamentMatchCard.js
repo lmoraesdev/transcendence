@@ -1,5 +1,5 @@
 import router from "../router/router.js";
-
+import TournamentPlayerCard from "../components/TournamentPlayerCard.js";
 const TournamentMatchCard = () => {
 
   const tournamentMatchCardHTML = `
@@ -21,7 +21,7 @@ const TournamentMatchCard = () => {
   const template = document.getElementById("tournament-match-card");
   const component = template.content.cloneNode(true);
 
-  const tournamentMatchCard = document.querySelector('#tournamentMatchCard');
+  const tournamentMatchCard = document.querySelector('tournament-match-card');
   tournamentMatchCard.appendChild(component);
   tournamentMatchCard.classList.add(
     "d-flex",
