@@ -1,15 +1,15 @@
 import router from "../router/router.js";
-import TournamentPlayerCard from "../components/TournamentPlayerCard.js";
+import TournamentPlayerCard from "./TournamentPlayerCard.js";
 
 const TournamentMatchCard = () => {
 
   const tournamentMatchCardHTML = `
     <template id="tournament-match-card">
       <div class="d-flex justify-content-center align-items-center flex-wrap gap-3">
-        <tournament-player-card class="player1"></tournament-player-card>
-        <tournament-player-card class="player2"></tournament-player-card>
+        <div class="tournament-player-card player1"></div>
+        <div class="tournament-player-card player2"></div>
       </div>
-      <button class="d-none btn">Play</button>
+      <button class="btn">Play</button>
     </template>
   `;
 
@@ -22,7 +22,7 @@ const TournamentMatchCard = () => {
   const template = document.getElementById("tournament-match-card");
   const component = template.content.cloneNode(true);
 
-  const tournamentMatchCard = document.querySelector('tournament-match-card');
+  const tournamentMatchCard = document.querySelector('.tournament-match-card');
   tournamentMatchCard.appendChild(component);
   tournamentMatchCard.classList.add(
     "d-flex",
@@ -36,9 +36,10 @@ const TournamentMatchCard = () => {
 
   const btn = tournamentMatchCard.querySelector("button");
   btn.addEventListener("click", () => {
+
     router.go("/game/", `?game=PG&mode=two&match=${tournamentMatchCard.getAttribute("match-id")}`, false);
   });
-  //TournamentPlayerCard();
+  TournamentPlayerCard();
 };
 
 export default TournamentMatchCard;

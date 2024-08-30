@@ -18,7 +18,7 @@ const truncateUsername = (username) => {
   const maxLength = 10;
   
   if (username.length > maxLength) {
-    return username.slice(0, maxLength - 3) + '...';
+    return username.slice(0, maxLength - 3) + '.';
   }
   
   return username;
@@ -54,20 +54,10 @@ const animateSVGElements = (selector) => {
   });
 };
 
-// Função para criar elementos de forma segura, uma prevenção de XSS em strings HTML
-// utilizar este ao inves de createTemplate
-const createSafeElement = (html) => {
-  const div = document.createElement('div');
-  div.textContent = html;
-  return div.innerHTML;
-}
-
-
 export default {
   getRandom,
   createTemplate,
   animateSVGElements,
-  createSafeElement,
   truncateUsername,
   setFocus
 };

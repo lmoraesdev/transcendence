@@ -1,41 +1,31 @@
-import TournamentMatchCard from "../components/TournamentMatchCard.js";
+import TournamentMatchCard from "./TournamentMatchCard.js";
 
 const TournamentMatches = () => {
-  const tournamentMatchesHTML = `
-    <template id="tournament-matches">
+  const container = document.getElementById('tournament-matches');
+  container.innerHTML = '';
+
+  const template = document.createElement('div');
+  template.className = 'tournament-match';
+
+  template.innerHTML = `
+    <div class="match">
       <section class="tournament-quarterfinal d-flex flex-column justify-content-around align-items-center gap-3">
-        <tournament-match-card></tournament-match-card>
-        <tournament-match-card></tournament-match-card>
-        <tournament-match-card></tournament-match-card>
-        <tournament-match-card></tournament-match-card>
+        <div class="tournament-match-card"></div>
+        <div class="tournament-match-card"></div>
+        <div class="tournament-match-card"></div>
+        <div class="tournament-match-card"></div>
       </section>
       <section class="tournament-semifinal d-flex flex-column justify-content-around align-items-center gap-3">
-        <tournament-match-card></tournament-match-card>
-        <tournament-match-card></tournament-match-card>
+        <div class="tournament-match-card"></div>
+        <div class="tournament-match-card"></div>
       </section>
       <section class="tournament-final d-flex flex-column justify-content-around align-items-center gap-3">
-        <tournament-match-card></tournament-match-card>
+        <div class="tournament-match-card"></div>
       </section>
-    </template>  
+    </div>  
   `;
 
-  if (!document.querySelector('#tournament-matches')) {
-    const templateContainer = document.createElement('div');
-    templateContainer.innerHTML = tournamentMatchesHTML;
-    document.body.appendChild(templateContainer);
-  }
-      
-  const template = document.getElementById("tournament-matches");
-  const component = template.content.cloneNode(true);
-
-  const tournamentMatches = document.querySelector('tournament-matches');
-  tournamentMatches.appendChild(component);
-  tournamentMatches.classList.add(
-    "d-none", 
-    "justify-content-center", 
-    "gap-1"
-  );
-
+  container.appendChild(template);
   TournamentMatchCard();
 };
 
