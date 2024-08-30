@@ -1,4 +1,3 @@
-import GameModalityPage from '../pages/GameModalityPage.js';
 import GamePage from '../pages/GamePage.js';
 import StatisticsPage from '../pages/StatisticsPage.js';
 import LoginPage from '../pages/LoginPage.js';
@@ -7,7 +6,7 @@ import ProfilePage from '../pages/ProfilePage.js';
 import ProfileSetup from '../pages/ProfileSetup.js'
 import SettingPage from '../pages/SettingPage.js';
 import TournamentPage from '../pages/TournamentPage.js';
-import CreateTournamentPage from '../pages/CreateTournamentPage.js';
+import TournamentUserRegistration from '../pages/TournamentUserRegistration.js';
 import TwofaPage from '../pages/TwofaPage.js';
 
 import { wsTwo } from "../game/pongTwo.js";
@@ -21,13 +20,12 @@ const routes = {
   "/twofa/": hideNav(TwofaPage),
   "/home/": showNav(HomePage),
   "/game/": hideNav(GamePage),
-  "/game-modality/": showNav(GameModalityPage),
   "/statistics/": showNav(StatisticsPage),
   "/profile/": showNav(ProfilePage),
   "/profile-setup/": showNav(ProfileSetup),
   "/settings/": showNav(SettingPage),
   "/tournaments/": showNav(TournamentPage),
-  "/create-tournament/": showNav(CreateTournamentPage),
+  "/tournament-registration/": showNav(TournamentUserRegistration),
 }
 
 const router = {

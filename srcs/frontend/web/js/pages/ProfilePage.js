@@ -33,13 +33,29 @@ const ProfilePage = () => {
               <h3 id="champions-title" class="m-0 p-3 fw-bold">Champions</h3>
               <p class="champions m-0 p-3 text-center fw-bold rounded-5" aria-label="Champions Count"></p>
             </article>
-            <article class="d-flex flex-column justify-content-center rounded-5 p-2" aria-labelledby="wins-title">
-              <h3 id="wins-title" class="m-0 p-3 text-center fw-bold">Wins</h3>
-              <div class="wins m-0 p-3 text-center fw-bold rounded-5" aria-label="Wins Details"></div>
+            <article class="d-flex flex-column justify-content-center rounded-5 p-2" aria-labelledby="training-stats-title">
+              <h3 id="training-stats-title" class="m-0 p-3 fw-bold">Training Statistics</h3>
+              <table id="training-stats" class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Metric</th>
+                    <th>Value</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
             </article>
-            <article class="d-flex flex-column justify-content-center rounded-5 p-2" aria-labelledby="losses-title">
-              <h3 id="losses-title" class="m-0 p-3 text-center fw-bold">Losses</h3>
-              <div class="losses m-0 p-3 text-center fw-bold rounded-5" aria-label="Losses Details"></div>
+            <article class="d-flex flex-column justify-content-center rounded-5 p-2" aria-labelledby="current-stats-title">
+              <h3 id="current-stats-title" class="m-0 p-3 fw-bold">Current Statistics</h3>
+              <table id="current-stats" class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Metric</th>
+                    <th>Value</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
             </article>
           </section>
         </section>
@@ -59,7 +75,6 @@ const ProfilePage = () => {
   `;
 
   const templateProfile = document.createElement('div');
-
   if (!document.querySelector('#profile-template')) {
     templateProfile.innerHTML = profileHTML;
     document.body.appendChild(templateProfile);
@@ -71,7 +86,7 @@ const ProfilePage = () => {
 
   parentElement.innerHTML = "";
   parentElement.appendChild(component);
-  
+
   fetching(`https://${window.ft_transcendence_host}/player/`).then((res) => {
     const playerData = res.player;
 
@@ -80,7 +95,6 @@ const ProfilePage = () => {
 
     parentElement.querySelector(".avatar").src = avatarImg;
     parentElement.querySelector(".avatar").alt = avatarAlt;
-
     parentElement.querySelector(".player-data .username").innerText = playerData.username || "";
     parentElement.querySelector(".player-data .first-name").innerText = playerData.first_name || "";
     parentElement.querySelector(".player-data .last-name").innerText = playerData.last_name || "";
@@ -101,11 +115,63 @@ const ProfilePage = () => {
       <p>Player Losses: ${lossesPlayers}</p>
     `;
 
-    setFocus(parentElement.querySelector(".avatar"));
+    fetching(`https://${window.ft_transcendence_host}/player/training/`).then((trainingRes) => {
+      const trainingData = trainingRes.training;
+
+      const trainingStatsTable = parentElement.querySelector("#training-stats tbody");
+      trainingStatsTable.innerHTML = `
+        <tr>
+          <td>Wins</td>
+          <td>${trainingData.wins || 'N/A'}</td>
+        </tr>
+        <tr>
+          <td>Accuracy</td>
+          <td>${trainingData.accuracy || 'N/A'}</td>
+        </tr>
+        <tr>
+          <td>Total Points</td>
+          <td>${trainingData.totalPoints || 'N/A'}</td>
+        </tr>
+        <tr>
+          <td>Performance</td>
+          <td>${trainingData.performance || 'N/A'}</td>
+        </tr>
+        <tr>
+          <td>Correct Blocks</td>
+          <td>${trainingData.correctBlocks || '0'}</td>
+        </tr>
+        <tr>
+          <td>Total Blocks</td>
+          <td>${trainingData.totalBlocks || '0'}</td>
+        </tr>
+      `;
+
+      const currentStatsTable = parentElement.querySelector("#current-stats tbody");
+      currentStatsTable.innerHTML = `
+        <tr>
+          <td>AI Wins</td>
+          <td>${playerData.wins?.ai || '0'}</td>
+        </tr>
+        <tr>
+          <td>Player Wins</td>
+          <td>${playerData.wins?.players || '0'}</td>
+        </tr>
+        <tr>
+          <td>AI Losses</td>
+          <td>${playerData.losses?.ai || '0'}</td>
+        </tr>
+        <tr>
+          <td>Player Losses</td>
+          <td>${playerData.losses?.players || '0'}</td>
+        </tr>
+      `;
+
+      setFocus(parentElement.querySelector(".avatar"));
+    });
   });
 
   MatchHistory();
-  //FriendsList(); Reparar a quebra da listagem
+  // FriendsList(); Reparar a quebra da listagem
 };
 
 export default ProfilePage;

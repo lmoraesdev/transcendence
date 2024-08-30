@@ -29,9 +29,9 @@ const StatisticsPage = async () => {
           </div>
           <nav class="pagination-container d-flex justify-content-center mt-4" role="navigation" aria-labelledby="pagination-label">
             <h2 id="pagination-label" class="visually-hidden">Pagination controls</h2>
-            <button id="prev-page" class="btn btn-dark mx-2" aria-label="Previous page" disabled>Previous</button>
+            <button id="prev-page" class="btn btn-custom text-white mx-2" aria-label="Previous page" disabled>Previous</button>
             <span id="page-number" class="mx-2" aria-live="polite">Page 1</span>
-            <button id="next-page" class="btn btn-dark mx-2" aria-label="Next page">Next</button>
+            <button id="next-page" class="btn btn-custom text-white mx-2" aria-label="Next page">Next</button>
           </nav>
         </main>
       </section>
