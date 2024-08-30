@@ -29,32 +29,34 @@ const ProfilePage = () => {
           </article>
           <section class="data-section d-flex flex-wrap justify-content-center gap-2 p-2 rounded-5" role="region" aria-labelledby="stats">
             <h2 id="stats" class="visually-hidden">Statistics</h2>
-            <article class="d-flex flex-column justify-content-center rounded-5 p-2" aria-labelledby="champions-title">
-              <h3 id="champions-title" class="m-0 p-3 fw-bold">Champions</h3>
-              <p class="champions m-0 p-3 text-center fw-bold rounded-5" aria-label="Champions Count"></p>
-            </article>
             <article class="d-flex flex-column justify-content-center rounded-5 p-2" aria-labelledby="training-stats-title">
-              <h3 id="training-stats-title" class="m-0 p-3 fw-bold">Training Statistics</h3>
-              <table id="training-stats" class="table table-bordered">
+              <h3 id="training-stats-title" class="m-0 p-3 fw-light text-center">Training Statistics</h3>
+              <table  class="table w-100 text-center fw-light">
                 <thead>
                   <tr>
-                    <th>Metric</th>
-                    <th>Value</th>
+                    <th>Wins</th>
+                    <th>Accuracy</th>
+                    <th>Total Points</th>
+                    <th>Performance</th>
+                    <th>Correct Blocks</th>
+                    <th>Total Blocks</th>
                   </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody id="training-stats"></tbody>
               </table>
             </article>
             <article class="d-flex flex-column justify-content-center rounded-5 p-2" aria-labelledby="current-stats-title">
-              <h3 id="current-stats-title" class="m-0 p-3 fw-bold">Current Statistics</h3>
-              <table id="current-stats" class="table table-bordered">
+              <h3 id="current-stats-title" class="m-0 p-3 fw-light text-center">Current Statistics</h3>
+              <table  class="table w-100 text-center fw-light">
                 <thead>
                   <tr>
-                    <th>Metric</th>
-                    <th>Value</th>
+                    <th>AI Wins</th>
+                    <th>Player Wins</th>
+                    <th>AI Losses</th>
+                    <th>Player Losses</th>
                   </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody id="current-stats"></tbody>
               </table>
             </article>
           </section>
@@ -98,77 +100,43 @@ const ProfilePage = () => {
     parentElement.querySelector(".player-data .username").innerText = playerData.username || "";
     parentElement.querySelector(".player-data .first-name").innerText = playerData.first_name || "";
     parentElement.querySelector(".player-data .last-name").innerText = playerData.last_name || "";
-    parentElement.querySelector(".player-data .champions").innerText = playerData.champions || "";
 
-    const winsAI = playerData.wins?.ai || 0;
-    const winsPlayers = playerData.wins?.players || 0;
-    const lossesAI = playerData.losses?.ai || 0;
-    const lossesPlayers = playerData.losses?.players || 0;
+    const currentStatsTable = parentElement.querySelector("#current-stats");
 
-    parentElement.querySelector(".wins").innerHTML = `
-      <p>AI Wins: ${winsAI}</p>
-      <p>Player Wins: ${winsPlayers}</p>
+    const rowStats = document.createElement('tr');
+    rowStats.innerHTML = `
+      <td>${playerData.wins?.ai || '0'}</td>
+      <td>${playerData.wins?.players || '0'}</td>
+      <td>${playerData.losses?.ai || '0'}</td>
+      <td>${playerData.losses?.players || '0'}</td>
     `;
 
-    parentElement.querySelector(".losses").innerHTML = `
-      <p>AI Losses: ${lossesAI}</p>
-      <p>Player Losses: ${lossesPlayers}</p>
-    `;
+    currentStatsTable.appendChild(rowStats);   
 
+  });
+
+  try {
     fetching(`https://${window.ft_transcendence_host}/player/training/`).then((trainingRes) => {
       const trainingData = trainingRes.training;
 
-      const trainingStatsTable = parentElement.querySelector("#training-stats tbody");
-      trainingStatsTable.innerHTML = `
-        <tr>
-          <td>Wins</td>
-          <td>${trainingData.wins || 'N/A'}</td>
-        </tr>
-        <tr>
-          <td>Accuracy</td>
-          <td>${trainingData.accuracy || 'N/A'}</td>
-        </tr>
-        <tr>
-          <td>Total Points</td>
-          <td>${trainingData.totalPoints || 'N/A'}</td>
-        </tr>
-        <tr>
-          <td>Performance</td>
-          <td>${trainingData.performance || 'N/A'}</td>
-        </tr>
-        <tr>
-          <td>Correct Blocks</td>
-          <td>${trainingData.correctBlocks || '0'}</td>
-        </tr>
-        <tr>
-          <td>Total Blocks</td>
-          <td>${trainingData.totalBlocks || '0'}</td>
-        </tr>
-      `;
+      const trainingStatsTable = parentElement.querySelector("#training-stats");
 
-      const currentStatsTable = parentElement.querySelector("#current-stats tbody");
-      currentStatsTable.innerHTML = `
-        <tr>
-          <td>AI Wins</td>
-          <td>${playerData.wins?.ai || '0'}</td>
-        </tr>
-        <tr>
-          <td>Player Wins</td>
-          <td>${playerData.wins?.players || '0'}</td>
-        </tr>
-        <tr>
-          <td>AI Losses</td>
-          <td>${playerData.losses?.ai || '0'}</td>
-        </tr>
-        <tr>
-          <td>Player Losses</td>
-          <td>${playerData.losses?.players || '0'}</td>
-        </tr>
+      const rowTraining = document.createElement('tr');
+      rowTraining.innerHTML = `
+        <td>${trainingData.wins || '0'}</td>
+        <td>${trainingData.accuracy || '0'}</td>
+        <td>${trainingData.totalPoints || '0'}</td>
+        <td>${trainingData.performance || '0'}</td>
+        <td>${trainingData.correctBlocks || '0'}</td>
+        <td>${trainingData.totalBlocks || '0'}</td>
       `;
+      trainingStatsTable.appendChild(rowTraining);
 
       setFocus(parentElement.querySelector(".avatar"));
     });
-  });
+  } catch (error) {
+    console.error("Failed to fetch training data:", error);
+  }
 
   MatchHistory();
   // FriendsList(); Reparar a quebra da listagem
