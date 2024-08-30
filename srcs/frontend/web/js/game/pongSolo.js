@@ -29,8 +29,10 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 
   let namePlayer = await getName();
 
   // get banco
-  let playerWins = parseInt(localStorage.getItem("playerWins")) || 0;
-  let computerWins = parseInt(localStorage.getItem("computerWins")) || 0;
+  const traningValues = await fetching(`https://${window.ft_transcendence_host}/player/training/`);
+
+  let playerWins = parseInt(traningValues.playerTrainingWin) || 0;
+  let computerWins = parseInt(traningValues.iaTrainingWin) || 0;
 
   canvas.width = 1920;
   canvas.height = 1080;
@@ -133,12 +135,45 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 
       //Banco de dados aqui
       try {
         if (scoreComputer === 7) {
-          computerWins += 1;
-          localStorage.setItem("computerWins", computerWins);
+          // computerWins += 1;
+          fetch(`https://${window.ft_transcendence_host}/player/training/`, {
+            method: 'POST',
+            headers: {
+             'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+              'training': {
+                'PlayerTraining': {
+                  'win': false
+                },
+                'IaTraining': {
+                  'win': true
+                },
+              }
+            }),
+          })
+
           await playSound(gameOverSound);
         } else if (scorePlayer === 7) {
-          playerWins += 1;
-          localStorage.setItem("playerWins", playerWins);
+          // playerWins += 1;
+          
+          fetch(`https://${window.ft_transcendence_host}/player/training/`, {
+            method: 'POST',
+            headers: {
+             'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+              'training': {
+                'PlayerTraining': {
+                  'win': true
+                },
+                'IaTraining': {
+                  'win': false
+                },
+              }
+            }),
+          })
+
           await playSound(winGameSound);
         }
       } catch (error) {
@@ -186,6 +221,7 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 
 
     // Continuar o loop
     loopIdSolo = window.requestAnimationFrame(gameLoopSolo);
+    localStorage.setItem("loopIdSolo", loopIdSolo);
   }
 
   window.onkeydown = (e) => (KeyPressedSolo[e.keyCode] = true);
