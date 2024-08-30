@@ -1,5 +1,6 @@
 import router from "../router/router.js";
 import TournamentPlayerCard from "../components/TournamentPlayerCard.js";
+
 const TournamentMatchCard = () => {
 
   const tournamentMatchCardHTML = `
@@ -37,7 +38,7 @@ const TournamentMatchCard = () => {
   btn.addEventListener("click", () => {
     router.go("/game/", `?game=PG&mode=two&match=${tournamentMatchCard.getAttribute("match-id")}`, false);
   });
-
+  //TournamentPlayerCard();
 };
 
 export default TournamentMatchCard;

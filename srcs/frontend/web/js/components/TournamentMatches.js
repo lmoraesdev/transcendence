@@ -1,6 +1,5 @@
 import TournamentMatchCard from "../components/TournamentMatchCard.js";
 
-
 const TournamentMatches = () => {
   const tournamentMatchesHTML = `
     <template id="tournament-matches">
