@@ -1,3 +1,5 @@
+import logging
+from pprint import pformat
 from django.utils.decorators import method_decorator
 from django.conf import settings
 from rest_framework.views import APIView
@@ -6,6 +8,8 @@ from itertools import cycle
 from .models import Tournament, Player, Match, PlayerMatch, PlayerTournament
 from .serializer import TournamentSerializer
 from .decorators import jwtCookieRequired
+
+logger = logging.getLogger('custom_logger')
 
 def updateTournament(tournamentId):
     tournament = Tournament.objects.get(id=tournamentId)
@@ -45,56 +49,95 @@ def updateTournament(tournamentId):
 class TournamentView(APIView):
     @method_decorator(jwtCookieRequired)
     def get(self, request):
-        playerId = request.decoded_token['id']
+        playerId = request.decoded_token.get('id')
+        logger.info(f"Fetching tournament data for playerId: {playerId}")
+        
         serializer = TournamentSerializer()
-        player = Player.objects.get(id=playerId)
-        if (serializer.is_player_in_tournament(player)):
+        
+        try:
+            player = Player.objects.get(id=playerId)
+            logger.info(f"Player found: {player}")
+        except Player.DoesNotExist:
+            logger.error(f"Player with ID {playerId} does not exist")
+            return Response({"statusCode": 404, "message": "Player not found"})
+
+        if serializer.playerInTournament(player):
             try:
                 tournament = serializer.playerInTournament(player)
+                logger.info(f"Tournament found for player: {tournament}")
+                
                 serializer = TournamentSerializer(
                     tournament,
                     context={"player": player}
                 )
-                if (tournament.status == Tournament.StatusChoices.PENDING.value):
+                
+                if tournament.status == Tournament.StatusChoices.PENDING.value:
+                    logger.info(f"Tournament {tournament.id} is pending")
                     return Response({
                         "statusCode": 200,
                         "currentTournament": serializer.data,
                         "players": serializer.getPlayers(tournament)
                     })
+                
+                # Assume updateTournament is a function that updates tournament status
                 updateTournament(tournament.id)
+                logger.info(f"Tournament {tournament.id} status updated")
                 return Response({"statusCode": 200, "currentTournament": serializer.data})
+            
             except Tournament.DoesNotExist:
+                logger.error(f"Tournament not found for player {playerId}")
                 return Response({"statusCode": 404, "message": "Tournament not found"})
+
         tournaments = Tournament.objects.filter(status="PN")
         tournamentPlayerFinished = PlayerTournament.objects.filter(playerId=player).order_by("-id").first()
         responseData = {}
-        if (tournamentPlayerFinished is not None):
+        
+        if tournamentPlayerFinished:
             tournamentFinished = Tournament.objects.filter(id=tournamentPlayerFinished.tournamentId.id).first()
-            serializerFinished = TournamentSerializer(tournamentFinished)
-            responseData["currentTournament"] = serializerFinished.data
-        if (not tournaments):
-            responseData.update({"statusCode": 405, "message": "No Tournament are avaible"})
+            if tournamentFinished:
+                serializerFinished = TournamentSerializer(tournamentFinished)
+                responseData["currentTournament"] = serializerFinished.data
+                logger.info(f"Current finished tournament: {tournamentFinished}")
+            else:
+                logger.warning(f"Finished tournament with ID {tournamentPlayerFinished.tournamentId.id} not found")
+
+        if not tournaments:
+            logger.info("No tournaments available")
+            responseData.update({"statusCode": 405, "message": "No Tournament are available"})
             return Response(responseData)
+        
         serializerAll = TournamentSerializer(tournaments, many=True)
         responseData.update({"statusCode": 200, "tournaments": serializerAll.data})
+        logger.info(f"Available tournaments: {serializerAll.data}")
         return Response(responseData)
-    
+
     @method_decorator(jwtCookieRequired)
     def post(self, request):
+        logger.debug(f"request {pformat(request.data)}")
         action = request.data.get('action')
         tournamentId = request.data.get('tournamentId')
         name = request.data.get('name')
         playerId = request.data.get('id')
+        
+        logger.info(f"Received request with action={action}, tournamentId={tournamentId}, name={name}, playerId={playerId}")
+        
         try:
             player = Player.objects.get(id=playerId)
+            logger.info(f"Player {playerId} found")
         except Player.DoesNotExist:
+            logger.error(f"Player {playerId} does not exist")
             return Response({"statusCode": 402, "message": "Player does not exist"})
-        if ("create" in action):
-            if (name is None or len(name) == 0):
+        
+        if "create" in action:
+            if name is None or len(name) == 0:
+                logger.error("Invalid Tournament name provided")
                 return Response({"statusCode": 403, "message": "Invalid Tournament name"})
+            
             serializer = TournamentSerializer()
-            if (serializer.playerInTournament(player)):
+            if serializer.playerInTournament(player):
+                logger.warning(f"Player {playerId} already in a Tournament")
                 return Response({"statusCode": 400, "message": "Already in a Tournament"})
+            
             tournament = Tournament.objects.create(name=name)
             PlayerTournament.objects.create(
                 playerId=player,
@@ -103,42 +146,68 @@ class TournamentView(APIView):
             )
             serializer = TournamentSerializer(tournament)
             player.save()
-            return Response({"statusCode": 200, "currentTournament": serializer.getPlayers(tournament)}, status=201) 
+            logger.info(f"Tournament {tournament.id} created and player {playerId} added as creator")
+            return Response({"statusCode": 200, "currentTournament": serializer.getPlayers(tournament)}, status=201)
+        
         try:
             tournament = Tournament.objects.get(id=tournamentId)
             serializer = TournamentSerializer(tournament)
+            logger.info(f"Tournament {tournamentId} found")
         except Tournament.DoesNotExist:
+            logger.error(f"Tournament {tournamentId} does not exist")
             return Response({"statusCode": 402, "message": "Missing Tournament id"})
-        if ("join" in action):
-            if (tournamentId is None or len(tournamentId) == 0):
+        
+        if "join" in action:
+            if tournamentId is None or len(tournamentId) == 0:
+                logger.error("Missing Tournament id")
                 return Response({"statusCode": 400, "message": "Missing Tournament id"})
-            if (tournament.status == "PN" and serializer.getPlayerCount < settings.COMPETITORS):
-                if (serializer.playerInTournament(player)):
+            
+            if tournament.status == "PN" and serializer.getPlayerCount < settings.COMPETITORS:
+                if serializer.playerInTournament(player):
+                    logger.warning(f"Player {playerId} already in Tournament {tournamentId}")
                     return Response({"statusCode": 400, "message": "Already in a Tournament"})
+                
                 PlayerTournament.objects.create(playerId=player, tournamentId=tournament)
+                logger.info(f"Player {playerId} joined Tournament {tournamentId}")
                 return Response({"statusCode": 200, "message": "Successfully joined tournament"})
+            
+            logger.warning(f"Tournament {tournamentId} is full")
             return Response({"statusCode": 400, "message": "Tournament is full"})
-        elif ("leave" in action):
+        
+        elif "leave" in action:
             if tournament.status != Tournament.StatusChoices.PENDING.value:
+                logger.error(f"Tournament {tournamentId} status is not pending")
                 return Response({"statusCode": 400, "message": "Tournament status is not pending"})
+            
             try:
                 playerTournament = PlayerTournament.objects.get(playerId=player, tournamentId=tournament)
+                logger.info(f"Player {playerId} found in Tournament {tournamentId}")
             except PlayerTournament.DoesNotExist:
+                logger.error(f"Player {playerId} not found in Tournament {tournamentId}")
                 return Response({"statusCode": 400, "message": "Player is not in the Tournament"})
+            
             if playerTournament.creator:
                 tournament.delete()
+                logger.info(f"Tournament {tournamentId} deleted along with player {playerId}")
                 return Response({"statusCode": 200, "message": "Tournament deleted along with player"})
             else:
                 playerTournament.delete()
+                logger.info(f"Player {playerId} removed from Tournament {tournamentId}")
                 return Response({"statusCode": 200, "message": "Player removed from Tournament"})
-        elif ("start" in action):
+        
+        elif "start" in action:
             if not PlayerTournament.objects.filter(playerId=player, tournamentId=tournament, creator=True).exists():
+                logger.error(f"Player {playerId} cannot start Tournament {tournamentId}")
                 return Response({"statusCode": 400, "message": "Tournament cannot be started"})
-            if serializer.get_players_count(tournament) != settings.COMPETITORS:
+            
+            if serializer.getPlayerCount(tournament) != settings.COMPETITORS:
+                logger.error(f"Tournament {tournamentId} not full yet")
                 return Response({"statusCode": 400, "message": "Tournament not full yet"})
+            
             if tournament.status == Tournament.StatusChoices.PENDING.value:
                 playersTournaments = PlayerTournament.objects.filter(tournamentId=tournament)
                 playersCycle = cycle(playersTournaments)
+                
                 for _ in range(0, settings.COMPETITORS - 1, 2):
                     player1 = next(playersCycle).playerId
                     player2 = next(playersCycle).playerId
@@ -155,9 +224,14 @@ class TournamentView(APIView):
                         match_id=tournamentMatch,
                         playerId=player2
                     )
+                
                 tournament.status = Tournament.StatusChoices.PROGRESS.value
                 tournament.save()
-                return Response({"statusCode": 200, "message": "Tournament started",
-                                 "tournamentId": tournamentId})
+                logger.info(f"Tournament {tournamentId} started")
+                return Response({"statusCode": 200, "message": "Tournament started", "tournamentId": tournamentId})
+            
+            logger.error(f"Tournament {tournamentId} is not pending")
             return Response({"statusCode": 400, "message": "Tournament is not pending"})
+        
+        logger.error(f"Wrong action provided: {action}")
         return Response({"statusCode": 400, "message": "Wrong Action"})

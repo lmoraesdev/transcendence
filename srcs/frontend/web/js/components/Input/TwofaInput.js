@@ -10,13 +10,13 @@ import router from "../../router/router.js";
       </button>
     </template>
   `;
-  
+
   if (!document.querySelector('#twofa-input')) {
     const templateContainer = document.createElement('div');
     templateContainer.innerHTML = twofaInputHTML;
     document.body.appendChild(templateContainer);
   }
-  
+
   const template = document.getElementById("twofa-input");
   const component = template.content.cloneNode(true);
 
@@ -76,21 +76,73 @@ const TwoFAInput = () => {
     'px-5'
   );
 
-  const labelText = document.createElement('p');
-  labelText.textContent = 'Enter 2FA security code:';
-  labelText.classList.add('text-muted', 'mb-0');
+  // const labelText = document.createElement('p');
+  // labelText.textContent = 'Enter 2FA security code:';
+  // labelText.classList.add('text-muted', 'mb-0');
 
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.classList.add('form-control', 'twofa-input', 'mb-2');
-  input.placeholder = 'Enter 2FA Code';
-  input.maxLength = 6;
+  const codeInput = document.createElement('input');
+  codeInput.id = 'twofa-code-input';
+  codeInput.type = 'number';
+  codeInput.inputMode = 'numeric';
+  codeInput.classList.add('form-control', 'twofa-input');
+  codeInput.placeholder = 'Enter 2FA Code';
+  codeInput.maxLength = 6;
 
-  inputContainer.appendChild(labelText);
-  inputContainer.appendChild(input);
-  
+  const sendButton = document.createElement('button');
+  sendButton.id = 'send-button';
+  sendButton.type = 'button';
+  sendButton.innerHTML = 'Send';
+  sendButton.classList.add('btn', 'btn-primary');
+
+  const inputGroup = document.createElement('div');
+  inputGroup.classList.add('input-group', 'mb-3');
+  //inputGroup.appendChild(labelText);
+  inputGroup.appendChild(codeInput);
+  inputGroup.appendChild(sendButton);
+
+  inputContainer.appendChild(inputGroup);
+
+  sendButton.addEventListener("click", (event) => {
+    const code = codeInput.value;
+
+    if (code.length === 6) {
+      fetching(
+        `https://${window.ft_transcendence_host}/authentication/2FA/verify/`,
+        "POST",
+        JSON.stringify({ code: codeInput.value }),
+        { "Content-Type": "application/json" },
+      ).then((res) => {
+
+        if (res.statusCode === 200) {
+          codeInput.value = "";
+
+          if (res.redirected)
+            router.go('/home/', '/home/', false);
+          else {
+            const popup_twofa = document.querySelector(".popup-twofa");
+
+            if (popup_twofa) {
+              const popup_twofa_qrcode = document.querySelector(".popup-twofa-qrcode");
+              popup_twofa.removeChild(popup_twofa.lastChild);
+
+              if (popup_twofa_qrcode)
+                popup_twofa_qrcode.innerHTML = "";
+
+              popup_twofa.style.display = "none";
+            }
+
+            alert(res.message);
+          }
+        } else {
+          alert(res.message);
+        }
+      });
+    } else {
+      alert("Please enter a 6-digit code.");
+    }
+  });
+
   return inputContainer;
 };
 
 export default TwoFAInput;
-

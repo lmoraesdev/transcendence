@@ -2,7 +2,8 @@ import router from "../router/router.js";
 import { runPongTwoGame, wsTwo } from "../game/pongTwo.js";
 import { runPongFourGame, wsFour } from "../game/pongFour.js";
 import { runPongCoopGame } from "../game/pongCoop.js";
-import { runPongSoloGame } from "../game/pongSolo.js";
+import { runPongSoloGame, pauseGame, resumeGame, restartGame } from "../game/pongSolo.js";
+
 import fetching from "../helpers/fetching.js";
 
 const GamePage = () => {
@@ -64,22 +65,22 @@ const GamePage = () => {
     document.body.appendChild(templateContainer);
   }
 
-  const template      = document.getElementById("game-template");
-  const component     = template.content.cloneNode(true);
+  const template = document.getElementById("game-template");
+  const component = template.content.cloneNode(true);
   const parentElement = document.getElementById("main");
 
   parentElement.innerHTML = "";
   parentElement.appendChild(component);
 
-  const gameHeader  = parentElement.querySelector(".game-header");
-  const modality    = document.getElementById("mode");
-  const game_exit   = document.getElementById("exit");
+  const gameHeader = parentElement.querySelector(".game-header");
+  const modality = document.getElementById("mode");
+  const game_exit = document.getElementById("exit");
   const soundButton = document.getElementById("sound");
-  const playButton  = document.getElementById("play");
-  const newGame     = document.getElementById("new-game");
+  const playButton = document.getElementById("play");
+  const newGame = document.getElementById("new-game");
   const pauseButton = document.getElementById("pause");
-  const canvas      = document.getElementById("canvas-pong");
-  const ctx         = canvas.getContext("2d");
+  const canvas = document.getElementById("canvas-pong");
+  const ctx = canvas.getContext("2d");
 
   soundButton.textContent = disableSound ? "Sound Off" : "Sound On";
   soundButton.addEventListener("click", () => {
@@ -97,6 +98,7 @@ const GamePage = () => {
   let gamePaused = false;
 
   function drawOverlay() {
+    console.log("🚀 ~ drawOverlay ~ drawOverlay:", drawOverlay);
     if (gamePaused) {
       const overlay = document.getElementById("canvas-pong");
       overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
@@ -110,16 +112,16 @@ const GamePage = () => {
 
   switch (game_type_query) {
     case "solo":
-      modality.textContent = 'Solo';
+      modality.textContent = "Solo";
       break;
     case "two":
-      modality.textContent = 'Multiplayer';
+      modality.textContent = "Multiplayer";
       break;
     case "four":
-      modality.textContent = 'Multiplayer';
+      modality.textContent = "Multiplayer";
       break;
     case "coop":
-      modality.textContent = 'Multiplayer';
+      modality.textContent = "Multiplayer";
       break;
   }
 
@@ -137,8 +139,8 @@ const GamePage = () => {
   const startGame = () => {
     switch (game_type_query) {
       case "solo":
-        modality.textContent = 'Solo';
-        runPongSoloGame(canvas, ctx, 0, 0);
+        modality.textContent = "Solo";
+        runPongSoloGame(canvas, ctx);
         break;
       case "two":
         runPongTwoGame(canvas, ctx, match_id); // Ajustar pausa, play e som
@@ -152,16 +154,19 @@ const GamePage = () => {
     }
   };
 
-  const resumeGame = () => {
-    const scorePlayer = localStorage.getItem("scorePlayer");
-    const scoreComputer = localStorage.getItem("scoreComputer");
-    runPongSoloGame(canvas, ctx, Number(scorePlayer), Number(scoreComputer));
+  const resumeGameHandler = () => {
+    if (game_type_query === "solo") {
+      const scorePlayer = localStorage.getItem("scorePlayer") || 0;
+      const scoreComputer = localStorage.getItem("scoreComputer") || 0;
+      resumeGame(); // Retoma o loop do jogo sem reiniciar
+      runPongSoloGame(canvas, ctx, Number(scorePlayer), Number(scoreComputer)); // Continua com as pontuações
+    }
   };
 
-  const startNewGame = () => {
+  const startNewGameHandler = () => {
     if (game_type_query === "solo") {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      runPongSoloGame(canvas, ctx, 0, 0);
+      restartGame(canvas, ctx); // Reinicia o jogo com a pontuação zerada
     }
   };
 
@@ -170,10 +175,12 @@ const GamePage = () => {
       gamePaused = !gamePaused;
       drawOverlay();
       if (gamePaused) {
-        const idSolo = localStorage.getItem("loopIdSolo");
-        window.cancelAnimationFrame(idSolo);
+        pauseGame(); // Pausa o jogo usando a função importada
+      } else {
+        resumeGameHandler(); // Retoma o jogo se estava pausado
       }
     }
+    console.log("🚀 ~ pauseButton.addEventListener ~ drawOverlay:", drawOverlay);
   });
 
   playButton.addEventListener("click", () => {
@@ -182,21 +189,23 @@ const GamePage = () => {
       gamePaused = false;
       drawOverlay();
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      startGame();
+      startGame(); // Inicia um novo jogo
     } else {
-      gameRunning = true;
-      gamePaused = false;
-      drawOverlay();
-      resumeGame();
+      resumeGameHandler(); // Retoma o jogo em pausa
     }
+    console.log("🚀 ~ playButton.addEventListener ~ startGame:", startGame);
+    console.log("🚀 ~ playButton.addEventListener ~ drawOverlay:", drawOverlay);
   });
 
   newGame.addEventListener("click", () => {
     gameRunning = true;
+    console.log("🚀 ~ newGame.addEventListener ~ gameRunning:", gameRunning);
     gamePaused = false;
+    console.log("🚀 ~ newGame.addEventListener ~ gamePaused:", gamePaused);
     drawOverlay();
-    startNewGame();
+    startNewGameHandler(); // Começa um novo jogo
   });
+  console.log("🚀 ~ newGame.addEventListener ~ drawOverlay:", drawOverlay());
 
   game_exit.addEventListener("click", () => {
     if (wsTwo) wsTwo.close(1000);
@@ -209,8 +218,7 @@ const GamePage = () => {
 
   if (avatarElement && nameElement) {
     fetching(`https://${window.ft_transcendence_host}/player/`).then((res) => {
-
-      avatarElement.src = res.player.avatar ? res.player.avatar : '/web/images/profile.png';
+      avatarElement.src = res.player.avatar ? res.player.avatar : "/web/images/profile.png";
       nameElement.textContent = res.player.firstName ? res.player.firstName : "";
     });
   }

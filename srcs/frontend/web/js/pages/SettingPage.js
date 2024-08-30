@@ -29,7 +29,7 @@ const SettingPage = () => {
           <h2 id="change-avatar-heading" class="fs-6 fw-bold">Change Avatar</h2>
         </section>
 
-        <div class="d-flex">       
+        <div class="d-flex">
           <section class="border-end border-light-subtle col d-block justify-content-center">
             <section class="mb-4">
               <div class="d-flex flex-wrap justify-content-center align-items-center gap-2" role="group" aria-labelledby="change-username-heading">
@@ -56,7 +56,7 @@ const SettingPage = () => {
             </section>
           </section>
 
-          <section class="col d-block justify-content-center">   
+          <section class="col d-block justify-content-center">
             <section class="twofa-section justify-content-around d-flex flex-wrap align-items-center gap-2 p-2 rounded-3" role="region" aria-labelledby="twofa-heading">
               <h2 id="twofa-heading" class="text-center fs-6 fw-bold m-0 px-3 py-2">Two Factor Authentication</h2>
               <div class="setting-twofa p-2 rounded-3">
@@ -76,7 +76,7 @@ const SettingPage = () => {
                     </div>
                     <div class="twofa-input text-center"></div>
                   </div>
-                </div>            
+                </div>
               </div>
             </section>
 
@@ -147,12 +147,25 @@ const SettingPage = () => {
 
   const submitFieldChange = (field, inputElem) => {
     const value = field === "two_factor" ? inputElem.checked : inputElem.value;
-    fetching(`https://${window.ft_transcendence_host}/player/`, "PATCH", {
-      field,
-      value,
-    }).then(() => {
-      if (field !== "two_factor") inputElem.placeholder = inputElem.value;
-      inputElem.value = "";
+
+    fetch(`https://${window.ft_transcendence_host}/player/`, {
+      method: 'POST',
+      headers: {
+       'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ field, value }),
+    }).then((res) => {
+      if (field !== "two_factor")
+      {
+        inputElem.placeholder = inputElem.value;
+        inputElem.value = "";
+      } else {
+        inputElem.value = "off";
+      }
+
+      console.log("Success:", res);
+    }).catch((reason) => {
+      console.log("Error:", reason);
     });
   };
 

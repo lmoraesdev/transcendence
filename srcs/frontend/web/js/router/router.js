@@ -77,7 +77,7 @@ const router = {
         if (route == "/login/" || route == "/twofa/" || route == "/")
           route = "/home/";
       }
-      else if (playerResponse.status == 402)
+      else if (playerResponse.statusCode == 403)
         route = "/twofa/";
       else
         route = "/login/";
