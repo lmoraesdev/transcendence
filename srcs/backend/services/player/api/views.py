@@ -467,22 +467,9 @@ class TrainingHistory(APIView):
 
                     playerTraining = TrainingPlayer.objects.get(trainingId=training)
                     logger.debug(f"Player training data: {playerTraining}")
-<<<<<<< HEAD
-
-                    playerTrainings.append({
-                        "win": playerTraining.win,
-                        "accuracy": playerTraining.accuracy,
-                        "totalPoints": playerTraining.totalPoints,
-                        "playerPerformance": playerTraining.playerPerformance,
-                        "correctBlocks": playerTraining.correctBlocks,
-                        "totalBlocks": playerTraining.totalBlocks,
-                    })
-
-=======
                     
                     playerTrainings.append({ "win": playerTraining.win })
                     
->>>>>>> d1bc0d5291cbd0853df80115429f030e8ffdecc7
                     playerTrainingMatchs += 1
                     if playerTraining.win:
                         playerTrainingWin += 1
@@ -490,34 +477,8 @@ class TrainingHistory(APIView):
                     iaTraining = IaStatistics.objects.get(trainingId=training)
                     logger.debug(f"IA training data: {iaTraining}")
 
-<<<<<<< HEAD
-                    states = []
-                    iaStates = IaState.objects.filter(iaStatisticsId=iaTraining)
-                    logger.debug(f"IA states found: {len(iaStates)}")
-
-                    for state in iaStates:
-                        logger.debug(f"Processing IA state: {state.stage}")
-                        states.append({
-                            "state": state.stage,
-                            "action1": state.action1,
-                            "action2": state.action2,
-                            "action3": state.action3,
-                        })
-
-                    iaTrainings.append({
-                        "win": iaTraining.win,
-                        "accuracy": iaTraining.accuracy,
-                        "totalPoints": iaTraining.totalPoints,
-                        "playerPerformance": iaTraining.playerPerformance,
-                        "correctBlocks": iaTraining.correctBlocks,
-                        "totalBlocks": iaTraining.totalBlocks,
-                        "states": states
-                    })
-
-=======
                     iaTrainings.append({ "win": iaTraining.win })
                     
->>>>>>> d1bc0d5291cbd0853df80115429f030e8ffdecc7
                     iaTrainingMatchs += 1
                     if iaTraining.win:
                         iaTrainingWin += 1
@@ -566,16 +527,6 @@ class TrainingHistory(APIView):
 
             logger.debug(f"Request\n{pformat(request.data)}")
 
-<<<<<<< HEAD
-            # if '_content' in request.data:
-            #     content = request.data['_content']
-            #     # Parse o conteúdo JSON
-            #     data = json.loads(content)
-            # else:
-            #     raise ValueError("No '_content' key found in request data.")
-
-=======
->>>>>>> d1bc0d5291cbd0853df80115429f030e8ffdecc7
             trainingData = request.data.get('training')
             logger.debug(f"Training data received: {trainingData}")
 
