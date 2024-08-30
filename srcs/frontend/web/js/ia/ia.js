@@ -1,7 +1,7 @@
 export class AI {
   constructor(initialDifficulty) {
     this.baseDifficulty = initialDifficulty;
-    this.difficulty = initialDifficulty / 2;
+    this.difficulty = initialDifficulty;
     this.randomnessFactor = 20;
     this.movementVariance = 15;
     this.evolutionLevel = 0;
@@ -23,30 +23,30 @@ export class AI {
 
   setDifficultyParameters() {
     if (this.difficulty >= 5) {
-      this.ignoreBallChance = 0.1; // IA ignora a bola apenas 10% do tempo (difícil)
-      this.predictionError = 30; // Menor erro de previsão
-      this.reactionDelay = 400; // Menor atraso na reação
-      this.movementRandomness = 5; // Menor variância aleatória
+      this.ignoreBallChance = 0.2; // Aumenta a chance para 20% no nível difícil
+      this.predictionError = 30;
+      this.reactionDelay = 400;
+      this.movementRandomness = 5;
     } else if (this.difficulty >= 4) {
-      this.ignoreBallChance = 0.3;
+      this.ignoreBallChance = 0.4; // Aumenta a chance para 40%
       this.predictionError = 40;
       this.reactionDelay = 500;
       this.movementRandomness = 8;
     } else if (this.difficulty >= 3) {
-      this.ignoreBallChance = 0.5;
+      this.ignoreBallChance = 0.6; // Aumenta a chance para 60%
       this.predictionError = 50;
       this.reactionDelay = 600;
       this.movementRandomness = 10;
     } else if (this.difficulty >= 2) {
-      this.ignoreBallChance = 0.7;
+      this.ignoreBallChance = 0.8; // Aumenta a chance para 80%
       this.predictionError = 60;
       this.reactionDelay = 700;
       this.movementRandomness = 12;
     } else {
-      this.ignoreBallChance = 0.9; // IA ignora a bola 90% do tempo (muito fácil)
-      this.predictionError = 70; // Grande erro de previsão
-      this.reactionDelay = 800; // Grande atraso na reação
-      this.movementRandomness = 15; // Maior variância aleatória
+      this.ignoreBallChance = 0.98; // Aumenta a chance para 98% no nível muito fácil
+      this.predictionError = 70;
+      this.reactionDelay = 800;
+      this.movementRandomness = 15;
     }
   }
 
@@ -62,13 +62,13 @@ export class AI {
           // Movimento aleatório, como se a IA estivesse "adivinhando"
           ballTargetY = Math.random() * canvasHeight;
         } else {
-          // Considerar a posição futura da bola de forma não precisa
-          const predictionError = (Math.random() - 0.5) * this.predictionError;
-          const predictedBallY =
-            ball.positionY + ball.velocityY * this.difficulty + predictionError;
+          // Estimativa da posição da bola baseada na última posição conhecida e suposições
+          const estimatedBallY = this.lastBallPosition.y + (Math.random() - 0.5) * 100; // Introduz um erro considerável na estimativa
+          const predictionError = (Math.random() - 2.0) * this.predictionError;
 
           // IA tenta "adivinhar" onde a bola estará, mas com erros calculados
-          ballTargetY = predictedBallY + (Math.random() - 0.5) * this.movementVariance;
+          ballTargetY =
+            estimatedBallY + (Math.random() - 0.5) * this.movementVariance + predictionError;
         }
 
         const distanceToTarget = Math.abs(paddleCenter - ballTargetY);
@@ -93,6 +93,9 @@ export class AI {
         if (paddle.positionY + paddle.sizeY > canvasHeight) {
           paddle.positionY = canvasHeight - paddle.sizeY;
         }
+
+        // Atualizar a última posição da bola (simulando uma percepção atrasada)
+        this.lastBallPosition = { x: ball.positionX, y: ball.positionY };
 
         // Atualizar as métricas de acerto
         this.totalHits++;
