@@ -24,7 +24,7 @@ const TournamentPopup = async (actionType, data) => {
             >
           </div>
           <h2 id="tournament-name-description" class="popup-tournament-name p-3 rounded-5 text-center"></h2>
-          <button type="submit" class="popup-btn btn btn-primary fw-bold" aria-label="Submit form"></button>
+          <button type="submit" class="popup-btn btn btn-custom text-white fw-bold" aria-label="Submit form"></button>
         </form>
       </section>
     </template>

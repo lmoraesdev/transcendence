@@ -13,14 +13,14 @@ const TournamentPage = () => {
   const tournamentHTML = `
     <template id="tournament-template">
       <main class="text-black bg-white container-fluid d-flex justify-content-around align-items-stretch gap-3 h-100">
-        <section class="tournament-actions border-end border-light-subtle flex-column justify-content-center align-items-center py-5 px-4 gap-5">
+        <section class="tournament-actions flex-column justify-content-center align-items-center py-5 px-4 gap-5">
           <div class="tournament-create d-flex flex-column justify-content-center p-4 gap-4">
             <header class="text-center">
               <h3 class="text-center m-0">Create a new tournament</h3>
             </header>            
             <div class="d-grid col-12 gap-2 justify-content-center">
               <p>To create a new tournament click on the button below, create</p>
-              <button id="createTournamentBtn" class="btn btn-primary fw-bold" type="button">
+              <button id="createTournamentBtn" class="btn btn-custom text-white fw-bold" type="button">
                 Create
               </button>
             </div>
@@ -34,7 +34,7 @@ const TournamentPage = () => {
           <div id="tournament-container"></div>
         </section>
 
-        <section class="tournament-current flex-column p-5 rounded-5">
+        <section class="tournament-current d-none flex-column p-5 rounded-5">
           <header class="text-center">
             <h3 class="text-center m-0">Current Tournament</h3>
           </header>            
@@ -71,12 +71,12 @@ const TournamentPage = () => {
     const tournamentPlayersLeave = tournamentPlayers.querySelector(".leave");
     const tournamentMatches = tournamentCurrent.querySelector(".tournament-matches");  
     const createBtn = tournamentActions.querySelector(".tournament-create button");
+    const tournamentList = document.querySelector(".tournament-list");
 
 
     fetching(`https://${window.ft_transcendence_host}/tournament/`).then((data) => {
-      if (!data || data.status !== "FN") {
+      if (!data.currentTournament || data.currentTournament.status === "FN") {
         console.log("aqui")
-        TournamentCard(data.currentTournament);
         createBtn.addEventListener("click", () => {
           const tournament_popup = document.createElement("tournament-popup");
           tournament_popup.setAttribute("popup-type", "CREATE");
@@ -85,7 +85,8 @@ const TournamentPage = () => {
           TournamentPopup("CREATE", data);
         });
       } else {
-        document.querySelector("#tournament-container").textContent = "No tournaments available";
+        TournamentCard(data.currentTournament);
+        tournamentList.textContent = "No tournaments available";
       }
 
       if (data.currentTournament.status === "PD") {
@@ -107,6 +108,8 @@ const TournamentPage = () => {
 
       if (data.currentTournament) {
         tournamentCurrent.classList.remove("d-none");
+        tournamentActions.classList.add("border-start");
+        tournamentActions.classList.add("border-light-subtle");
         tournamentCurrent.classList.add("d-flex");
         if (data.currentTournament.status === "PD") {
           tournamentPlayers.classList.remove("d-none");

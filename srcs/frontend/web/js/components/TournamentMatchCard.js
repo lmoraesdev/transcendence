@@ -9,7 +9,7 @@ const TournamentMatchCard = () => {
         <div class="tournament-player-card player1"></div>
         <div class="tournament-player-card player2"></div>
       </div>
-      <button class="btn">Play</button>
+      <button class="btn btn-primary">Play</button>
     </template>
   `;
 

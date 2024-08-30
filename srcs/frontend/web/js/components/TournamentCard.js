@@ -10,17 +10,31 @@ const TournamentCard = (tournament) => {
   card.innerHTML = `
     <section class="card" aria-labelledby="tournament-title">
       <header class="card-header">
-        <h2 id="tournament-title" class="card-title text-center">${tournament.name}</h2>
+        <h2 id="tournament-title" class="tournament-name card-title text-center"></h2>
       </header>
       <div class="card-body">
-        <p class="card-text text-center" aria-live="polite" aria-atomic="true">
-          ${tournament.playersQuantity} / 4 players
-        </p>
+        <p class="tournament-size card-text text-center" aria-live="polite" aria-atomic="true"></p>
       </div>
     </section>
   `;
 
   container.appendChild(card);
+  container.classList.add(
+    "d-flex",
+    "flex-column",
+    "justify-content-center",
+    "align-items-center",
+    "flex-wrap",
+    "rounded-4",
+    "text-black",
+    "p-2",
+  );
+
+  const tournamentName = tournamentCard.querySelector(".tournament-name");
+  const tournamentSize = tournamentCard.querySelector(".tournament-size");
+  console.log(tournament);
+  tournamentName.textContent = tournament.name
+  tournamentSize.textContent = `${tournament.playersQuantity} / 4 players`;
 
   setFocus(card, `Tournament ${tournament.name} loaded. Players: ${tournament.playersQuantity} out of 4.`);
 };

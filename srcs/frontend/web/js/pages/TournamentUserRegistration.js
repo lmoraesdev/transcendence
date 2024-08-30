@@ -1,6 +1,6 @@
-const CreateTournamentPage = () => {
+const TournamentUserRegistration = () => {
   const createTournamentHTML = `
-    <template id="game-settings-template">
+    <template id="tournament-registration-template">
       <section class="container-fluid justify-content-center p-3">
         <header class="text-center">
           <h1 class="display-5 fw-bold mb-4">Game Settings</h1>
@@ -8,14 +8,14 @@ const CreateTournamentPage = () => {
         <p>Enter a name for the tournament</p>
       </section>
 
-      <section class="col game-settings" id="game-settings" tabindex="-1" aria-labelledby="game-settingsLabel" aria-hidden="true">
-        <div class="game-settings-dialog" role="dialog" aria-modal="true">
-          <div class="game-settings-content">
-            <header class="game-settings-header">
-              <h2 class="game-settings-title" id="game-settingsLabel">Pong</h2>
-              <button type="button" class="btn-close" data-bs-dismiss="game-settings" aria-label="Close"></button>
+      <section class="col tournament-registration" id="tournament-registration" tabindex="-1" aria-labelledby="tournament-registrationLabel" aria-hidden="true">
+        <div class="tournament-registration-dialog" role="dialog" aria-modal="true">
+          <div class="tournament-registration-content">
+            <header class="tournament-registration-header">
+              <h2 class="tournament-registration-title" id="tournament-registrationLabel">Pong</h2>
+              <button type="button" class="btn-close" data-bs-dismiss="tournament-registration" aria-label="Close"></button>
             </header>
-            <div class="game-settings-body">
+            <div class="tournament-registration-body">
               <p>Choose your avatar and nickname to start the game.</p>
               <div class="text-center">
                 <label for="photoInput" class="d-flex justify-content-center align-items-center">
@@ -38,7 +38,7 @@ const CreateTournamentPage = () => {
                 <div id="error-message" class="text-danger" style="display: none;"></div>
               </div>
             </div>
-            <footer class="game-settings-footer">
+            <footer class="tournament-registration-footer">
               <button type="button" class="btn btn-primary" id="saveChangesButton">Save changes</button>
             </footer>
           </div>
@@ -47,14 +47,14 @@ const CreateTournamentPage = () => {
     </template>
   `;
 
-  if (!document.querySelector('#game-settings-template')) {
+  if (!document.querySelector('#tournament-registration-template')) {
     const templateContainer = document.createElement('div');
     templateContainer.innerHTML = createTournamentHTML;
     document.body.appendChild(templateContainer);
   }
 
-  const parentElement = document.createElement('game-settings-template');
-  const template = document.getElementById('game-settings-template');
+  const parentElement = document.createElement('tournament-registration-template');
+  const template = document.getElementById('tournament-registration-template');
   const component = template.content.cloneNode(true);
 
   parentElement.appendChild(component);
@@ -134,7 +134,7 @@ const CreateTournamentPage = () => {
       }
     })
     .then(() => {
-      game-settings.hide();
+      tournament-registration.hide();
     })
     .catch(error => {
       console.error('Error:', error);
@@ -145,4 +145,4 @@ const CreateTournamentPage = () => {
   
 };
 
-export default CreateTournamentPage;
+export default TournamentUserRegistration;
