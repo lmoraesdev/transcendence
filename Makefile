@@ -11,7 +11,7 @@ run:
 	@sudo mkdir -p $(VOLUME)/wordpress
 	@sudo mkdir -p $(VOLUME)/mariadb
 	@echo "$(GREEN)** Compose Up ** $(RESET)"
-	@docker-compose --file=$(COMPOSE) up --build --detach
+	@docker compose --file=$(COMPOSE) up --build --detach
 
 up:
 	@echo "$(GREEN)** Compose Up ** $(RESET)"
@@ -27,7 +27,7 @@ start:
 
 stop:
 	@echo "$(GREEN)** Stop containers ** $(RESET)"
-	@docker-compose --file=$(COMPOSE) stop
+	@docker compose --file=$(COMPOSE) stop
 
 ls:
 	@echo "$(GREEN)**** List containers ****$(RESET)"

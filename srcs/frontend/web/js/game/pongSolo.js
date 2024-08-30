@@ -121,7 +121,7 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 
       ai.adjustDifficulty(true);
     }
 
-    if (scorePlayer >= 7 || scoreComputer >= 7) {
+    if (scorePlayer === 7 || scoreComputer === 7) {
       window.cancelAnimationFrame(loopIdSolo);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.font = "100px monospace";
@@ -179,10 +179,8 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 
       } catch (error) {
         console.error("Erro ao reproduzir som:", error);
       }
-      scorePlayer = 0;
-      scoreComputer = 0;
       localStorage.clear();
-      loopIdSolo = window.requestAnimationFrame(gameLoop);
+      window.location.reload();
       return true;
     }
     return false;
@@ -197,10 +195,6 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 
   }
 
   function gameLoopSolo() {
-    if (scorePlayer >= 7 || scoreComputer >= 7) {
-      return; // Não continuar o loop se alguma das pontuações for 7 ou maior
-    }
-
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Renderizar a bola e as raquetes
