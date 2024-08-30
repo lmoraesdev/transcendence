@@ -51,7 +51,7 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer, ptsComputer) {
   winGameSound.addEventListener("canplaythrough", () => console.log("Som de vitória carregado."));
   reboundSound.addEventListener("canplaythrough", () => console.log("Som de rebote carregado."));
 
-  const FPS = 60;
+  const FPS = 75;
   const INTERVAL = 1000 / FPS;
   let lastUpdateTime = Date.now();
   let ai = new AI(5);
