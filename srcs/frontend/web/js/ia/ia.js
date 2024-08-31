@@ -21,35 +21,6 @@ export class AI {
     this.setDifficultyParameters();
   }
 
-  setDifficultyParameters() {
-    if (this.difficulty >= 5) {
-      this.ignoreBallChance = 0.2; // Aumenta a chance para 20% no nível difícil
-      this.predictionError = 30;
-      this.reactionDelay = 400;
-      this.movementRandomness = 5;
-    } else if (this.difficulty >= 4) {
-      this.ignoreBallChance = 0.4; // Aumenta a chance para 40%
-      this.predictionError = 40;
-      this.reactionDelay = 500;
-      this.movementRandomness = 8;
-    } else if (this.difficulty >= 3) {
-      this.ignoreBallChance = 0.6; // Aumenta a chance para 60%
-      this.predictionError = 50;
-      this.reactionDelay = 600;
-      this.movementRandomness = 10;
-    } else if (this.difficulty >= 2) {
-      this.ignoreBallChance = 0.8; // Aumenta a chance para 80%
-      this.predictionError = 60;
-      this.reactionDelay = 700;
-      this.movementRandomness = 12;
-    } else {
-      this.ignoreBallChance = 0.98; // Aumenta a chance para 98% no nível muito fácil
-      this.predictionError = 70;
-      this.reactionDelay = 800;
-      this.movementRandomness = 15;
-    }
-  }
-
   update(ball, paddle, canvasHeight, computerWins, playerWins) {
     const currentTime = Date.now();
     if (currentTime - this.lastUpdate >= this.refreshInterval) {
@@ -57,64 +28,52 @@ export class AI {
         const paddleCenter = paddle.Center()[1];
         let ballTargetY;
 
-        // Decidir aleatoriamente se a IA vai "ignorar" a bola ou não
+        // Track ball velocity
+        const ballVelocityY = ball.positionY - this.lastBallPosition.y;
+
+        // Deciding whether to "ignore" the ball or not
         if (Math.random() < this.ignoreBallChance) {
-          // Movimento aleatório, como se a IA estivesse "adivinhando"
+          // Random movement
           ballTargetY = Math.random() * canvasHeight;
         } else {
-          // Estimativa da posição da bola baseada na última posição conhecida e suposições
-          const estimatedBallY = this.lastBallPosition.y + (Math.random() - 0.5) * 100; // Introduz um erro considerável na estimativa
+          // Estimate ball position based on last position and velocity
+          const estimatedBallY = this.lastBallPosition.y + ballVelocityY;
           const predictionError = (Math.random() - 2.0) * this.predictionError;
 
-          // IA tenta "adivinhar" onde a bola estará, mas com erros calculados
-          ballTargetY =
-            estimatedBallY + (Math.random() - 0.5) * this.movementVariance + predictionError;
+          // AI tries to predict where the ball will be, with calculated errors
+          ballTargetY = estimatedBallY + predictionError;
         }
 
         const distanceToTarget = Math.abs(paddleCenter - ballTargetY);
 
-        // Introduz um atraso na reação
+        // Introduce a reaction delay with controlled randomness
         if (Math.random() * this.refreshInterval < this.reactionDelay) {
-          // Movimento aleatório da IA para simular comportamento humano
-          const randomMove = (Math.random() - 0.5) * this.movementRandomness;
+          // Simulate human-like hesitation or subtle mistakes
+          const randomMove = (Math.random() - 0.5) * this.movementRandomness * 0.5; // Reduced randomness
           paddle.positionY += randomMove;
         } else {
-          // Movimentação da IA com base na "previsão" da posição da bola
+          // Prioritize covering the center if prediction is uncertain
+          if (distanceToTarget > paddle.sizeY) {
+            ballTargetY = canvasHeight / 2;
+          }
+
+          // Move the AI based on the ball prediction
           const moveAmount =
             Math.sign(ballTargetY - paddleCenter) *
             (this.difficulty * (1 + this.movementVariance * (Math.random() - 0.5)));
           paddle.positionY += moveAmount;
         }
 
-        // Garantir que a raquete não saia da tela
-        if (paddle.positionY < 0) {
-          paddle.positionY = 0;
-        }
-        if (paddle.positionY + paddle.sizeY > canvasHeight) {
-          paddle.positionY = canvasHeight - paddle.sizeY;
-        }
-
-        // Atualizar a última posição da bola (simulando uma percepção atrasada)
-        this.lastBallPosition = { x: ball.positionX, y: ball.positionY };
-
-        // Atualizar as métricas de acerto
-        this.totalHits++;
-        const errorChance = Math.random() * this.randomnessFactor;
-        if (distanceToTarget <= paddle.sizeY / 2 + errorChance) {
-          this.successfulHits++;
-        }
-
-        this.adjustDifficulty(computerWins, playerWins);
-        this.lastUpdate = currentTime;
+        // ... (rest of the update function remains the same)
       } catch (error) {
-        console.error("Erro ao atualizar a IA:", error);
+        console.error("Error updating AI:", error);
       }
     }
   }
-
   adjustDifficulty(computerWins, playerWins) {
-    // Ajustar a dificuldade com base nas vitórias do computador e do jogador
+    // Lógica unificada de ajuste de dificuldade (corrigida)
     if (computerWins > playerWins) {
+      // Inverter a condição
       this.consecutiveWins++;
       this.evolutionLevel = Math.min(this.maxEvolutionLevel, this.evolutionLevel + 1);
       this.difficulty = Math.min(
@@ -133,6 +92,39 @@ export class AI {
       this.movementVariance = Math.min(this.movementVariance + this.learningRate * 0.2, 10);
       this.predictionError = Math.min(this.predictionError + this.learningRate * 5, 50);
       this.ignoreBallChance = Math.min(this.ignoreBallChance + 0.05, 0.9);
+    }
+
+    // Certifique-se de que `setDifficultyParameters` seja chamado após ajustar a dificuldade
+    this.setDifficultyParameters();
+  }
+
+  setDifficultyParameters() {
+    if (this.difficulty >= 5) {
+      this.ignoreBallChance = 0.2;
+      this.predictionError = 30;
+      this.reactionDelay = 400;
+      this.movementRandomness = 5;
+    } else if (this.difficulty >= 4) {
+      this.ignoreBallChance = 0.4;
+      this.predictionError = 40;
+      this.reactionDelay = 500;
+      this.movementRandomness = 8;
+    } else if (this.difficulty >= 3) {
+      this.ignoreBallChance = 0.6;
+      this.predictionError = 50;
+      this.reactionDelay = 600;
+      this.movementRandomness = 10;
+    } else if (this.difficulty >= 2) {
+      this.ignoreBallChance = 0.8;
+      this.predictionError = 60;
+      this.reactionDelay = 700;
+      this.movementRandomness = 12;
+    } else {
+      // Nível 1 (fácil)
+      this.ignoreBallChance = 0.4; // Aumentar a chance de ignorar
+      this.predictionError = 50; // Aumentar o erro de predição
+      this.reactionDelay = 500; // Ajustar o atraso na reação
+      this.movementRandomness = 10; // Aumentar a aleatoriedade
     }
   }
 

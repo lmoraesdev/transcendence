@@ -175,6 +175,8 @@ const GamePage = () => {
         window.cancelAnimationFrame(idSolo);
       } else {
         //precisa despausar
+        const newIdSolo = window.requestAnimationFrame(gameLoopSolo);
+        localStorage.setItem("loopIdSolo", newIdSolo);
       }
     }
   });
