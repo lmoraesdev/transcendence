@@ -197,6 +197,9 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 
   function gameLoopSolo() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    if (scorePlayer >= 7 || scoreComputer >= 7) {
+      return; // Não continuar o loop se alguma das pontuações for 7 ou maior
+    }
     // Renderizar a bola e as raquetes
     ball.render(ctx);
     paddlePlayer.render(ctx);
