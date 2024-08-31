@@ -88,8 +88,10 @@ class TournamentView(APIView):
                 logger.error(f"Tournament not found for player {playerId}")
                 return Response({"statusCode": 404, "message": "Tournament not found"})
 
-        tournaments = Tournament.objects.filter(status="PN")
+        tournaments = Tournament.objects.filter(status="PD")
+        logger.debug(f"torneios pendende {pformat(tournaments)}")
         tournamentPlayerFinished = PlayerTournament.objects.filter(playerId=player).order_by("-id").first()
+        logger.debug(f"tournamentPlayerFinished {pformat(tournamentPlayerFinished)}")
         responseData = {}
         
         if tournamentPlayerFinished:
@@ -117,7 +119,7 @@ class TournamentView(APIView):
         action = request.data.get('action')
         tournamentId = request.data.get('tournamentId')
         name = request.data.get('name')
-        playerId = request.data.get('id')
+        playerId = request.decoded_token.get('id')
         
         logger.info(f"Received request with action={action}, tournamentId={tournamentId}, name={name}, playerId={playerId}")
         
@@ -158,11 +160,13 @@ class TournamentView(APIView):
             return Response({"statusCode": 402, "message": "Missing Tournament id"})
         
         if "join" in action:
-            if tournamentId is None or len(tournamentId) == 0:
+            logger.debug("entoru no join")
+            if tournamentId is None:
                 logger.error("Missing Tournament id")
                 return Response({"statusCode": 400, "message": "Missing Tournament id"})
-            
-            if tournament.status == "PN" and serializer.getPlayerCount < settings.COMPETITORS:
+            logger.debug(f"tournament {pformat(tournament)}")
+            # logger.debug(f"{serializer.getPlayerCount} < {settings.COMPETITORS}")
+            if tournament.status == "PD" and serializer.getPlayerCount(tournament) < settings.COMPETITORS:
                 if serializer.playerInTournament(player):
                     logger.warning(f"Player {playerId} already in Tournament {tournamentId}")
                     return Response({"statusCode": 400, "message": "Already in a Tournament"})
@@ -196,35 +200,46 @@ class TournamentView(APIView):
                 return Response({"statusCode": 200, "message": "Player removed from Tournament"})
         
         elif "start" in action:
+            logger.debug("entoru no start")
             if not PlayerTournament.objects.filter(playerId=player, tournamentId=tournament, creator=True).exists():
                 logger.error(f"Player {playerId} cannot start Tournament {tournamentId}")
                 return Response({"statusCode": 400, "message": "Tournament cannot be started"})
-            
+            logger.debug("passou o 1 if")
             if serializer.getPlayerCount(tournament) != settings.COMPETITORS:
                 logger.error(f"Tournament {tournamentId} not full yet")
                 return Response({"statusCode": 400, "message": "Tournament not full yet"})
-            
+            logger.debug("passou o 2 if")
             if tournament.status == Tournament.StatusChoices.PENDING.value:
                 playersTournaments = PlayerTournament.objects.filter(tournamentId=tournament)
                 playersCycle = cycle(playersTournaments)
+                logger.debug("dentro do 3 if")
                 
                 for _ in range(0, settings.COMPETITORS - 1, 2):
-                    player1 = next(playersCycle).playerId
-                    player2 = next(playersCycle).playerId
-                    tournamentMatch = Match.objects.create(
-                        tournament=tournament,
-                        game=Match.Game.PONG.value,
-                        round=tournament.round
-                    )
-                    PlayerMatch.objects.create(
-                        match_id=tournamentMatch,
-                        playerId=player1
-                    )
-                    PlayerMatch.objects.create(
-                        match_id=tournamentMatch,
-                        playerId=player2
-                    )
-                
+                    try:
+                        logger.debug("inicio do loop");
+                        player1 = next(playersCycle).playerId
+                        logger.debug(f"player1 {player1}")
+                        player2 = next(playersCycle).playerId
+                        logger.debug(f"player2 {player2}")
+                        tournamentMatch = Match.objects.create(
+                            tournament=tournament,
+                            game=Match.Game.PONG.value,
+                            round=tournament.round
+                        )
+                        logger.debug(f"tournamentMatch = {tournamentMatch}")
+                        pm1 = PlayerTournament.objects.create(
+                            matchId=tournamentMatch,
+                            playerId=player1
+                        )
+                        logger.debug(f"PlayerMatch1 = {pm1}")
+                        pm2 = PlayerMatch.objects.create(
+                            matchId=tournamentMatch,
+                            playerId=player2
+                        )
+                        logger.debug(f"PlayerMatch2 = {pm2}")
+                    except Exception as e:
+                        logger.debug(f"erro: {pformat(e)}")
+
                 tournament.status = Tournament.StatusChoices.PROGRESS.value
                 tournament.save()
                 logger.info(f"Tournament {tournamentId} started")

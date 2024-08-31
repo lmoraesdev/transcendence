@@ -7,7 +7,7 @@ const TournamentPlayers = () => {
 
   templateContainer.innerHTML = `
       <section class="tournament-players-list d-flex flex-wrap align-self-stretch gap-1"></section>
-      <div class="d-flex flex-wrap justify-content-center align-items-center gap-1">
+      <div class="d-flex flex-wrap justify-content-start align-items-center gap-1">
         <button class="start btn">START</button>
         <button class="leave btn">LEAVE</button>
       </div>
@@ -16,7 +16,7 @@ const TournamentPlayers = () => {
   container.appendChild(templateContainer);
   container.classList.add(
     "flex-column",
-    "justify-content-center",
+    "justify-content-start",
     "align-items-center",
     "gap-2",
     "p-2",

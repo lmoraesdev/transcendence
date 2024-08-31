@@ -91,7 +91,7 @@ const TournamentPopup = async (actionType, data) => {
 
       const payload = JSON.stringify({
         action: "create",
-        name: data.currentTournament.name,
+        name: popup_input_tournament_name.value,
         id: id,
       });
 
@@ -117,14 +117,14 @@ const TournamentPopup = async (actionType, data) => {
     popup_header.textContent = "Join Tournament";
     popup_description.textContent = "To confirm your participation in the tournament below, click on the button:";
     popup_input_tournament_name.style.display = "none";
-    popup_tournament_name.textContent = data.currentTournament.name;
+    popup_tournament_name.textContent = data.tournaments[data.tournaments.length - 1].name; //arumar dps
     popup_btn.textContent = "Join";
 
     popup_btn.addEventListener("click", (event) => {
       event.preventDefault();
       const payload = JSON.stringify({
         action: "join",
-        tournamentId: data.currentTournament.id,
+        tournamentId: data.tournaments[data.tournaments.length - 1].id,
         id: id,
       });
 

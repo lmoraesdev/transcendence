@@ -64,12 +64,15 @@ const TournamentPage = () => {
     parentElement.innerHTML = "";
     parentElement.appendChild(component);
 
+    TournamentPlayers();
+    TournamentPlayerCard();
+    TournamentMatches();
     const tournamentActions = parentElement.querySelector(".tournament-actions");
     const tournamentCurrent = parentElement.querySelector(".tournament-current");
     const tournamentPlayers = tournamentCurrent.querySelector("#tournament-player");
     const tournamentPlayersStart = tournamentPlayers.querySelector(".start");
     const tournamentPlayersLeave = tournamentPlayers.querySelector(".leave");
-    const tournamentMatches = tournamentCurrent.querySelector(".tournament-matches");  
+    const tournamentMatches = tournamentCurrent.querySelector(".match");  
     const createBtn = tournamentActions.querySelector(".tournament-create button");
     const tournamentList = document.querySelector(".tournament-list");
 
@@ -85,17 +88,21 @@ const TournamentPage = () => {
           TournamentPopup("CREATE", data);
         });
       } else {
-        TournamentCard(data.currentTournament);
         tournamentList.textContent = "No tournaments available";
       }
 
-      if (data.currentTournament.status === "PD") {
-        TournamentPlayers();
-        TournamentMatches();
+      if (data.tournaments || (data.currentTournament && data.currentTournament.status === "PD")) {
+        if (data.currentTournament)
+          TournamentCard(data.currentTournament);
+        else {
+          for (const tournament of data.tournaments)
+            TournamentCard(tournament);
+        }
         const cardContainer = document.querySelector("#tournament-container");
         const tournamentCard = cardContainer.querySelector(".card");
         if (tournamentCard) {
-          tournamentCard.addEventListener("click", () => {
+          tournamentCard.addEventListener("click", (values) => {
+            console.log('values', values);
             const tournamentPopup = document.createElement("tournament-popup");
             tournamentPopup.setAttribute("popup-type", "JOIN");
             tournamentPopup.setAttribute("tournament-id", data.id);
@@ -111,27 +118,34 @@ const TournamentPage = () => {
         tournamentActions.classList.add("border-start");
         tournamentActions.classList.add("border-light-subtle");
         tournamentCurrent.classList.add("d-flex");
+      
         if (data.currentTournament.status === "PD") {
           tournamentPlayers.classList.remove("d-none");
-          tournamentPlayers.classList.remove("d-flex");
+          tournamentPlayers.classList.add("d-flex");
+      
           for (const player of data.players) {
             const playerElement = document.createElement("tournament-player-card");
-            const tournamentPlayerCard = document.querySelector('.tournament-player-card');
-            tournamentPlayerCard.querySelector(".avatar-card").src = player.avatar ? player.avatar : "/web/images/profile.png";
-            tournamentPlayerCard.querySelector(".alias-name").textContent = truncateUsername(player.username);
+            playerElement.innerHTML = `
+              <div class="tournament-player-card">
+                <img class="avatar-card" src="${player.avatar ? player.avatar : '/web/images/profile.png'}" alt="Avatar">
+                <span class="alias-name">${truncateUsername(player.username)}</span>
+              </div>
+            `;
             playerElement.setAttribute("status", "PD");
-            TournamentPlayerCard();
+            tournamentPlayers.appendChild(playerElement);
           }
         }
-        if (data.currentTournament.creator === true) {
+      
+        if (data.currentTournament.creator === true && tournamentPlayersStart) {
           tournamentPlayersStart.classList.remove("d-none");
           tournamentPlayersStart.classList.add("d-block");
         }
+      
         tournamentPlayersStart.addEventListener("click", () => {
           fetching(
             `https://${window.ft_transcendence_host}/tournament/`,
             "POST",
-            JSON.stringify({ action: "start", tournamentId: data.currentTournament.id }),
+            JSON.stringify({ action: "start", tournamentId: data.currentTournament.id, name: data.currentTournament.name }),
             { "Content-Type": "application/json" },
           ).then((data) => {
             if (data.status === 200) {
@@ -141,35 +155,38 @@ const TournamentPage = () => {
             }
           });
         });
+      
         tournamentPlayersLeave.addEventListener("click", () => {
           fetching(
             `https://${window.ft_transcendence_host}/tournament/`,
             "POST",
-            JSON.stringify({ action: "leave", tournamentId: data.currentTournament.id }),
+            JSON.stringify({ action: "leave", tournamentId: data.currentTournament.id, name: data.currentTournament.name }),
             { "Content-Type": "application/json" },
           ).then((data) => {
             window.location.reload(); //REMOVE
           });
         });
       } else {
-        tournamentMatches.classList.remove("d-none");
-        tournamentMatches.classList.add("d-flex");
-        const matchElements = parentElement.querySelectorAll("tournament-match-card");
-        for (let i = 0; i < 7; ++i) {
-          const match = data.currentTournament.matches[i];
-          const matchElement = matchElements[i];
-          if (match) {
-            matchElement.setAttribute("match-id", match.id);
-            if (match.current) {
-              matchElement.querySelector("button").classList.remove("d-none");
-            }
-            for (let j = 0; j < 2; ++j) {
-              const player = match.players[j];
-              const playerElement = matchElement.querySelector(`.player${j + 1}`);
-              playerElement.querySelector("h6").textContent = player.players.username;
-              playerElement.querySelector("img").src = player.players.avatar;
-              if (match.currentTournament.state === "PL")
-                playerElement.querySelector("h3").textContent = player.score;
+        if (tournamentMatches) {
+          tournamentMatches.classList.remove("d-none");
+          tournamentMatches.classList.add("d-flex");
+          const matchElements = parentElement.querySelectorAll("tournament-match-card");
+          for (let i = 0; i < 7; ++i) {
+            const match = data.currentTournament.matches[i];
+            const matchElement = matchElements[i];
+            if (match) {
+              matchElement.setAttribute("match-id", match.id);
+              if (match.current) {
+                matchElement.querySelector("button").classList.remove("d-none");
+              }
+              for (let j = 0; j < 2; ++j) {
+                const player = match.players[j];
+                const playerElement = matchElement.querySelector(`.player${j + 1}`);
+                playerElement.querySelector("h6").textContent = player.players.username;
+                playerElement.querySelector("img").src = player.players.avatar;
+                if (match.currentTournament.state === "PL")
+                  playerElement.querySelector("h3").textContent = player.score;
+              }
             }
           }
         }

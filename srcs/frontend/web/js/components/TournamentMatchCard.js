@@ -13,16 +13,20 @@ const TournamentMatchCard = () => {
     </template>
   `;
 
+  const player = document.querySelector('#tournament-player')
+
+
   if (!document.querySelector('#tournament-match-card')) {
     const templateContainer     = document.createElement('div');
     templateContainer.innerHTML = tournamentMatchCardHTML;
-    document.body.appendChild(templateContainer);
+    player.appendChild(templateContainer);
   }
+
 
   const template = document.getElementById("tournament-match-card");
   const component = template.content.cloneNode(true);
 
-  const tournamentMatchCard = document.querySelector('.tournament-match-card');
+  const tournamentMatchCard = document.querySelector('#tournament-match-card');
   tournamentMatchCard.appendChild(component);
   tournamentMatchCard.classList.add(
     "d-flex",
