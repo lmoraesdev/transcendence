@@ -1,5 +1,5 @@
 import fetching from '../helpers/fetching.js';
-import { toggleSound } from '../helpers/soundControl.js';
+import { getSoundStatus, toggleSoundStatus } from '../helpers/soundControl.js';
 import TwofaInput from "../components/Input/TwofaInput.js";
 import helpers from '../helpers/helpers.js';
 
@@ -123,9 +123,17 @@ const SettingPage = () => {
   const popup_twofa_close = parentElement.querySelector(".btn-close");
   const checkbox_sound = parentElement.querySelector('#toggle-sound-btn');
 
-  checkbox_sound.addEventListener('click', () => {
-    toggleSound();
-  });
+  const soundStatus = getSoundStatus();
+  checkbox_sound.checked = soundStatus;
+
+  console.log("On page load: Sound enabled?", soundStatus);
+  console.log("On page load: Sound checkbox checked?", checkbox_sound.checked);
+
+
+  checkbox_sound.onchange = () => {
+    toggleSoundStatus();
+    console.log("After change: Sound enabled?", getSoundStatus());
+  };
 
   fetching(`https://${window.ft_transcendence_host}/player/`).then((res) => {
     avatar.src = res.player.avatar ? res.player.avatar : "/web/images/profile.png";
