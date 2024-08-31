@@ -28,9 +28,22 @@ const ProfilePage = () => {
             </p>
           </article>
           <section class="data-section d-flex flex-wrap justify-content-center gap-2 p-2 rounded-5" role="region" aria-labelledby="stats">
-            <h2 id="stats" class="visually-hidden">Statistics</h2>
+            <h2 id="stats" class="visually-hidden text-black">Statistics</h2>
+            <article class="d-flex flex-column justify-content-center rounded-5 p-2" aria-labelledby="current-stats-title">
+              <h3 id="current-stats-title" class="m-0 p-3 fw-light text-center">Total wins</h3>
+              <table  class="table w-100 text-center fw-light">
+                <thead>
+                  <tr>
+                    <th>Wins</th>
+                  </tr>
+                </thead>
+                <tbody id="current"></tbody>
+              </table>
+            </article>
+            
             <article class="d-flex flex-column justify-content-center rounded-5 p-2" aria-labelledby="training-stats-title">
-              <h3 id="training-stats-title" class="m-0 p-3 fw-light text-center">Training Statistics</h3>
+              <p id="msg-error"></p>
+              <h3 id="training-stats-title" class="m-0 p-3 fw-light text-center">Your Training Stats</h3>
               <table  class="table w-100 text-center fw-light">
                 <thead>
                   <tr>
@@ -46,17 +59,19 @@ const ProfilePage = () => {
               </table>
             </article>
             <article class="d-flex flex-column justify-content-center rounded-5 p-2" aria-labelledby="current-stats-title">
-              <h3 id="current-stats-title" class="m-0 p-3 fw-light text-center">Current Statistics</h3>
+              <h3 id="current-stats-title" class="m-0 p-3 fw-light text-center">Comparison with AI training statistics</h3>
               <table  class="table w-100 text-center fw-light">
                 <thead>
                   <tr>
-                    <th>AI Wins</th>
-                    <th>Player Wins</th>
-                    <th>AI Losses</th>
-                    <th>Player Losses</th>
+                    <th>Wins</th>
+                    <th>Accuracy</th>
+                    <th>Total Points</th>
+                    <th>Performance</th>
+                    <th>Correct Blocks</th>
+                    <th>Total Blocks</th>
                   </tr>
                 </thead>
-                <tbody id="current-stats"></tbody>
+                <tbody id="current-stats-ia"></tbody>
               </table>
             </article>
           </section>
@@ -101,42 +116,94 @@ const ProfilePage = () => {
     parentElement.querySelector(".player-data .first-name").innerText = playerData.first_name || "";
     parentElement.querySelector(".player-data .last-name").innerText = playerData.last_name || "";
 
-    const currentStatsTable = parentElement.querySelector("#current-stats");
+    const currentStatsTable = parentElement.querySelector("#current");
 
     const rowStats = document.createElement('tr');
     rowStats.innerHTML = `
-      <td>${playerData.wins?.ai || '0'}</td>
-      <td>${playerData.wins?.players || '0'}</td>
-      <td>${playerData.losses?.ai || '0'}</td>
-      <td>${playerData.losses?.players || '0'}</td>
+      <td>${playerData.wins || '0'}</td>
     `;
 
     currentStatsTable.appendChild(rowStats);   
 
   });
 
-  try {
-    fetching(`https://${window.ft_transcendence_host}/player/training/`).then((trainingRes) => {
-      const trainingData = trainingRes.training;
+  fetching(`https://${window.ft_transcendence_host}/player/training/`)
+  .then((trainingRes) => {
+    const trainingData = trainingRes.training;
 
-      const trainingStatsTable = parentElement.querySelector("#training-stats");
+    const trainingStatsTable = parentElement.querySelector("#training-stats");
+    const trainingStatsIATable = parentElement.querySelector("#training-stats-ia");
+    const msgErrorContainer = parentElement.querySelector("#msg-error");
 
-      const rowTraining = document.createElement('tr');
-      rowTraining.innerHTML = `
-        <td>${trainingData.wins || '0'}</td>
-        <td>${trainingData.accuracy || '0'}</td>
-        <td>${trainingData.totalPoints || '0'}</td>
-        <td>${trainingData.performance || '0'}</td>
-        <td>${trainingData.correctBlocks || '0'}</td>
-        <td>${trainingData.totalBlocks || '0'}</td>
-      `;
-      trainingStatsTable.appendChild(rowTraining);
+    if (trainingData.length <=  0) {
+      const rowMsgError = document.createElement('p');
+      rowMsgError.innerHTML = `<td colspan="6">Failed to load training data</td>`;
+      msgErrorContainer.appendChild(rowMsgError);
+      msgErrorContainer.classList.add(
+        "text-danger",
+        "text-center"
+      );
 
-      setFocus(parentElement.querySelector(".avatar"));
-    });
-  } catch (error) {
+    } else {
+      trainingData.forEach((training) => {
+        if (training.PlayerTraining && training.PlayerTraining.length > 0) {
+          training.PlayerTraining.forEach((session) => {
+            const rowTraining = document.createElement('tr');
+            rowTraining.innerHTML = `
+              <td>${session.win ? session.win : '0'}</td>
+              <td>${session.accuracy || '0'}</td>
+              <td>${session.totalPoints || '0'}</td>
+              <td>${session.playerPerformance || '0'}</td>
+              <td>${session.correctBlocks || '0'}</td>
+              <td>${session.totalBlocks || '0'}</td>
+            `;
+            trainingStatsTable.appendChild(rowTraining);
+          });
+        } else {
+          const rowTraining = document.createElement('tr');
+          console.warn("PlayerTraining data not found");
+          rowTraining.innerHTML = `<td colspan="6">PlayerTraining data not found</td>`;
+          trainingStatsTable.appendChild(rowTraining);
+        }
+  
+        if (training.IaTraining && training.IaTraining.length > 0) {
+          training.IaTraining.forEach((session) => {
+            const rowTrainingIA = document.createElement('tr');
+            rowTrainingIA.innerHTML = `
+              <td>${session.win ? session.win : '0'}</td>
+              <td>${session.accuracy || '0'}</td>
+              <td>${session.totalPoints || '0'}</td>
+              <td>${session.playerPerformance || '0'}</td>
+              <td>${session.correctBlocks || '0'}</td>
+              <td>${session.totalBlocks || '0'}</td>
+            `;
+            trainingStatsIATable.appendChild(rowTrainingIA);
+          });
+        } else {
+          const rowTrainingIA = document.createElement('tr');
+          console.warn("IaTraining data not found");
+          rowTrainingIA.innerHTML = `<td colspan="6">IaTraining data not found</td>`;
+          trainingStatsIATable.appendChild(rowTrainingIA);
+        }
+      });
+    };
+
+    setFocus(parentElement.querySelector(".avatar"));
+  })
+  .catch((error) => {
     console.error("Failed to fetch training data:", error);
-  }
+    
+    const trainingStatsTable = parentElement.querySelector("#training-stats");
+    const trainingStatsIATable = parentElement.querySelector("#training-stats-ia");
+
+    const errorRowTraining = document.createElement('tr');
+    errorRowTraining.innerHTML = `<td colspan="6">Failed to load training data</td>`;
+    trainingStatsTable.appendChild(errorRowTraining);
+
+    const errorRowTrainingIA = document.createElement('tr');
+    errorRowTrainingIA.innerHTML = `<td colspan="6">Failed to load AI training data</td>`;
+    trainingStatsIATable.appendChild(errorRowTrainingIA);
+  });
 
   MatchHistory();
   // FriendsList(); Reparar a quebra da listagem

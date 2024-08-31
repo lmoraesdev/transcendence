@@ -76,7 +76,7 @@ const LeaderboardsPage = async () => {
         const row = document.createElement('tr');
         row.setAttribute('role', 'row');
         row.innerHTML = `
-          <td>${player.victory + player.victoryVsAI ? player.victory + player.victoryVsAI : "N/A"}</td>
+          <td>${player.victory ? player.victory : "N/A"}</td>
           <td>${start + index + 1}º</td>
           <td>${player.victory ? player.victory : "0"}</td>
           <td>${player.victoryVsAI || '0'}</td>
