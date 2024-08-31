@@ -51,7 +51,6 @@ const GamePage = () => {
         <div class="d-flex  justify-content-around align-items-center my-4">
           <button class="btn btn-outline-warning fw-bold" id="exit">Exit</button>
           <button class="btn btn-outline-warning fw-bold" id="new-game">New Game</button>
-          <button class="btn btn-outline-warning fw-bold" id="pause">|| Pause</button>
           <button class="btn btn-outline-warning fw-bold" id="play">Play ></button>
           <button class="btn btn-outline-warning fw-bold" id="sound">Sound On</button>
         </div>
@@ -78,7 +77,6 @@ const GamePage = () => {
   const soundButton = document.getElementById("sound");
   const playButton = document.getElementById("play");
   const newGame = document.getElementById("new-game");
-  const pauseButton = document.getElementById("pause");
   const canvas = document.getElementById("canvas-pong");
   const ctx = canvas.getContext("2d");
 
@@ -95,18 +93,9 @@ const GamePage = () => {
   let match_id = game_match_query ? Number(game_match_query) : null;
 
   let gameRunning = false;
-  let gamePaused = false;
 
   function drawOverlay() {
-    if (gamePaused) {
-      const overlay = document.getElementById("canvas-pong");
-      overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-      overlay.style.zIndex = "10";
-      overlay.style.pointerEvents = "none";
-      overlay.style.display = "flex";
-    } else {
-      canvas.style.backgroundColor = "black";
-    }
+    canvas.style.backgroundColor = "black";
   }
 
   switch (game_type_query) {
@@ -166,31 +155,14 @@ const GamePage = () => {
     }
   };
 
-  pauseButton.addEventListener("click", () => {
-    if (gameRunning) {
-      gamePaused = !gamePaused;
-      drawOverlay();
-      if (gamePaused) {
-        const idSolo = localStorage.getItem("loopIdSolo");
-        window.cancelAnimationFrame(idSolo);
-      } else {
-        //precisa despausar
-        const newIdSolo = window.requestAnimationFrame(gameLoopSolo);
-        localStorage.setItem("loopIdSolo", newIdSolo);
-      }
-    }
-  });
-
   playButton.addEventListener("click", () => {
     if (!gameRunning) {
       gameRunning = true;
-      gamePaused = false;
       drawOverlay();
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       startGame();
     } else {
       gameRunning = true;
-      gamePaused = false;
       drawOverlay();
       resumeGame();
     }
@@ -198,7 +170,6 @@ const GamePage = () => {
 
   newGame.addEventListener("click", () => {
     gameRunning = true;
-    gamePaused = false;
     startNewGame();
     drawOverlay();
   });
