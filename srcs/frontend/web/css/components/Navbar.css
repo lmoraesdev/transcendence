@@ -10,6 +10,9 @@
 .btn-outline-warning {
   border: none !important;
   color: #F3C00C;
+  background: none !important;
+  border-radius: 0px !important;
+  border-bottom: 2px solid transparent !important;
 }
 
 .btn-outline-warning:hover {
@@ -49,7 +52,6 @@
     width: 100%;
     text-align: left;
     padding: 15px;
-    border-bottom: 1px solid #F3C00C;
   }
 }
 
