@@ -1,7 +1,7 @@
 import fetching from "../helpers/fetching.js";
 import MatchHistory from "../components/MatchHistory.js";
 import FriendsList from "../components/FriendsList.js";
-import helpers from '../helpers/helpers.js';
+import helpers from "../helpers/helpers.js";
 
 const { setFocus } = helpers;
 
@@ -38,8 +38,8 @@ const ProfilePage = () => {
     </template>
   `;
 
-  const templateProfile = document.createElement('div');
-  if (!document.querySelector('#profile-template')) {
+  const templateProfile = document.createElement("div");
+  if (!document.querySelector("#profile-template")) {
     templateProfile.innerHTML = profileHTML;
     document.body.appendChild(templateProfile);
   }
@@ -55,82 +55,68 @@ const ProfilePage = () => {
     fetching(`https://${window.ft_transcendence_host}/player/`).then((res) => {
       const playerData = res.player;
 
-      console.log(playerData);
-  
-      const avatarAlt = `Profile photo of ${playerData.username || 'the user'}`;
+      const avatarAlt = `Profile photo of ${playerData.username || "the user"}`;
       const avatarImages = parentElement.querySelector(".avatar");
       avatarImages.src = playerData.avatar ? playerData.avatar : "/web/images/profile.png";
       parentElement.querySelector(".avatar").alt = avatarAlt;
       parentElement.querySelector(".player-data .username").innerText = playerData.username || "";
-      // parentElement.querySelector(".player-data .first-name").innerText = playerData.firstName || "";
-      // parentElement.querySelector(".player-data .last-name").innerText = playerData.lastName || "";
-      // const currentStatsTable = parentElement.querySelector("#current");
-  
-      // const rowStats = document.createElement('tr');
-      // rowStats.innerHTML = `
-      //   <td>${playerData.wins || '0'}</td>
-      // `;
-  
-      // currentStatsTable.appendChild(rowStats);   
-  
     });
   } catch (error) {
     console.error(error);
   }
 
   fetching(`https://${window.ft_transcendence_host}/player/training/`)
-  .then((trainingRes) => {
-    const trainingData = trainingRes.training;
+    .then((trainingRes) => {
+      const trainingData = trainingRes.training;
 
-    const trainingStatsTable = parentElement.querySelector("#training-stats");
-    const trainingStatsIATable = parentElement.querySelector("#training-stats-ia");
-    const msgErrorContainer = parentElement.querySelector("#msg-error");
+      const trainingStatsTable = parentElement.querySelector("#training-stats");
+      const trainingStatsIATable = parentElement.querySelector("#training-stats-ia");
+      const msgErrorContainer = parentElement.querySelector("#msg-error");
 
-    if (trainingData.length <=  0) {
-      /*const rowMsgError = document.createElement('div');
+      if (trainingData.length <= 0) {
+        /*const rowMsgError = document.createElement('div');
       rowMsgError.innerHTML = `<td colspan="6">Failed to load training data</td>`;
       msgErrorContainer.appendChild(rowMsgError);
       msgErrorContainer.classList.add(
         "text-danger",
         "text-center"
       );*/
-
-    } else {
-      trainingData.forEach((training) => {
-        if (training.PlayerTraining && training.PlayerTraining.length > 0) {
-          training.PlayerTraining.forEach((session) => {
-            const rowTraining = document.createElement('tr');
-            rowTraining.innerHTML = `
-              <td>${session.win ? session.win : '0'}</td>
+      } else {
+        trainingData.forEach((training) => {
+          if (training.PlayerTraining && training.PlayerTraining.length > 0) {
+            training.PlayerTraining.forEach((session) => {
+              const rowTraining = document.createElement("tr");
+              rowTraining.innerHTML = `
+              <td>${session.win ? session.win : "0"}</td>
             `;
+              trainingStatsTable.appendChild(rowTraining);
+            });
+          } else {
+            const rowTraining = document.createElement("tr");
+            console.warn("PlayerTraining data not found");
+            rowTraining.innerHTML = `<td colspan="6">PlayerTraining data not found</td>`;
             trainingStatsTable.appendChild(rowTraining);
-          });
-        } else {
-          const rowTraining = document.createElement('tr');
-          console.warn("PlayerTraining data not found");
-          rowTraining.innerHTML = `<td colspan="6">PlayerTraining data not found</td>`;
-          trainingStatsTable.appendChild(rowTraining);
-        }
-  
-        if (training.IaTraining && training.IaTraining.length > 0) {
-          training.IaTraining.forEach((session) => {
-            const rowTrainingIA = document.createElement('tr');
-            rowTrainingIA.innerHTML = `
-              <td>${session.win ? session.win : '0'}</td>
-            `;
-            trainingStatsIATable.appendChild(rowTrainingIA);
-          });
-        } else {
-          console.warn("IaTraining data not found");
-        }
-      });
-    };
+          }
 
-    setFocus(parentElement.querySelector(".avatar"));
-  })
-  .catch((error) => {
-    console.error("Failed to fetch training data:", error);
-  });
+          if (training.IaTraining && training.IaTraining.length > 0) {
+            training.IaTraining.forEach((session) => {
+              const rowTrainingIA = document.createElement("tr");
+              rowTrainingIA.innerHTML = `
+              <td>${session.win ? session.win : "0"}</td>
+            `;
+              trainingStatsIATable.appendChild(rowTrainingIA);
+            });
+          } else {
+            console.warn("IaTraining data not found");
+          }
+        });
+      }
+
+      setFocus(parentElement.querySelector(".avatar"));
+    })
+    .catch((error) => {
+      console.error("Failed to fetch training data:", error);
+    });
 
   MatchHistory();
   FriendsList();

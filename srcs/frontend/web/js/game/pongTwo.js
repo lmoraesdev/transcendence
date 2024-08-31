@@ -2,7 +2,6 @@ export let wsTwo;
 let TwoPressKey = true;
 
 const setPlayerData = (data) => {
-  console.log("data:", data);
   const { avatar: avatar_left, username: username_left } = data["padd_left"];
   const { avatar: avatar_right, username: username_right } = data["padd_right"];
   const pong_players_elem = document.querySelector(".pong-players");

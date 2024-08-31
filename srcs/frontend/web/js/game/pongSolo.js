@@ -19,14 +19,11 @@ const getName = async () => {
   }
 };
 
-
-
 export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 0) {
   let scorePlayer = ptsPlayer;
   let scoreComputer = ptsComputer;
   let namePlayer = await getName();
 
-  // get banco
   const traningValues = await fetching(`https://${window.ft_transcendence_host}/player/training/`);
 
   let playerWins = parseInt(traningValues.playerTrainingWin) || 0;
@@ -48,12 +45,6 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 
   const reboundSound = new Audio(
     "https://assets.mixkit.co/active_storage/sfx/2073/2073-preview.mp3",
   );
-
-  gameOverSound.addEventListener("canplaythrough", () =>
-    console.log("Som de game over carregado."),
-  );
-  winGameSound.addEventListener("canplaythrough", () => console.log("Som de vitória carregado."));
-  reboundSound.addEventListener("canplaythrough", () => console.log("Som de rebote carregado."));
 
   let ai = new AI(1);
 
@@ -130,10 +121,8 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 
         canvas.height / 2,
       );
 
-      //Banco de dados aqui
       try {
         if (scoreComputer >= 7) {
-          // computerWins += 1;
           fetch(`https://${window.ft_transcendence_host}/player/training/`, {
             method: "POST",
             headers: {
@@ -153,8 +142,6 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 
 
           await playSound(gameOverSound);
         } else if (scorePlayer >= 7) {
-          // playerWins += 1;
-
           fetch(`https://${window.ft_transcendence_host}/player/training/`, {
             method: "POST",
             headers: {
@@ -196,14 +183,12 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (scorePlayer >= 7 || scoreComputer >= 7) {
-      return; // Não continuar o loop se alguma das pontuações for 7 ou maior
+      return;
     }
-    // Renderizar a bola e as raquetes
     ball.render(ctx);
     paddlePlayer.render(ctx);
     paddleComputer.render(ctx);
 
-    // Atualizar a bola e as raquetes
     ball.update();
     BallPaddleCollision(ball, paddlePlayer);
     BallPaddleCollision(ball, paddleComputer);
@@ -217,10 +202,8 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 
     paddleCollision(canvas, paddlePlayer);
     paddleCollision(canvas, paddleComputer);
 
-    // Desenhar a pontuação
     Score(ctx, canvas, scorePlayer, scoreComputer);
 
-    // Continuar o loop
     loopIdSolo = window.requestAnimationFrame(gameLoopSolo);
     localStorage.setItem("loopIdSolo", loopIdSolo);
   }
