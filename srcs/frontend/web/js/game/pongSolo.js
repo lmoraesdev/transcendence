@@ -137,42 +137,42 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 
         if (scoreComputer === 7) {
           // computerWins += 1;
           fetch(`https://${window.ft_transcendence_host}/player/training/`, {
-            method: 'POST',
+            method: "POST",
             headers: {
-             'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
-            body: JSON.stringify({ 
-              'training': {
-                'PlayerTraining': {
-                  'win': false
+            body: JSON.stringify({
+              training: {
+                PlayerTraining: {
+                  win: false,
                 },
-                'IaTraining': {
-                  'win': true
+                IaTraining: {
+                  win: true,
                 },
-              }
+              },
             }),
-          })
+          });
 
           await playSound(gameOverSound);
         } else if (scorePlayer === 7) {
           // playerWins += 1;
-          
+
           fetch(`https://${window.ft_transcendence_host}/player/training/`, {
-            method: 'POST',
+            method: "POST",
             headers: {
-             'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
-            body: JSON.stringify({ 
-              'training': {
-                'PlayerTraining': {
-                  'win': true
+            body: JSON.stringify({
+              training: {
+                PlayerTraining: {
+                  win: true,
                 },
-                'IaTraining': {
-                  'win': false
+                IaTraining: {
+                  win: false,
                 },
-              }
+              },
             }),
-          })
+          });
 
           await playSound(winGameSound);
         }
@@ -197,6 +197,9 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 
   function gameLoopSolo() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    if (scorePlayer >= 7 || scoreComputer >= 7) {
+      return; // Não continuar o loop se alguma das pontuações for 7 ou maior
+    }
     // Renderizar a bola e as raquetes
     ball.render(ctx);
     paddlePlayer.render(ctx);

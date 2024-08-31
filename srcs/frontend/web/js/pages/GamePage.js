@@ -175,6 +175,8 @@ const GamePage = () => {
         window.cancelAnimationFrame(idSolo);
       } else {
         //precisa despausar
+        const newIdSolo = window.requestAnimationFrame(gameLoopSolo);
+        localStorage.setItem("loopIdSolo", newIdSolo);
       }
     }
   });
@@ -204,6 +206,8 @@ const GamePage = () => {
   game_exit.addEventListener("click", () => {
     if (wsTwo) wsTwo.close(1000);
     if (wsFour) wsFour.close(1000);
+    const idSolo = localStorage.getItem("loopIdSolo");
+    window.cancelAnimationFrame(idSolo);
     router.go("/home/", "", "add");
   });
 
