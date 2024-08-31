@@ -10,16 +10,16 @@ export function runPongCoopGame(canvas, ctx) {
   let right = 0;
   canvas.width = 1920;
   canvas.height = 1080;
-  
+
   const ball = createBall([10, 10], [canvas.width / 2, canvas.height / 2], 20);
   const paddle1 = createPaddle(15, [60, canvas.height / 2 - 100], [40, 200]);
   const paddle2 = createPaddle(15, [canvas.width - 100, canvas.height / 2 - 100], [40, 200]);
-  
+
   gameLoop(canvas, ctx, ball, paddle1, paddle2);
-  
+
   window.onkeydown = (e) => KeyPressed[e.keyCode] = true;
   window.onkeyup = (e) => KeyPressed[e.keyCode] = false;
-  
+
   window.addEventListener("keydown", (e) => {
     if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(e.code) > -1) {
       e.preventDefault();
@@ -76,7 +76,7 @@ export function runPongCoopGame(canvas, ctx) {
       right += 1;
       ball.speedX = 10;
     }
-    if (left === 7 || right === 7) {
+    if (left >= 7 || right >= 7) {
       window.cancelAnimationFrame(loopId);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.font = "100px monospace";

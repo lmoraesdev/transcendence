@@ -5,34 +5,36 @@ const { truncateUsername, setFocus } = helpers;
 const LeaderboardsPage = async () => {
   const leaderboardHTML = `
     <template id="leaderboard-template">
-      <section class="leaderboard text-black bg-white h-100 p-0" role="region" aria-labelledby="leaderboard-header">
-        <header id="leaderboard-header" class="leaderboard-header d-flex align-items-center justify-content-center my-4">
-          <h1 class="text-center fs-5 mx-0">Leaderboard</h1>
-        </header>
-        <main class="leaderboard-content" role="main">
-          <div class="table-responsive">
-            <table class="table w-100 text-center" aria-describedby="table-description">
-              <thead>
-                <tr>
-                  <th scope="col">Score</th>
-                  <th scope="col">Ranking</th>
-                  <th scope="col">Wins vs Players</th>
-                  <th scope="col">Wins vs AI</th>
-                  <th scope="col">Nickname</th>
-                </tr>
-              </thead>
-              <tbody id="leaderboard-body" role="rowgroup"></tbody>
-            </table>
-            <p id="table-description" class="visually-hidden">Table showing player leaderboards including score, ranking, champion status, and number of wins.</p>
-          </div>
-          <nav class="pagination-container d-flex justify-content-center mt-4" role="navigation" aria-labelledby="pagination-label">
-            <h2 id="pagination-label" class="visually-hidden">Pagination controls</h2>
-            <button id="prev-page" class="btn btn-custom text-white mx-2" aria-label="Previous page" disabled>Previous</button>
-            <span id="page-number" class="mx-2" aria-live="polite">Page 1</span>
-            <button id="next-page" class="btn btn-custom text-white mx-2" aria-label="Next page">Next</button>
-          </nav>
-        </main>
-      </section>
+      <main class="bg-white h-100">
+        <section class="leaderboard text-black  p-0" role="region" aria-labelledby="leaderboard-header">
+          <header id="leaderboard-header" class="leaderboard-header d-flex align-items-center justify-content-center py-4">
+            <h1 class="text-center fs-5 mx-0">Leaderboard</h1>
+          </header>
+          <main class="leaderboard-content" role="main">
+            <div class="table-responsive">
+              <table class="table w-100 text-center" aria-describedby="table-description">
+                <thead>
+                  <tr>
+                    <th scope="col">Score</th>
+                    <th scope="col">Ranking</th>
+                    <th scope="col">Wins vs Players</th>
+                    <th scope="col">Wins vs AI</th>
+                    <th scope="col">Nickname</th>
+                  </tr>
+                </thead>
+                <tbody id="leaderboard-body" role="rowgroup"></tbody>
+              </table>
+              <p id="table-description" class="visually-hidden">Table showing player leaderboards including score, ranking, champion status, and number of wins.</p>
+            </div>
+            <nav class="pagination-container d-flex justify-content-center mt-4" role="navigation" aria-labelledby="pagination-label">
+              <h2 id="pagination-label" class="visually-hidden">Pagination controls</h2>
+              <button id="prev-page" class="btn btn-custom text-white mx-2" aria-label="Previous page" disabled>Previous</button>
+              <span id="page-number" class="mx-2" aria-live="polite">Page 1</span>
+              <button id="next-page" class="btn btn-custom text-white mx-2" aria-label="Next page">Next</button>
+            </nav>
+          </main>
+        </section>
+      </main>
     </template>
   `;
 
@@ -52,10 +54,29 @@ const LeaderboardsPage = async () => {
 
   try {
     const response = await fetch(`https://${window.ft_transcendence_host}/player/listAllPlayers/`);
+    const trainingRes = await fetch(`https://${window.ft_transcendence_host}/player/training/`);
+    const trainingData = await trainingRes.json();
     const players = await response.json();
 
-    // Utilizara a base do número total de vitórias (vitórias vs jogadores + vitórias vs IA) para ordenar os jogadore
-    players.sort((a, b) => (b.victory + b.victoryVsAI) - (a.victory + a.victoryVsAI));
+    /*
+     Sort players by sum of wins (wins vs players + wins vs AI)
+     If there is a tie, the next criterion is the number of victories 
+     against players (player.victory).
+     If there is still a tie, the final ordering is done by player name 
+     (player.username), in alphabetical order.
+     */
+    players.sort((a, b) => {
+      const totalVictoriesA = (a.victory || 0) + (trainingData.training.win || 0);
+      const totalVictoriesB = (b.victory || 0) + (trainingData.training.win || 0);
+
+      if (totalVictoriesB !== totalVictoriesA) {
+        return totalVictoriesB - totalVictoriesA;
+      } else if ((b.victory || 0) !== (a.victory || 0)) {
+        return (b.victory || 0) - (a.victory || 0);
+      } else {
+        return a.username.localeCompare(b.username);
+      }
+    });
 
     const tbody = document.getElementById("leaderboard-body");
     const pageNumberElement = document.getElementById("page-number");
@@ -73,13 +94,15 @@ const LeaderboardsPage = async () => {
       const pageItems = players.slice(start, end);
 
       pageItems.forEach((player, index) => {
+        const totalVictories = (player.victory || 0) + (trainingData.training.win || 0);
+
         const row = document.createElement('tr');
         row.setAttribute('role', 'row');
         row.innerHTML = `
-          <td>${player.victory ? player.victory : "N/A"}</td>
+          <td>${totalVictories}</td>
           <td>${start + index + 1}º</td>
-          <td>${player.victory ? player.victory : "0"}</td>
-          <td>${player.victoryVsAI || '0'}</td>
+          <td>${player.victory || 0}</td>
+          <td>${trainingData.training.win || 0}</td>
           <td>${truncateUsername(player.username)}</td>
         `;
         tbody.appendChild(row);

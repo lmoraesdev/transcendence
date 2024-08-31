@@ -8,7 +8,7 @@ import TournamentPlayerCard from "../components/TournamentPlayerCard.js";
 import helpers from '../helpers/helpers.js';
 import TournamentMatchCard from "../components/TournamentMatchCard.js";
 
-const { truncateUsername, setFocus  } = helpers;
+const { truncateUsername, setFocus } = helpers;
 
 const TournamentPage = () => {
   const tournamentHTML = `
@@ -18,7 +18,7 @@ const TournamentPage = () => {
           <div class="tournament-create d-flex flex-column justify-content-center p-4 gap-4">
             <header class="text-center">
               <h3 class="text-center m-0">Create a new tournament</h3>
-            </header>            
+            </header>
             <div class="d-grid col-12 gap-2 justify-content-center">
               <p>To create a new tournament click on the button below, create</p>
               <button id="createTournamentBtn" class="btn btn-custom text-white fw-bold" type="button">
@@ -29,7 +29,7 @@ const TournamentPage = () => {
           <div class="tournament-join d-flex flex-column justify-content-center align-items-center p-4 gap-4">
             <header class="text-center">
               <h3 class="text-center m-0">Join a Tournament</h3>
-            </header>             
+            </header>
             <div class="tournament-list d-flex flex-wrap justify-content-center align-items-center gap-1"></div>
           </div>
           <div id="tournament-container"></div>
@@ -38,18 +38,18 @@ const TournamentPage = () => {
         <section class="tournament-current d-none flex-column p-5 rounded-5">
           <header class="text-center">
             <h3 class="text-center m-0">Current Tournament</h3>
-          </header>            
+          </header>
           <div id="tournament-player"></div>
           <div id="tournament-matches"></div>
         </section>
       </main>
-    </template>  
+    </template>
   `;
 
   const ensureTemplateExists = () => {
     return new Promise((resolve) => {
-      if (!document.querySelector('#tournament-template')) {
-        const templateContainer = document.createElement('div');
+      if (!document.querySelector("#tournament-template")) {
+        const templateContainer = document.createElement("div");
         templateContainer.innerHTML = tournamentHTML;
         document.body.appendChild(templateContainer);
       }
@@ -57,13 +57,14 @@ const TournamentPage = () => {
     });
   };
 
-  ensureTemplateExists().then(() => {
-    const template = document.getElementById("tournament-template");
-    const component = template.content.cloneNode(true);
-    const parentElement = document.querySelector('#main');
+  ensureTemplateExists()
+    .then(() => {
+      const template = document.getElementById("tournament-template");
+      const component = template.content.cloneNode(true);
+      const parentElement = document.querySelector("#main");
 
-    parentElement.innerHTML = "";
-    parentElement.appendChild(component);
+      parentElement.innerHTML = "";
+      parentElement.appendChild(component);
 
     TournamentPlayers();
     // TournamentPlayerCard();
@@ -76,19 +77,18 @@ const TournamentPage = () => {
     const tournamentList = document.querySelector(".tournament-list");
 
 
-    fetching(`https://${window.ft_transcendence_host}/tournament/`).then((data) => {
-      if (!data.currentTournament || data.currentTournament.status === "FN") {
-        console.log("aqui")
-        createBtn.addEventListener("click", () => {
-          const tournament_popup = document.createElement("tournament-popup");
-          tournament_popup.setAttribute("popup-type", "CREATE");
-          tournament_popup.setAttribute("tournament-name", null);
-          parentElement.appendChild(tournament_popup);
-          TournamentPopup("CREATE", data);
-        });
-      } else {
-        tournamentList.textContent = "No tournaments available";
-      }
+      fetching(`https://${window.ft_transcendence_host}/tournament/`).then((data) => {
+        if (!data.currentTournament || data.currentTournament.status === "FN") {
+          createBtn.addEventListener("click", () => {
+            const tournament_popup = document.createElement("tournament-popup");
+            tournament_popup.setAttribute("popup-type", "CREATE");
+            tournament_popup.setAttribute("tournament-name", null);
+            parentElement.appendChild(tournament_popup);
+            TournamentPopup("CREATE", data);
+          });
+        } else {
+          tournamentList.textContent = "No tournaments available";
+        }
 
       if (data.tournaments) {
         for (const tournament of data.tournaments) {
@@ -119,21 +119,23 @@ const TournamentPage = () => {
         });
       }
 
-      if (data.currentTournament) {
-        tournamentCurrent.classList.remove("d-none");
-        tournamentActions.classList.add("border-start");
-        tournamentActions.classList.add("border-light-subtle");
-        tournamentCurrent.classList.add("d-flex");
-      
-        if (data.currentTournament.status === "PD") {
-          tournamentPlayers.classList.remove("d-none");
-          tournamentPlayers.classList.add("d-flex");
-      
-          for (const player of data.players) {
-            const playerElement = document.createElement("tournament-player-card");
-            playerElement.innerHTML = `
+        if (data.currentTournament) {
+          tournamentCurrent.classList.remove("d-none");
+          tournamentActions.classList.add("border-start");
+          tournamentActions.classList.add("border-light-subtle");
+          tournamentCurrent.classList.add("d-flex");
+
+          if (data.currentTournament.status === "PD") {
+            tournamentPlayers.classList.remove("d-none");
+            tournamentPlayers.classList.add("d-flex");
+
+            for (const player of data.players) {
+              const playerElement = document.createElement("tournament-player-card");
+              playerElement.innerHTML = `
               <div class="tournament-player-card">
-                <img class="avatar-card" src="${player.avatar ? player.avatar : '/web/images/profile.png'}" alt="Avatar">
+                <img class="avatar-card" src="${
+                  player.avatar ? player.avatar : "/web/images/profile.png"
+                }" alt="Avatar">
                 <span class="alias-name">${truncateUsername(player.username)}</span>
               </div>
             `;
@@ -241,4 +243,3 @@ const TournamentPage = () => {
 };
 
 export default TournamentPage;
-

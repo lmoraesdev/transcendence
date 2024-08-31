@@ -1,4 +1,4 @@
-import helpers from '../helpers/helpers.js';
+import helpers from "../helpers/helpers.js";
 import fetching from "../helpers/fetching.js";
 
 const { setFocus } = helpers;
@@ -9,10 +9,10 @@ const TournamentCard = (tournament) => {
   // Remova a linha abaixo para evitar sobrescrever o conteúdo anterior
   // container.innerHTML = '';
 
-  const card = document.createElement('article');
-  card.className = 'tournament-card';
-  card.setAttribute('tabindex', '0');
-  card.setAttribute('role', 'group');
+  const card = document.createElement("article");
+  card.className = "tournament-card";
+  card.setAttribute("tabindex", "0");
+  card.setAttribute("role", "group");
 
   card.innerHTML = `
     <section class="card" aria-labelledby="tournament-title">
