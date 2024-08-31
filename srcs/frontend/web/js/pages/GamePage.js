@@ -3,12 +3,10 @@ import { runPongTwoGame, wsTwo } from "../game/pongTwo.js";
 import { runPongFourGame, wsFour } from "../game/pongFour.js";
 import { runPongCoopGame } from "../game/pongCoop.js";
 import { runPongSoloGame } from "../game/pongSolo.js";
-
 import fetching from "../helpers/fetching.js";
+import { getSoundStatus, toggleSoundStatus } from "../helpers/soundControl.js";
 
 const GamePage = () => {
-  let disableSound = localStorage.getItem("disableSound") === "true";
-
   const gameHTML = `
     <template id="game-template">
       <div class="d-flex flex-wrap content-game justify-content-between align-items-center">
@@ -80,11 +78,11 @@ const GamePage = () => {
   const canvas = document.getElementById("canvas-pong");
   const ctx = canvas.getContext("2d");
 
-  soundButton.textContent = disableSound ? "Sound Off" : "Sound On";
+  soundButton.textContent = getSoundStatus() ? "Sound On" : "Sound Off";
+
   soundButton.addEventListener("click", () => {
-    disableSound = !disableSound;
-    localStorage.setItem("disableSound", disableSound);
-    soundButton.textContent = disableSound ? "Sound Off" : "Sound On";
+    toggleSoundStatus();
+    soundButton.textContent = getSoundStatus() ? "Sound On" : "Sound Off";
   });
 
   //const gameHeader_query = new URLSearchParams(window.location.search).get("game");
