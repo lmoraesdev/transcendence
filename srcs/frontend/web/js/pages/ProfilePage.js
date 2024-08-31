@@ -42,7 +42,7 @@ const ProfilePage = () => {
             </article>
             
             <article class="d-flex flex-column justify-content-center rounded-5 p-2" aria-labelledby="training-stats-title">
-              <p id="msg-error"></p>
+              <div id="msg-error"></div>
               <h3 id="training-stats-title" class="m-0 p-3 fw-light text-center">Your Training Stats</h3>
               <table  class="table w-100 text-center fw-light">
                 <thead>
@@ -104,28 +104,34 @@ const ProfilePage = () => {
   parentElement.innerHTML = "";
   parentElement.appendChild(component);
 
-  fetching(`https://${window.ft_transcendence_host}/player/`).then((res) => {
-    const playerData = res.player;
+  try {
+    fetching(`https://${window.ft_transcendence_host}/player/`).then((res) => {
+      const playerData = res.player;
 
-    const avatarImg = playerData.avatar ? playerData.avatar : "/web/images/profile.png";
-    const avatarAlt = `Profile photo of ${playerData.username || 'the user'}`;
-
-    parentElement.querySelector(".avatar").src = avatarImg;
-    parentElement.querySelector(".avatar").alt = avatarAlt;
-    parentElement.querySelector(".player-data .username").innerText = playerData.username || "";
-    parentElement.querySelector(".player-data .first-name").innerText = playerData.first_name || "";
-    parentElement.querySelector(".player-data .last-name").innerText = playerData.last_name || "";
-
-    const currentStatsTable = parentElement.querySelector("#current");
-
-    const rowStats = document.createElement('tr');
-    rowStats.innerHTML = `
-      <td>${playerData.wins || '0'}</td>
-    `;
-
-    currentStatsTable.appendChild(rowStats);   
-
-  });
+      console.log(playerData);
+  
+      //const avatarAlt = `Profile photo of ${playerData.username || 'the user'}`;
+      const avatarImages = parentElement.querySelector(".avatar");
+      avatarImages.src = playerData.avatar ? playerData.avatar : "/web/images/profile.png";
+      parentElement.querySelector(".avatar").src = avatarImg;
+      parentElement.querySelector(".avatar").alt = avatarAlt;
+      parentElement.querySelector(".player-data .username").innerText = playerData.username || "";
+      parentElement.querySelector(".player-data .first-name").innerText = playerData.first_name || "";
+      parentElement.querySelector(".player-data .last-name").innerText = playerData.last_name || "";
+  
+      const currentStatsTable = parentElement.querySelector("#current");
+  
+      const rowStats = document.createElement('tr');
+      rowStats.innerHTML = `
+        <td>${playerData.wins || '0'}</td>
+      `;
+  
+      currentStatsTable.appendChild(rowStats);   
+  
+    });
+  } catch (error) {
+    console.error(error);
+  }
 
   fetching(`https://${window.ft_transcendence_host}/player/training/`)
   .then((trainingRes) => {
@@ -136,13 +142,13 @@ const ProfilePage = () => {
     const msgErrorContainer = parentElement.querySelector("#msg-error");
 
     if (trainingData.length <=  0) {
-      const rowMsgError = document.createElement('p');
+      /*const rowMsgError = document.createElement('div');
       rowMsgError.innerHTML = `<td colspan="6">Failed to load training data</td>`;
       msgErrorContainer.appendChild(rowMsgError);
       msgErrorContainer.classList.add(
         "text-danger",
         "text-center"
-      );
+      );*/
 
     } else {
       trainingData.forEach((training) => {
@@ -180,10 +186,7 @@ const ProfilePage = () => {
             trainingStatsIATable.appendChild(rowTrainingIA);
           });
         } else {
-          const rowTrainingIA = document.createElement('tr');
           console.warn("IaTraining data not found");
-          rowTrainingIA.innerHTML = `<td colspan="6">IaTraining data not found</td>`;
-          trainingStatsIATable.appendChild(rowTrainingIA);
         }
       });
     };
@@ -192,21 +195,10 @@ const ProfilePage = () => {
   })
   .catch((error) => {
     console.error("Failed to fetch training data:", error);
-    
-    const trainingStatsTable = parentElement.querySelector("#training-stats");
-    const trainingStatsIATable = parentElement.querySelector("#training-stats-ia");
-
-    const errorRowTraining = document.createElement('tr');
-    errorRowTraining.innerHTML = `<td colspan="6">Failed to load training data</td>`;
-    trainingStatsTable.appendChild(errorRowTraining);
-
-    const errorRowTrainingIA = document.createElement('tr');
-    errorRowTrainingIA.innerHTML = `<td colspan="6">Failed to load AI training data</td>`;
-    trainingStatsIATable.appendChild(errorRowTrainingIA);
   });
 
   MatchHistory();
-  // FriendsList(); Reparar a quebra da listagem
+  FriendsList();
 };
 
 export default ProfilePage;
