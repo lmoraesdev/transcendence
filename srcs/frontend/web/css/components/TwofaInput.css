@@ -1,13 +1,3 @@
-/* twofa-input input[type="number"] {
-  font-size: 50px;
-  outline: none;
-  text-align: center;
-  border: none;
-  color: var(--color-font-white);
-  background-color: var(--color-primary);
-  border-radius: 50px;
-} */
-
 .twofa-input input::-webkit-outer-spin-button,
 .twofa-input input::-webkit-inner-spin-button {
     -webkit-appearance: none;
@@ -18,13 +8,3 @@
     -moz-appearance:textfield;
 }
 
-/* twofa-input button.btn.btn-lg {
-  background-color: var(--color-primary) !important;
-  color: var(--color-font-white) !important;
-}
-
-twofa-input button.btn.btn-lg:hover,
-twofa-input button.btn.btn-lg:active {
-  background-color: var(--color-primary) !important;
-  color: var(--color-font-white) !important;
-} */
