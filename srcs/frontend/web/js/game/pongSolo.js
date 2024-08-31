@@ -1,6 +1,6 @@
 import { AI } from "../ia/ia.js";
 import fetching from "../helpers/fetching.js";
-import { soundEnabled } from "../helpers/soundControl.js";
+import { getSoundStatus } from "../helpers/soundControl.js";
 
 let loopIdSolo;
 const KeyPressedSolo = [];
@@ -19,9 +19,7 @@ const getName = async () => {
   }
 };
 
-export function getSoundStatus() {
-  return localStorage.getItem("disableSound") === "true";
-}
+
 
 export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 0) {
   let scorePlayer = ptsPlayer;
@@ -60,7 +58,7 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 
   let ai = new AI(1);
 
   function playSound(sound) {
-    if (!getSoundStatus()) {
+    if (getSoundStatus()) {
       sound.play();
     }
   }
