@@ -1,5 +1,5 @@
 import GamePage from '../pages/GamePage.js';
-import StatisticsPage from '../pages/StatisticsPage.js';
+import LeaderboardsPage from '../pages/LeaderboardPage.js';
 import LoginPage from '../pages/LoginPage.js';
 import NotfoundPage from '../pages/NotfoundPage.js';
 import ProfilePage from '../pages/ProfilePage.js';
@@ -20,7 +20,7 @@ const routes = {
   "/twofa/": hideNav(TwofaPage),
   "/home/": showNav(HomePage),
   "/game/": hideNav(GamePage),
-  "/statistics/": showNav(StatisticsPage),
+  "/leaderboard/": showNav(LeaderboardsPage),
   "/profile/": showNav(ProfilePage),
   "/profile-setup/": showNav(ProfileSetup),
   "/settings/": showNav(SettingPage),

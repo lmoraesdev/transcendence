@@ -12,17 +12,13 @@ const TournamentPlayerCard = () => {
     </template>
   `;
 
-  if (!document.querySelector('#tournament-player-card')) {
+  if (!document.querySelector('tournament-player-card')) {
     const templateContainer     = document.createElement('div');
     templateContainer.innerHTML = tournamentPlayerCardHTML;
     document.body.appendChild(templateContainer);
   }
 
-  const template = document.getElementById("tournament-player-card");
-  const component = template.content.cloneNode(true);
-
-  const tournamentPlayerCard = document.querySelector('.tournament-player-card');
-  tournamentPlayerCard.appendChild(component);
+  const tournamentPlayerCard = document.querySelector('#tournament-player-card');
   tournamentPlayerCard.classList.add(
     "d-flex",
     "flex-column",

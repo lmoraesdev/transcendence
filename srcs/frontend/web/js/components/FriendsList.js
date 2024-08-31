@@ -28,7 +28,7 @@ const FriendsList = () => {
           </li>
         </ul>
       </nav>
-      <div class="friend-cards"></div>
+      <div class="friend-cards-container"></div>
     </template>
   `;
 
@@ -51,11 +51,11 @@ const FriendsList = () => {
   );
 
   const showCards = (friend_card_type) => {
-    const friend_cards = friendsList.querySelector(".friend-cards");
-    friend_cards.innerHTML = "";
+    const friend_cards_container = friendsList.querySelector(".friend-cards-container");
+    friend_cards_container.innerHTML = ""; // Limpa a lista antes de adicionar novos cartões
 
     if (friend_card_type === "search") {
-      friend_cards.appendChild(document.createElement("search-list"));
+      friend_cards_container.appendChild(document.createElement("search-list"));
       return;
     }
 
@@ -64,15 +64,18 @@ const FriendsList = () => {
     ).then((req) => {
       const arr = req.friendships;
       for (let i = 0; i < arr.length; i++) {
-        const friend_card_elem = document.createElement("friend-card");
-        friend_card_elem.setAttribute("friend-card-type", friend_card_type);
+        const friend_card_elem = document.createElement("div"); // Use uma div para criar o contêiner do cartão
+        friend_card_elem.classList.add("friend-card"); // Adicione a classe para estilização
         friend_card_elem.setAttribute("player-id", arr[i].id);
-        friend_card_elem.setAttribute("first-name", arr[i].first_name);
-        friend_card_elem.setAttribute("last-name", arr[i].last_name);
-        friend_card_elem.setAttribute("username", arr[i].username);
         friend_card_elem.setAttribute("avatar", arr[i].avatar);
         friend_card_elem.setAttribute("status", arr[i].status);
-        friend_cards.appendChild(friend_card_elem);
+        friend_card_elem.setAttribute("username", arr[i].username);
+        friend_card_elem.setAttribute("first-name", arr[i].firstName);
+        friend_card_elem.setAttribute("last-name", arr[i].lastName);
+
+        FriendCard(friend_card_elem); // Passa o elemento correto para a função FriendCard
+
+        friend_cards_container.appendChild(friend_card_elem); // Adiciona o cartão ao contêiner
       }
     });
   }
@@ -82,11 +85,9 @@ const FriendsList = () => {
   const requests_btn = nav.querySelector(".requests-btn");
   const invites_btn  = nav.querySelector(".invites-btn");
   const search_btn   = friendsList.querySelector(".search-btn");
-  const friend_cards = friendsList.querySelector(".friend-cards");
+  const friend_cards_container = friendsList.querySelector(".friend-cards-container");
 
-  showCards("friends");
-
-  friend_cards.classList.add("d-flex", "flex-wrap", "gap-1");
+  friend_cards_container.classList.add("d-flex", "flex-wrap", "gap-1");
   friends_btn.addEventListener("click", () => {
     friends_btn.classList.add("active");
     requests_btn.classList.remove("active");
@@ -118,8 +119,7 @@ const FriendsList = () => {
     search_btn.classList.add("active");
     showCards("search");
   });
-
-  FriendCard();
+  showCards("friends");
 }
 
 export default FriendsList;

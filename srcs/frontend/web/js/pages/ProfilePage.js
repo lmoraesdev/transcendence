@@ -9,9 +9,9 @@ const ProfilePage = () => {
   const profileHTML = `
     <template id="profile-template">
       <main class="text-black bg-white profile-container container-fluid d-flex flex-column justify-content-center gap-5 p-4 h-100 ">
-        <section class="player-data d-flex justify-content-around align-items-center flex-wrap gap-1 p-3 rounded-5 h-100" role="region" aria-labelledby="player-info">
+        <section class="player-data justify-content-around align-items-center flex-wrap gap-2 rounded-5" role="region" aria-labelledby="player-info">
           <h1 id="player-info" class="visually-hidden">Player Information</h1>
-          <article class="data-section d-flex flex-column justify-content-center align-items-center gap-2 p-2 rounded-5" aria-labelledby="profile-picture">
+          <article class="data-section d-flex flex-column justify-content-center align-items-center gap-2  " aria-labelledby="profile-picture">
             <h2 id="profile-picture" class="visually-hidden">Profile Picture</h2>
             <div class="position-relative" style="width: 170px; height: 170px;">
               <img
@@ -22,51 +22,15 @@ const ProfilePage = () => {
               />
             </div>
             <h3 class="username align-self-stretch text-center m-0 p-2 rounded-5" aria-label="Username"></h3>
-            <p class="text-center fw-bold m-0 p-3 rounded-5" id="full-name" aria-label="Full Name">
-              <span class="first-name"></span>
-              <span class="last-name"></span>
-            </p>
           </article>
-          <section class="data-section d-flex flex-wrap justify-content-center gap-2 p-2 rounded-5" role="region" aria-labelledby="stats">
-            <h2 id="stats" class="visually-hidden">Statistics</h2>
-            <article class="d-flex flex-column justify-content-center rounded-5 p-2" aria-labelledby="champions-title">
-              <h3 id="champions-title" class="m-0 p-3 fw-bold">Champions</h3>
-              <p class="champions m-0 p-3 text-center fw-bold rounded-5" aria-label="Champions Count"></p>
-            </article>
-            <article class="d-flex flex-column justify-content-center rounded-5 p-2" aria-labelledby="training-stats-title">
-              <h3 id="training-stats-title" class="m-0 p-3 fw-bold">Training Statistics</h3>
-              <table id="training-stats" class="table table-bordered">
-                <thead>
-                  <tr>
-                    <th>Metric</th>
-                    <th>Value</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
-            </article>
-            <article class="d-flex flex-column justify-content-center rounded-5 p-2" aria-labelledby="current-stats-title">
-              <h3 id="current-stats-title" class="m-0 p-3 fw-bold">Current Statistics</h3>
-              <table id="current-stats" class="table table-bordered">
-                <thead>
-                  <tr>
-                    <th>Metric</th>
-                    <th>Value</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
-            </article>
-          </section>
-        </section>
         <section class="player-data-related d-flex justify-content-around gap-5 p-3 rounded-5 h-100" role="region" aria-labelledby="related-info">
           <h2 id="related-info" class="visually-hidden">Related Information</h2>
-          <article class="match-history d-flex flex-column justify-content-center gap-2 p-3 rounded-5 flex-grow-1" aria-labelledby="match-history-title">
-            <h3 id="match-history-title" class="text-center fw-bold m-0 px-3 py-1 rounded-5">Match History</h3>
+          <article class="match-history d-flex flex-column justify-content-center gap-2 p-3 flex-grow-1" aria-labelledby="match-history-title">
+            <h3 id="match-history-title" class="text-center fw-bold m-0 px-3 py-1 rounded-5 text-decoration-underline">Match History</h3>
             <div id="matchHistory" role="list"></div>
           </article>
           <article class="friend-list d-flex flex-column justify-content-center gap-2 p-3 rounded-5 flex-grow-1" aria-labelledby="friends-title">
-            <h3 id="friends-title" class="text-center fw-bold m-0 px-3 py-1 rounded-5">My Friends</h3>
+            <h3 id="friends-title" class="text-center fw-bold m-0 px-3 py-1 rounded-5 text-decoration-underline ">My Friends</h3>
             <div id="friendsList" role="list"></div>
           </article>
         </section>
@@ -87,91 +51,89 @@ const ProfilePage = () => {
   parentElement.innerHTML = "";
   parentElement.appendChild(component);
 
-  fetching(`https://${window.ft_transcendence_host}/player/`).then((res) => {
-    const playerData = res.player;
+  try {
+    fetching(`https://${window.ft_transcendence_host}/player/`).then((res) => {
+      const playerData = res.player;
 
-    const avatarImg = playerData.avatar ? playerData.avatar : "/web/images/profile.png";
-    const avatarAlt = `Profile photo of ${playerData.username || 'the user'}`;
-
-    parentElement.querySelector(".avatar").src = avatarImg;
-    parentElement.querySelector(".avatar").alt = avatarAlt;
-    parentElement.querySelector(".player-data .username").innerText = playerData.username || "";
-    parentElement.querySelector(".player-data .first-name").innerText = playerData.first_name || "";
-    parentElement.querySelector(".player-data .last-name").innerText = playerData.last_name || "";
-    parentElement.querySelector(".player-data .champions").innerText = playerData.champions || "";
-
-    const winsAI = playerData.wins?.ai || 0;
-    const winsPlayers = playerData.wins?.players || 0;
-    const lossesAI = playerData.losses?.ai || 0;
-    const lossesPlayers = playerData.losses?.players || 0;
-
-    parentElement.querySelector(".wins").innerHTML = `
-      <p>AI Wins: ${winsAI}</p>
-      <p>Player Wins: ${winsPlayers}</p>
-    `;
-
-    parentElement.querySelector(".losses").innerHTML = `
-      <p>AI Losses: ${lossesAI}</p>
-      <p>Player Losses: ${lossesPlayers}</p>
-    `;
-
-    fetching(`https://${window.ft_transcendence_host}/player/training/`).then((trainingRes) => {
-      const trainingData = trainingRes.training;
-
-      const trainingStatsTable = parentElement.querySelector("#training-stats tbody");
-      trainingStatsTable.innerHTML = `
-        <tr>
-          <td>Wins</td>
-          <td>${trainingData.wins || 'N/A'}</td>
-        </tr>
-        <tr>
-          <td>Accuracy</td>
-          <td>${trainingData.accuracy || 'N/A'}</td>
-        </tr>
-        <tr>
-          <td>Total Points</td>
-          <td>${trainingData.totalPoints || 'N/A'}</td>
-        </tr>
-        <tr>
-          <td>Performance</td>
-          <td>${trainingData.performance || 'N/A'}</td>
-        </tr>
-        <tr>
-          <td>Correct Blocks</td>
-          <td>${trainingData.correctBlocks || '0'}</td>
-        </tr>
-        <tr>
-          <td>Total Blocks</td>
-          <td>${trainingData.totalBlocks || '0'}</td>
-        </tr>
-      `;
-
-      const currentStatsTable = parentElement.querySelector("#current-stats tbody");
-      currentStatsTable.innerHTML = `
-        <tr>
-          <td>AI Wins</td>
-          <td>${playerData.wins?.ai || '0'}</td>
-        </tr>
-        <tr>
-          <td>Player Wins</td>
-          <td>${playerData.wins?.players || '0'}</td>
-        </tr>
-        <tr>
-          <td>AI Losses</td>
-          <td>${playerData.losses?.ai || '0'}</td>
-        </tr>
-        <tr>
-          <td>Player Losses</td>
-          <td>${playerData.losses?.players || '0'}</td>
-        </tr>
-      `;
-
-      setFocus(parentElement.querySelector(".avatar"));
+      console.log(playerData);
+  
+      const avatarAlt = `Profile photo of ${playerData.username || 'the user'}`;
+      const avatarImages = parentElement.querySelector(".avatar");
+      avatarImages.src = playerData.avatar ? playerData.avatar : "/web/images/profile.png";
+      parentElement.querySelector(".avatar").alt = avatarAlt;
+      parentElement.querySelector(".player-data .username").innerText = playerData.username || "";
+      // parentElement.querySelector(".player-data .first-name").innerText = playerData.firstName || "";
+      // parentElement.querySelector(".player-data .last-name").innerText = playerData.lastName || "";
+      // const currentStatsTable = parentElement.querySelector("#current");
+  
+      // const rowStats = document.createElement('tr');
+      // rowStats.innerHTML = `
+      //   <td>${playerData.wins || '0'}</td>
+      // `;
+  
+      // currentStatsTable.appendChild(rowStats);   
+  
     });
+  } catch (error) {
+    console.error(error);
+  }
+
+  fetching(`https://${window.ft_transcendence_host}/player/training/`)
+  .then((trainingRes) => {
+    const trainingData = trainingRes.training;
+
+    const trainingStatsTable = parentElement.querySelector("#training-stats");
+    const trainingStatsIATable = parentElement.querySelector("#training-stats-ia");
+    const msgErrorContainer = parentElement.querySelector("#msg-error");
+
+    if (trainingData.length <=  0) {
+      /*const rowMsgError = document.createElement('div');
+      rowMsgError.innerHTML = `<td colspan="6">Failed to load training data</td>`;
+      msgErrorContainer.appendChild(rowMsgError);
+      msgErrorContainer.classList.add(
+        "text-danger",
+        "text-center"
+      );*/
+
+    } else {
+      trainingData.forEach((training) => {
+        if (training.PlayerTraining && training.PlayerTraining.length > 0) {
+          training.PlayerTraining.forEach((session) => {
+            const rowTraining = document.createElement('tr');
+            rowTraining.innerHTML = `
+              <td>${session.win ? session.win : '0'}</td>
+            `;
+            trainingStatsTable.appendChild(rowTraining);
+          });
+        } else {
+          const rowTraining = document.createElement('tr');
+          console.warn("PlayerTraining data not found");
+          rowTraining.innerHTML = `<td colspan="6">PlayerTraining data not found</td>`;
+          trainingStatsTable.appendChild(rowTraining);
+        }
+  
+        if (training.IaTraining && training.IaTraining.length > 0) {
+          training.IaTraining.forEach((session) => {
+            const rowTrainingIA = document.createElement('tr');
+            rowTrainingIA.innerHTML = `
+              <td>${session.win ? session.win : '0'}</td>
+            `;
+            trainingStatsIATable.appendChild(rowTrainingIA);
+          });
+        } else {
+          console.warn("IaTraining data not found");
+        }
+      });
+    };
+
+    setFocus(parentElement.querySelector(".avatar"));
+  })
+  .catch((error) => {
+    console.error("Failed to fetch training data:", error);
   });
 
   MatchHistory();
-  // FriendsList(); Reparar a quebra da listagem
+  FriendsList();
 };
 
 export default ProfilePage;
