@@ -128,13 +128,13 @@ def set_db_two_player(room_id, match_id):
         player_match_left.score = player_left['info']['score']
         player_match_right.score = player_right['info']['score']
 
-        player_match_left.winner = player_left['info']['score'] == 7
-        player_match_right.winner = player_right['info']['score'] == 7
+        player_match_left.winner = player_left['info']['score'] >= 7
+        player_match_right.winner = player_right['info']['score'] >= 7
 
         player_match_left.save()
         player_match_right.save()
 
-        if player_left['info']['score'] == 7:
+        if player_left['info']['score'] >= 7:
             player_left_db.victory += 1
             player_right_db.defeat += 1
         else:
@@ -144,7 +144,7 @@ def set_db_two_player(room_id, match_id):
         player_left_db.save()
         player_right_db.save()
 
-        winner = player_left_db if player_left['info']['score'] == 7 else player_right_db
+        winner = player_left_db if player_left['info']['score'] >= 7 else player_right_db
         return f"{winner.username} winner"
     except Exception as e:
         logger.error(f"Error in set_db_two_player: {e}")
@@ -156,11 +156,11 @@ def ballDirection(capacity):
         'Y': 0
     }
     speedX, speedY = (
-        (random.choice([10, -10]), random.choice([0, -10, 10])) 
-        if capacity != 2 
+        (random.choice([10, -10]), random.choice([0, -10, 10]))
+        if capacity != 2
         else (
-            (random.choice([0, -5, 5]), random.choice([0, -6, 6])) 
-            if (random.choice([0, -5, 5]) == 0 and random.choice([0, -6, 6]) == 0) 
+            (random.choice([0, -5, 5]), random.choice([0, -6, 6]))
+            if (random.choice([0, -5, 5]) == 0 and random.choice([0, -6, 6]) == 0)
             else (random.choice([0, -5, 5]), random.choice([0, -6, 6]))
         )
     )
@@ -181,7 +181,7 @@ class Pong(AsyncWebsocketConsumer):
         self.capacity = int(self.scope['url_route']['kwargs']['capacity'])
         self.match_id = self.scope['url_route']['kwargs'].get('match_id')
         player_db = await database_sync_to_async(Player.objects.get)(id=self.scope['payload']['id'])
-   
+
         await self.channel_layer.group_add(room_id, self.channel_name)
 
         if room_id not in rooms:
@@ -227,12 +227,12 @@ class Pong(AsyncWebsocketConsumer):
             asyncio.create_task(self.gameLoop(room_id))
 
     def prepareGame(self, room_id):
-        rooms[room_id]['canvas_width'] = 1920 
+        rooms[room_id]['canvas_width'] = 1920
         rooms[room_id]['canvas_height'] = 1080
 
         rooms[room_id]['padd_left']['info']['positionX'] = 60
         rooms[room_id]['padd_left']['info']['positionY'] = rooms[room_id]['canvas_height'] / 2 - 100
-        
+
         rooms[room_id]['padd_right']['info']['positionX'] = rooms[room_id]['canvas_width'] - 100
         rooms[room_id]['padd_right']['info']['positionY'] = rooms[room_id]['canvas_height'] / 2 - 100
 
@@ -277,7 +277,7 @@ class Pong(AsyncWebsocketConsumer):
     def getPaddCenter(self, room_id, side):
         padd_info = rooms[room_id][f'padd_{side[:-1]}']['info']
         size_x, size_y = padd_info['sizeX'], padd_info['sizeY']
-        position = padd_info[f'position{side[-1]}'] 
+        position = padd_info[f'position{side[-1]}']
         center_offset = size_x / 2 if side[-1] == 'X' else size_y / 2
 
         return position + center_offset
@@ -300,7 +300,7 @@ class Pong(AsyncWebsocketConsumer):
             if not rooms[room_id][pkey]['info']['eliminated'] and (dx <= ball_size + size / 2 and dy <= ball_size + size / 2):
                 if (ball['positionX'] >= center_x and ball[speed_key] > 0) or (ball['positionX'] <= center_x and ball[speed_key] < 0):
                     return
-                ball[speed_key] *= -1        
+                ball[speed_key] *= -1
 
 
     async def paddleCollision(self, room_id):
@@ -310,7 +310,7 @@ class Pong(AsyncWebsocketConsumer):
                 size = rooms[room_id][paddle]['info']['sizeY']
                 pos = rooms[room_id][paddle]['info']['positionY']
                 canvas_height = rooms[room_id]['canvas_height']
-                rooms[room_id][paddle]['info']['positionY'] = max(0, min(pos, canvas_height - size)) 
+                rooms[room_id][paddle]['info']['positionY'] = max(0, min(pos, canvas_height - size))
 
     async def ballCollision(self, room_id):
         ballPositionX = rooms[room_id]['ball']['positionX']
@@ -319,14 +319,14 @@ class Pong(AsyncWebsocketConsumer):
         canvasWidth = rooms[room_id]['canvas_width']
         canvasHeight = rooms[room_id]['canvas_height']
 
-        if (ballPositionX + ballSize >= canvasWidth 
+        if (ballPositionX + ballSize >= canvasWidth
             or ballPositionX - ballSize <= 0):
-            if (rooms[room_id]['padd_right']['info']['eliminated'] 
+            if (rooms[room_id]['padd_right']['info']['eliminated']
                 or rooms[room_id]['padd_left']['info']['eliminated']):
                 rooms[room_id]['ball']['speedX'] *= -1
             else:
                 await self.resetGame(room_id, True)
-        if (ballPositionY + ballSize >= canvasHeight 
+        if (ballPositionY + ballSize >= canvasHeight
             or ballPositionY - ballSize <= 0):
             rooms[room_id]['ball']['speedY'] *= -1
 
@@ -350,8 +350,8 @@ class Pong(AsyncWebsocketConsumer):
             }
             rooms[room_id]['ball'] = speed
             addSpeedBall(room_id)
-            
-            if rooms[room_id][padd]['info']['score'] == 7:
+
+            if rooms[room_id][padd]['info']['score'] >= 7:
                 result = await set_db_two_player(room_id, self.match_id)
                 logger.debug(f"resultado: {pformat(result)}")
                 await self.channel_layer.group_send(
@@ -372,12 +372,12 @@ class Pong(AsyncWebsocketConsumer):
             else:
                 rooms[room_id]['padd_up']['info']['eliminated'] = True
             rooms[room_id]['elimination_count'] += 1
-            rooms[room_id]['ball']['speedX'] = speed['X'] 
+            rooms[room_id]['ball']['speedX'] = speed['X']
         rooms[room_id]['ball']['speedY'] = speed['Y']
         rooms[room_id]['ball']['positionX'] = rooms[room_id]['canvas_width'] / 2
         rooms[room_id]['ball']['positionY'] = rooms[room_id]['canvas_height'] / 2
         rooms[room_id]['padd_left']['info']['positionY'] = rooms[room_id]['canvas_height'] / 2 - 100
-        rooms[room_id]['padd_right']['info']['positionY'] = rooms[room_id]['canvas_height'] / 2 - 100        
+        rooms[room_id]['padd_right']['info']['positionY'] = rooms[room_id]['canvas_height'] / 2 - 100
 
     def movePaddle(self, paddle, room_id, neg):
         if self.channel_name in rooms[room_id][paddle]['player']:
@@ -394,7 +394,7 @@ class Pong(AsyncWebsocketConsumer):
                     else:
                         self.movePaddle(paddle, room_id, 1)
                     break
-        await self.paddleCollision(room_id)             
+        await self.paddleCollision(room_id)
 
     async def new_player(self, event):
         logger.debug(f"new_player called with event: {event}")
@@ -462,7 +462,7 @@ class Pong(AsyncWebsocketConsumer):
                 del rooms[room_id]
             if self.capacity == 2 and room_id in rooms:
                 del rooms[room_id]
-    
+
     def getRoomId(self):
         try:
             # logger.debug(f"self in getRoomId {pformat(self)}")

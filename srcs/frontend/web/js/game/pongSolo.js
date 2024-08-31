@@ -121,7 +121,7 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 
       ai.adjustDifficulty(true);
     }
 
-    if (scorePlayer === 7 || scoreComputer === 7) {
+    if (scorePlayer >= 7 || scoreComputer >= 7) {
       window.cancelAnimationFrame(loopIdSolo);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.font = "100px monospace";
@@ -134,7 +134,7 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 
 
       //Banco de dados aqui
       try {
-        if (scoreComputer === 7) {
+        if (scoreComputer >= 7) {
           // computerWins += 1;
           fetch(`https://${window.ft_transcendence_host}/player/training/`, {
             method: "POST",
@@ -154,7 +154,7 @@ export async function runPongSoloGame(canvas, ctx, ptsPlayer = 0, ptsComputer = 
           });
 
           await playSound(gameOverSound);
-        } else if (scorePlayer === 7) {
+        } else if (scorePlayer >= 7) {
           // playerWins += 1;
 
           fetch(`https://${window.ft_transcendence_host}/player/training/`, {
