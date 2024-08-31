@@ -1,7 +1,7 @@
-import fetching from '../helpers/fetching.js';
-import { getSoundStatus, toggleSoundStatus } from '../helpers/soundControl.js';
+import fetching from "../helpers/fetching.js";
+import { getSoundStatus, toggleSoundStatus } from "../helpers/soundControl.js";
 import TwofaInput from "../components/Input/TwofaInput.js";
-import helpers from '../helpers/helpers.js';
+import helpers from "../helpers/helpers.js";
 
 const { setFocus } = helpers;
 
@@ -93,9 +93,9 @@ const SettingPage = () => {
     </template>
   `;
 
-  const templateLogin = document.createElement('div');
+  const templateLogin = document.createElement("div");
 
-  if (!document.querySelector('#setting-template')) {
+  if (!document.querySelector("#setting-template")) {
     templateLogin.innerHTML = settingHTML;
     document.body.appendChild(templateLogin);
   }
@@ -107,12 +107,9 @@ const SettingPage = () => {
   parentElement.innerHTML = "";
   parentElement.appendChild(component);
 
-  parentElement.classList.add(
-    'text-black',
-    'bg-white',
-  );
+  parentElement.classList.add("text-black", "bg-white");
 
-  const twofaContainer = parentElement.querySelector('.twofa-input');
+  const twofaContainer = parentElement.querySelector(".twofa-input");
   twofaContainer.appendChild(TwofaInput());
 
   const avatar = parentElement.querySelector(".avatar");
@@ -121,18 +118,13 @@ const SettingPage = () => {
   const popup_twofa = parentElement.querySelector(".popup-twofa");
   const popup_twofa_qrcode = parentElement.querySelector(".popup-twofa-qrcode img");
   const popup_twofa_close = parentElement.querySelector(".btn-close");
-  const checkbox_sound = parentElement.querySelector('#toggle-sound-btn');
+  const checkbox_sound = parentElement.querySelector("#toggle-sound-btn");
 
   const soundStatus = getSoundStatus();
   checkbox_sound.checked = soundStatus;
 
-  console.log("On page load: Sound enabled?", soundStatus);
-  console.log("On page load: Sound checkbox checked?", checkbox_sound.checked);
-
-
   checkbox_sound.onchange = () => {
     toggleSoundStatus();
-    console.log("After change: Sound enabled?", getSoundStatus());
   };
 
   fetching(`https://${window.ft_transcendence_host}/player/`).then((res) => {
@@ -157,35 +149,41 @@ const SettingPage = () => {
     const value = field === "two_factor" ? inputElem.checked : inputElem.value;
 
     fetch(`https://${window.ft_transcendence_host}/player/`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-       'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ field, value }),
-    }).then((res) => {
-      if (field !== "two_factor")
-      {
-        inputElem.placeholder = inputElem.value;
-        inputElem.value = "";
-      }
-    }).catch((reason) => {
-      console.log("Error:", reason);
-    });
+    })
+      .then((res) => {
+        if (field !== "two_factor") {
+          inputElem.placeholder = inputElem.value;
+          inputElem.value = "";
+        }
+      })
+      .catch((reason) => {
+        console.error("Error:", reason);
+      });
   };
 
   const disableTwofa = (inputElem) => {
     fetch(`https://${window.ft_transcendence_host}/player/2FA/disable/`, {
-      method: 'PATCH',
-    }).then((res) => {
-      inputElem.checked = false;
-    }).catch((reason) => {
-      console.log("Error:", reason);
-    });
+      method: "PATCH",
+    })
+      .then((res) => {
+        inputElem.checked = false;
+      })
+      .catch((reason) => {
+        console.error("Error:", reason);
+      });
   };
 
-  document.querySelector(".button-username").onclick = () => submitFieldChange("username", document.querySelector(".input-username"));
-  document.querySelector(".button-first-name").onclick = () => submitFieldChange("first_name", document.querySelector(".input-first-name"));
-  document.querySelector(".button-last-name").onclick = () => submitFieldChange("last_name", document.querySelector(".input-last-name"));
+  document.querySelector(".button-username").onclick = () =>
+    submitFieldChange("username", document.querySelector(".input-username"));
+  document.querySelector(".button-first-name").onclick = () =>
+    submitFieldChange("first_name", document.querySelector(".input-first-name"));
+  document.querySelector(".button-last-name").onclick = () =>
+    submitFieldChange("last_name", document.querySelector(".input-last-name"));
 
   popup_twofa_close.addEventListener("click", () => {
     popup_twofa.classList.add("d-none");
@@ -205,8 +203,8 @@ const SettingPage = () => {
     }
   };
 
-  const form = parentElement.querySelector('form');
-  setFocus(form, ['username', 'first_name', 'last_name']);
+  const form = parentElement.querySelector("form");
+  setFocus(form, ["username", "first_name", "last_name"]);
 };
 
 export default SettingPage;
