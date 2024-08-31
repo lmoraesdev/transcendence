@@ -104,7 +104,7 @@ def walk_over_two(room_id, match_id, pos):
 
 def get_match(match_id):
     logger.debug(f"get_match called with match_id: {match_id}")
-    match = Match.objects.create(game='PG', status=Match.Status.PLAYING.value) if not match_id else Match.objects.get(id=match_id)
+    match = Match.objects.create(game=Match.Game.PONG.value, status=Match.Status.PLAYING.value) if not match_id else Match.objects.get(id=match_id)
     match.status = Match.Status.PLAYING.value
     match.save()
     return match
@@ -449,6 +449,7 @@ class Pong(AsyncWebsocketConsumer):
             positions = ['padd_left', 'padd_right', 'padd_up', 'padd_down']
             for position in positions:
                 if self.channel_name == rooms[room_id][position]['player'] and close_code is not None:
+                    logger.debug(f"self antes do walk {pformat(self)}")
                     message = await walk_over(room_id, self.match_id, position.split('_')[1], self.capacity)
                     break
             if message is not None:

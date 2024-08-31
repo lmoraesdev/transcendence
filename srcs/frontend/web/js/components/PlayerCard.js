@@ -1,4 +1,4 @@
-const PlayerCard = () => {
+const PlayerCard = (playerCard) => {
   const PlayerCardHTML = `
     <template id="player-card">
       <div class="d-flex flex-column justify-content-center align-items-center m-0 p-2 gap-1 rounded-4">
@@ -19,7 +19,7 @@ const PlayerCard = () => {
   const template = document.getElementById("player-card");
   const component = template.content.cloneNode(true);
 
-  const playerCard = document.querySelector('player-card');
+  // Em vez de usar o querySelector, vamos trabalhar diretamente com o playerCard passado como parâmetro
   playerCard.appendChild(component);
   playerCard.classList.add(
     "d-flex",
@@ -41,7 +41,6 @@ const PlayerCard = () => {
   avatar_elem.src = avatar;
   username_elem.textContent = username;
   score_elem.textContent = score;
-
 };
 
 export default PlayerCard;

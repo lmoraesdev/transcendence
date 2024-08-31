@@ -79,7 +79,7 @@ class Matchmaking(WebsocketConsumer):
     def connect(self):
         logger.debug("WebSocket connect initiated.")
         logger.debug("Scope details: %s", pformat(self.scope))
-        matchId = self.scope['url_route']['kwargs'].get('matchId')
+        matchId = self.scope['url_route']['kwargs'].get('match_id')
         logger.debug("Match ID from URL: %s", matchId)
         self.accept()
 
