@@ -66,11 +66,12 @@ const FriendsList = () => {
       for (let i = 0; i < arr.length; i++) {
         const friend_card_elem = document.createElement("div"); // Use uma div para criar o contêiner do cartão
         friend_card_elem.classList.add("friend-card"); // Adicione a classe para estilização
+        friend_card_elem.setAttribute("player-id", arr[i].id);
         friend_card_elem.setAttribute("avatar", arr[i].avatar);
         friend_card_elem.setAttribute("status", arr[i].status);
         friend_card_elem.setAttribute("username", arr[i].username);
-        friend_card_elem.setAttribute("first-name", arr[i].first_name);
-        friend_card_elem.setAttribute("last-name", arr[i].last_name);
+        friend_card_elem.setAttribute("first-name", arr[i].firstName);
+        friend_card_elem.setAttribute("last-name", arr[i].lastName);
 
         FriendCard(friend_card_elem); // Passa o elemento correto para a função FriendCard
 

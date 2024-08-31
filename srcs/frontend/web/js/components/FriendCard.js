@@ -40,7 +40,7 @@ const FriendCard = (friendCardElem) => {
 
   friendCardElem.querySelector("h6").textContent = truncateUsername(username);
   friendCardElem.querySelector("img").src = avatar;
-  friendCardElem.querySelector(".status").style.backgroundColor = status === "ON" ? "green" : "red";
+  // friendCardElem.querySelector(".status").style.backgroundColor = status === "ON" ? "green" : "red";
 
   friendCardElem.addEventListener("click", () => {
     const friend_card_popup = document.createElement("friend-card-popup");
@@ -49,11 +49,11 @@ const FriendCard = (friendCardElem) => {
     friend_card_popup.setAttribute("username", truncateUsername(username));
     friend_card_popup.setAttribute("first-name", first_name);
     friend_card_popup.setAttribute("last-name", last_name);
-    friend_card_popup.setAttribute("avatar-f", avatar);
+    friend_card_popup.setAttribute("avatar", avatar);
 
     friendCardElem.parentNode.appendChild(friend_card_popup);
+    FriendCardPopup();
   });
-
 };
 
 export default FriendCard;
