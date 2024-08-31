@@ -12,39 +12,81 @@ from .decorators import jwtCookieRequired
 logger = logging.getLogger('custom_logger')
 
 def updateTournament(tournamentId):
-    tournament = Tournament.objects.get(id=tournamentId)
-    if (tournament.status == Tournament.StatusChoices.FINISHED.value):
+    logger.info(f"Updating tournament with ID: {tournamentId}")
+
+    try:
+        tournament = Tournament.objects.get(id=tournamentId)
+    except Tournament.DoesNotExist:
+        logger.error(f"Tournament with ID {tournamentId} does not exist.")
         return
+
+    logger.info(f"Tournament status: {tournament.status}")
+
+    if tournament.status == Tournament.StatusChoices.FINISHED.value:
+        logger.info("Tournament is already finished. No further updates required.")
+        return
+
     currentRound = tournament.round
     currentMatch = Match.objects.filter(tournament=tournament, round=currentRound)
-    if (all(match.status == Match.Status.PLAYING.value for match in currentMatch)):
-        if (tournament.round == 3):
+
+    # Log para mostrar o status de cada partida
+    for match in currentMatch:
+        logger.info(f"Match ID: {match.id}, Status: {match.status}")
+
+    # Verificação e log do status de cada partida
+    all_playing = all(match.status == Match.Status.PLAYING.value for match in currentMatch)
+    logger.info(f"All matches are in PLAYING status: {all_playing}")
+
+    if all_playing:
+        logger.info("All matches in the current round are still playing.")
+
+        if tournament.round == 3:
+            logger.info("Tournament is at the final round. Determining the winner.")
             tournament.status = Tournament.StatusChoices.FINISHED.value
-            winner = PlayerMatch.objects.get(matchId__in=currentMatch, winner=True)
-            winner.playerId.champion += 1
-            tournament.save()
-            winner.playerId.save()
+            try:
+                winner = PlayerMatch.objects.get(matchId__in=currentMatch, winner=True)
+                winner.playerId.champion += 1
+                tournament.save()
+                winner.playerId.save()
+                logger.info(f"Tournament finished. Winner: {winner.playerId}.")
+            except PlayerMatch.DoesNotExist:
+                logger.error("No winner found for the final round.")
             return
+
         playerWinners = list(PlayerMatch.objects.filter(matchId__in=currentMatch, winner=True))
-        if (playerWinners):
+        logger.info(f"Number of players who won: {len(playerWinners)}")
+
+        if playerWinners:
+            logger.info("Updating tournament round.")
             tournament.round += 1
             tournament.save()
-        while (len(playerWinners) >= 2):
-            playerOne = playerWinners.pop(0)
-            playerTwo = playerWinners.pop(0)
-            matchTournament = Match.objects.create(
-                tournament=tournament,
-                game=Match.Game.PONG.value,
-                round=currentRound + 1
-            )
-            PlayerMatch.objects.create(
-                matchId=matchTournament,
-                playerId=playerOne
-            )
-            PlayerMatch.objects.create(
-                matchId=matchTournament,
-                playerId=playerTwo
-            )
+
+        while len(playerWinners) >= 2:
+            playerOneMatch = playerWinners.pop(0)
+            playerTwoMatch = playerWinners.pop(0)
+            playerOne = playerOneMatch.playerId
+            playerTwo = playerTwoMatch.playerId
+            logger.info(f"Creating new match between player {playerOne} and player {playerTwo}.")
+            try:
+                matchTournament = Match.objects.create(
+                    tournament=tournament,
+                    game=Match.Game.PONG.value,
+                    round=currentRound + 1
+                )
+                PlayerMatch.objects.create(
+                    matchId=matchTournament,
+                    playerId=playerOne
+                )
+                PlayerMatch.objects.create(
+                    matchId=matchTournament,
+                    playerId=playerTwo
+                )
+                logger.info(f"New match created with ID: {matchTournament.id}")
+            except Exception as e:
+                logger.debug(f"erro: {pformat(e)}")
+
+    else:
+        logger.info("Not all matches in the current round are still playing. No updates made.")
 
 class TournamentView(APIView):
     @method_decorator(jwtCookieRequired)
@@ -61,6 +103,10 @@ class TournamentView(APIView):
             logger.error(f"Player with ID {playerId} does not exist")
             return Response({"statusCode": 404, "message": "Player not found"})
 
+        tournaments = Tournament.objects.filter(status="PD")
+        logger.debug(f"torneios pendende {pformat(tournaments)}")
+        serializerAll = TournamentSerializer(tournaments, many=True)
+
         if serializer.playerInTournament(player):
             try:
                 tournament = serializer.playerInTournament(player)
@@ -75,6 +121,7 @@ class TournamentView(APIView):
                     logger.info(f"Tournament {tournament.id} is pending")
                     return Response({
                         "statusCode": 200,
+                        "tournaments": serializerAll.data,
                         "currentTournament": serializer.data,
                         "players": serializer.getPlayers(tournament)
                     })
@@ -88,8 +135,6 @@ class TournamentView(APIView):
                 logger.error(f"Tournament not found for player {playerId}")
                 return Response({"statusCode": 404, "message": "Tournament not found"})
 
-        tournaments = Tournament.objects.filter(status="PD")
-        logger.debug(f"torneios pendende {pformat(tournaments)}")
         tournamentPlayerFinished = PlayerTournament.objects.filter(playerId=player).order_by("-id").first()
         logger.debug(f"tournamentPlayerFinished {pformat(tournamentPlayerFinished)}")
         responseData = {}
@@ -108,7 +153,6 @@ class TournamentView(APIView):
             responseData.update({"statusCode": 405, "message": "No Tournament are available"})
             return Response(responseData)
         
-        serializerAll = TournamentSerializer(tournaments, many=True)
         responseData.update({"statusCode": 200, "tournaments": serializerAll.data})
         logger.info(f"Available tournaments: {serializerAll.data}")
         return Response(responseData)
@@ -227,7 +271,7 @@ class TournamentView(APIView):
                             round=tournament.round
                         )
                         logger.debug(f"tournamentMatch = {tournamentMatch}")
-                        pm1 = PlayerTournament.objects.create(
+                        pm1 = PlayerMatch.objects.create(
                             matchId=tournamentMatch,
                             playerId=player1
                         )

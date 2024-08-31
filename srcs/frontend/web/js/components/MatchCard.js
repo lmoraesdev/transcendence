@@ -1,4 +1,6 @@
-const MatchCard = () => {
+import PlayerCard from "./PlayerCard.js";
+
+const MatchCard = (matchCard) => {
   const matchCardHTML = `
     <template id="match-card"></template>
   `;
@@ -12,7 +14,7 @@ const MatchCard = () => {
   const template = document.getElementById("match-card");
   const component = template.content.cloneNode(true);
 
-  const matchCard = document.querySelector('match-card');
+  // const matchCard = document.querySelector('match-card');
   matchCard.appendChild(component);
   matchCard.classList.add(
     "d-flex",
@@ -26,7 +28,7 @@ const MatchCard = () => {
 
   const match = JSON.parse(matchCard.getAttribute("match"));
 
-  if (match.game === "PO")
+  if (match.game === "PG")
     matchCard.style.backgroundImage = `url('/web/images/pong_super_glass.svg')`;
   matchCard.style.backgroundSize = "cover";
 
@@ -36,6 +38,9 @@ const MatchCard = () => {
     player_card_elem.setAttribute("username", player.username);
     player_card_elem.setAttribute("score", player.score);
     matchCard.appendChild(player_card_elem);
+
+    // Passar o player_card_elem como parâmetro
+    PlayerCard(player_card_elem);
   }
 };
 

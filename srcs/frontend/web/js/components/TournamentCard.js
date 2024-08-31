@@ -5,7 +5,9 @@ const { setFocus } = helpers;
 
 const TournamentCard = (tournament) => {
   const container = document.getElementById('tournament-container');
-  container.innerHTML = '';
+
+  // Remova a linha abaixo para evitar sobrescrever o conteúdo anterior
+  // container.innerHTML = '';
 
   const card = document.createElement('article');
   card.className = 'tournament-card';
@@ -39,12 +41,10 @@ const TournamentCard = (tournament) => {
   const tournamentSize = card.querySelector(".tournament-size");
   console.log(tournament);
   card.setAttribute('tournamentId', tournament.id);
-  tournamentName.textContent = tournament.name
+  tournamentName.textContent = tournament.name;
   tournamentSize.textContent = `${tournament.playersQuantity} / 4 players`;
 
   setFocus(card, `Tournament ${tournament.name} loaded. Players: ${tournament.playersQuantity} out of 4.`);
-
-  
 };
 
 export default TournamentCard;

@@ -6,6 +6,7 @@ import TournamentPopup from "../components/TournamentPopup.js";
 import TournamentCard from "../components/TournamentCard.js";
 import TournamentPlayerCard from "../components/TournamentPlayerCard.js";
 import helpers from '../helpers/helpers.js';
+import TournamentMatchCard from "../components/TournamentMatchCard.js";
 
 const { truncateUsername, setFocus  } = helpers;
 
@@ -65,14 +66,12 @@ const TournamentPage = () => {
     parentElement.appendChild(component);
 
     TournamentPlayers();
-    TournamentPlayerCard();
-    TournamentMatches();
+    // TournamentPlayerCard();
     const tournamentActions = parentElement.querySelector(".tournament-actions");
     const tournamentCurrent = parentElement.querySelector(".tournament-current");
     const tournamentPlayers = tournamentCurrent.querySelector("#tournament-player");
     const tournamentPlayersStart = tournamentPlayers.querySelector(".start");
-    const tournamentPlayersLeave = tournamentPlayers.querySelector(".leave");
-    const tournamentMatches = tournamentCurrent.querySelector(".match");  
+    const tournamentPlayersLeave = tournamentPlayers.querySelector(".leave");  
     const createBtn = tournamentActions.querySelector(".tournament-create button");
     const tournamentList = document.querySelector(".tournament-list");
 
@@ -91,26 +90,33 @@ const TournamentPage = () => {
         tournamentList.textContent = "No tournaments available";
       }
 
-      if (data.tournaments || (data.currentTournament && data.currentTournament.status === "PD")) {
-        if (data.currentTournament)
-          TournamentCard(data.currentTournament);
-        else {
-          for (const tournament of data.tournaments)
+      if (data.tournaments) {
+        for (const tournament of data.tournaments) {
+          if (!data.currentTournament || (data.currentTournament && data.currentTournament.id != tournament.id)) {
             TournamentCard(tournament);
+          }
         }
+      
         const cardContainer = document.querySelector("#tournament-container");
-        const tournamentCard = cardContainer.querySelector(".card");
-        if (tournamentCard) {
-          tournamentCard.addEventListener("click", (values) => {
-            console.log('values', values);
+        const tournamentCards = cardContainer.querySelectorAll(".card"); // Use querySelectorAll para pegar todos os cards
+      
+        tournamentCards.forEach((card) => {
+          card.addEventListener("click", (event) => {
+            const tournamentId = card.parentElement.getAttribute('tournamentId');
+            const tournamentName = card.querySelector(".tournament-name").textContent;
+      
             const tournamentPopup = document.createElement("tournament-popup");
             tournamentPopup.setAttribute("popup-type", "JOIN");
-            tournamentPopup.setAttribute("tournament-id", data.id);
-            tournamentPopup.setAttribute("tournament-name", data.name);
+            tournamentPopup.setAttribute("tournament-id", tournamentId);
+            tournamentPopup.setAttribute("tournament-name", tournamentName);
             parentElement.append(tournamentPopup);
-            TournamentPopup("JOIN", data);
+      
+            TournamentPopup("JOIN", {
+              id: tournamentId,
+              name: tournamentName
+            });
           });
-        }
+        });
       }
 
       if (data.currentTournament) {
@@ -166,29 +172,64 @@ const TournamentPage = () => {
             window.location.reload(); //REMOVE
           });
         });
-      } else {
-        if (tournamentMatches) {
+      // } else {
+        if (data.currentTournament.matches.length > 0) {
+          TournamentMatches(data.currentTournament.matches);
+          const tournamentMatches = tournamentCurrent.querySelector(".match");
+
           tournamentMatches.classList.remove("d-none");
           tournamentMatches.classList.add("d-flex");
-          const matchElements = parentElement.querySelectorAll("tournament-match-card");
-          for (let i = 0; i < 7; ++i) {
-            const match = data.currentTournament.matches[i];
-            const matchElement = matchElements[i];
-            if (match) {
-              matchElement.setAttribute("match-id", match.id);
-              if (match.current) {
-                matchElement.querySelector("button").classList.remove("d-none");
-              }
-              for (let j = 0; j < 2; ++j) {
-                const player = match.players[j];
-                const playerElement = matchElement.querySelector(`.player${j + 1}`);
-                playerElement.querySelector("h6").textContent = player.players.username;
-                playerElement.querySelector("img").src = player.players.avatar;
-                if (match.currentTournament.state === "PL")
-                  playerElement.querySelector("h3").textContent = player.score;
-              }
-            }
-          }
+//           const matchElements = parentElement.querySelectorAll(".tournament-match-card");
+//           for (let i = 0; i < data.currentTournament.matches.length; ++i) {
+//             const match = data.currentTournament.matches[i];
+//             const matchElement = matchElements[i];
+//             if (match) {
+//               matchElement.setAttribute("match-id", match.id); //erro aqui
+// /*               if (match.current) {
+//                 console.log('match butao:', matchElement);
+//                 matchElement.querySelector("button").classList.remove("d-none");
+//               } */
+//               for (let j = 0; j < 2; ++j) {
+//                 console.log('match Element:', matchElement); 
+//                 const player = match.players[j];
+//                 const playerElement = matchElement.querySelector(`.player${j + 1}`);
+            
+//                 if (playerElement) {
+//                     console.log('Player:', player); // Verifica o jogador
+//                     console.log('Player Element:', playerElement); // Verifica o elemento
+            
+//                     // Verifica se h6 existe antes de definir o textContent
+//                     const usernameElement = playerElement.querySelector("h6");
+//                     if (usernameElement) {
+//                         usernameElement.textContent = player.player.username;
+//                     } else {
+//                         console.error('Elemento h6 não encontrado no playerElement:', playerElement);
+//                     }
+            
+//                     // Verifica se img existe antes de definir o src
+//                     const avatarElement = playerElement.querySelector("img");
+//                     if (avatarElement) {
+//                         avatarElement.src = player.player.avatar;
+//                     } else {
+//                         console.error('Elemento img não encontrado no playerElement:', playerElement);
+//                     }
+            
+//                     // Verifica se h3 existe e se o estado é "PL" antes de definir o textContent
+//                     if (match.state === "PL") {
+//                         const scoreElement = playerElement.querySelector("h3");
+//                         if (scoreElement) {
+//                             scoreElement.textContent = player.score;
+//                         } else {
+//                             console.error('Elemento h3 não encontrado no playerElement:', playerElement);
+//                         }
+//                     }
+//                 } else {
+//                     console.error(`Elemento .player${j + 1} não encontrado no matchElement.`);
+//                 }
+//             }
+            
+//             }
+//           }
         }
       }
 

@@ -1,4 +1,6 @@
 import fetching from "../helpers/fetching.js";
+import MatchCard from "./MatchCard.js";
+
 
 const MatchHistory = () => {
   
@@ -15,7 +17,7 @@ const MatchHistory = () => {
   const template = document.getElementById("match-history");
   const component = template.content.cloneNode(true);
   
-  const matchHistory = document.querySelector('#matchHistory');
+  const matchHistory = document.querySelector('#match-history');
   matchHistory.appendChild(component);
   matchHistory.classList.add(
     "d-flex",
@@ -36,6 +38,7 @@ const MatchHistory = () => {
       const match_card_elem = document.createElement("match-card");
       match_card_elem.setAttribute("match", JSON.stringify(match));
       matchHistory.appendChild(match_card_elem);
+      MatchCard(match_card_elem);
     }
   });
 
