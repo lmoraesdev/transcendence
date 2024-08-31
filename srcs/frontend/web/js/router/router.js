@@ -6,7 +6,6 @@ import ProfilePage from '../pages/ProfilePage.js';
 import ProfileSetup from '../pages/ProfileSetup.js'
 import SettingPage from '../pages/SettingPage.js';
 import TournamentPage from '../pages/TournamentPage.js';
-import TournamentUserRegistration from '../pages/TournamentUserRegistration.js';
 import TwofaPage from '../pages/TwofaPage.js';
 
 import { wsTwo } from "../game/pongTwo.js";
@@ -25,7 +24,6 @@ const routes = {
   "/profile-setup/": showNav(ProfileSetup),
   "/settings/": showNav(SettingPage),
   "/tournaments/": showNav(TournamentPage),
-  "/tournament-registration/": showNav(TournamentUserRegistration),
 }
 
 const router = {
