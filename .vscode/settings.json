@@ -1,8 +1,0 @@
-{
-  "chat.tools.terminal.autoApprove": {
-    "/^cd /home/lbc_m/transcendence && python3 -m py_compile srcs/backend/services/matchmaking/api/consumers\\.py srcs/backend/services/pong/api/asgi\\.py srcs/backend/services/pong/api/routing\\.py$/": {
-      "approve": true,
-      "matchCommandLine": true
-    }
-  }
-}
