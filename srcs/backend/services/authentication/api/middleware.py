@@ -19,25 +19,23 @@ class TokenAuthMW:
         headers = dict(scope['headers'])
         if b"cookie" in headers:
             cookies = headers[b"cookie"].decode()
-            getCookie = re.search("jwt_token=(.*)", cookies)
+            getCookie = re.search(r"jwt_token=([^;]+)", cookies)
             if getCookie is not None:
                 tokenKey = getCookie.group(1)
-                await self.decodeToken(tokenKey, scope)
-                return await self.inner(scope, receive, send)
-        scope['status'] = "Invalid"
-        return await self.inner(scope, receive, send)
-    
+                if await self.decodeToken(tokenKey, scope):
+                    return await self.inner(scope, receive, send)
+        await send({"type": "websocket.close", "code": 4401})
+
     async def decodeToken(self, tokenKey, scope):
         try:
-            payload = jwt.decode(tokenKey, settings.SECRET_KEY, algorithms="HS256")
-            if payload['twofa']:
-                scope['status'] = "Twofa"
-                return
+            payload = jwt.decode(tokenKey, settings.SECRET_KEY, algorithms=["HS256"])
+            if payload.get('twofa'):
+                return False
             scope['player'] = await getPlayerById(payload['id'])
             scope['status'] = "Valid"
-        except Player.DoesNotExist:
+            return True
+        except (Player.DoesNotExist, jwt.InvalidTokenError):
             scope['status'] = "Invalid"
-        except jwt.InvalidTokenError:
-            scope['status'] = "Invalid"
-    
+            return False
+
 AuthMWStack = lambda inner: TokenAuthMW(AuthMiddlewareStack(inner))

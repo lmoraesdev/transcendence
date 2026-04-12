@@ -32,11 +32,16 @@ setting-page main {
 
 .setting-avatar {
   position: relative;
+  width: 150px;
+  height: 150px;
+  overflow: hidden;
 }
 
 .setting-avatar .avatar {
-  width: 150px;
-  height: 150px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 1rem;
 }
 
 .setting-avatar input {
@@ -44,14 +49,14 @@ setting-page main {
 }
 
 .setting-avatar .change-avatar {
-  width: 150px;
-  height: 150px;
+  width: 100%;
+  height: 100%;
   position: absolute;
   left: 0;
-  bottom: 0;
+  top: 0;
   opacity: 0;
   transition: opacity 0.2s;
-  background-color: var(--color-primary);
+  background-color: rgba(0, 0, 0, 0.25);
   cursor: pointer;
 }
 
@@ -80,6 +85,27 @@ setting-page main {
 
 .setting-twofa .popup-twofa > div {
   background-color: var(--color-primary-solid);
+}
+
+.setting-data summary {
+  margin-bottom: 1rem;
+}
+
+.setting-data[open] {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.20);
+}
+
+.setting-data .section-body {
+  width: 100%;
+}
+
+.setting-data .section-body .setting-avatar,
+.setting-data .section-body .setting-username,
+.setting-data .section-body .setting-first-name,
+.setting-data .section-body .setting-last-name,
+.setting-data .section-body .setting-twofa {
+  width: 100%;
 }
 
 /* The switch - the box around the slider */

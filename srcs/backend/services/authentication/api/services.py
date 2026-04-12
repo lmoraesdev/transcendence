@@ -22,7 +22,7 @@ def generateJwt(id: int, twoFactor: bool) -> str:
     jwtToken = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
     return jwtToken
 
-def decodeGooleToken(idToken: str) -> Dict[str, str]:
+def decodeGoogleToken(idToken: str) -> Dict[str, str]:
     decodeToken = jwt.decode(idToken, options={"verify_signature": False})
     return decodeToken
 
@@ -32,7 +32,7 @@ def  get2FACode(playerId: int, code: int) -> bool:
 
 def check2FACode(playerId: int, code: int) -> bool:
     playerIdEnconde = str(playerId).encode("utf-8")
-    return TOTP(b32encode(playerIdEnconde)).verify(code)    
+    return TOTP(b32encode(playerIdEnconde)).verify(code)
 
 def jwtCookieRequired(viewFunction):
     @wraps(viewFunction)
@@ -65,7 +65,7 @@ def createPlayer(data: Dict[str, str]) -> Player:
         firstName = data['firstName']
         lastName = data['lastName']
         avatar = data.get('avatar')
-        
+
         player = Player.objects.create(
             email = email,
             username = username,
@@ -76,4 +76,5 @@ def createPlayer(data: Dict[str, str]) -> Player:
 
         return Player.objects.get(email=email)
     except Exception as e:
-        return Response({"statusCode": 500, 'error': f"Error creating player: {str(e)}"})
+        logger.error("Error creating player: %s", e)
+        return None

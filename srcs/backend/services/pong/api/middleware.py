@@ -1,8 +1,8 @@
 import re
 import jwt
 from django.db import close_old_connections
+from django.conf import settings
 from channels.auth import AuthMiddlewareStack
-from .settings import SECRET_KEY
 
 class TokenMiddleware:
     def __init__(self, inner):
@@ -13,18 +13,19 @@ class TokenMiddleware:
         headers = dict(scope["headers"])
         if b"cookie" in headers:
             cookies = headers[b"cookie"].decode()
-            match = re.search("jwt_token=(.*)", cookies)
+            match = re.search(r"jwt_token=([^;]+)", cookies)
             if match is not None:
                 token_key = match.group(1)
-                scope['payload'] = self.decode_token(token_key)
-                if scope['payload'] is not None:
+                payload = self.decode_token(token_key)
+                if payload is not None:
+                    scope['payload'] = payload
                     return await self.inner(scope, receive, send)
-        return
+        await send({"type": "websocket.close", "code": 4401})
 
     def decode_token(self, token_key):
         try:
-            payload = jwt.decode(token_key, SECRET_KEY, algorithms=['HS256'])
-            if (payload['twofa']):
+            payload = jwt.decode(token_key, settings.SECRET_KEY, algorithms=["HS256"])
+            if payload.get('twofa'):
                 return None
             return payload
         except jwt.InvalidTokenError:

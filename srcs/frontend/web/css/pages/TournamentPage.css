@@ -28,3 +28,20 @@ tournament-page main {
 .tournament-current h1 {
   background-color: var(--color-primary);
 }
+
+.tournament-current {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(14px);
+}
+
+.tournament-actions {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.18);
+}
+
+.tournament-create,
+.tournament-join,
+.tournament-current {
+  padding: 2rem;
+}

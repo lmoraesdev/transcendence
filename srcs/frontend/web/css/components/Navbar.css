@@ -67,6 +67,27 @@ li .logout.btn:active {
   background-color: var(--color-primary);
 }
 
+my-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  gap: 1rem;
+  background: rgba(6, 18, 29, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(14px);
+}
+
+.nav-bar {
+  gap: 0.5rem;
+}
+
+.link,
+.colorizer {
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
 @media only screen and (max-width: 1111px) {
   my-navbar.active {
     background-color: var(--color-primary);

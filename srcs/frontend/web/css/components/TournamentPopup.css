@@ -9,6 +9,10 @@ tournament-popup {
 
 tournament-popup > div {
   background-color: var(--color-primary-solid);
+  padding: 2rem;
+  border-radius: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.22);
 }
 
 tournament-popup .popup-header {

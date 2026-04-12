@@ -2,7 +2,6 @@ export let wsTwo;
 let TwoPressKey = true;
 
 function setPlayerData(data) {
-  console.log("data:", data);
   const avatar_left = data["padd_left"]["avatar"];
   const avatar_right = data["padd_right"]["avatar"];
   const username_left = data["padd_left"]["username"];
@@ -69,7 +68,6 @@ export function runPongTwoGame(canvas, ctx, match_id) {
       return;
     }
     let alreadyInGame = false;
-    console.log(`wss://${window.ft_transcendence_host}/ws/pong/${e.data}/2/${!match_id ? "" : match_id + "/"}`);
     wsTwo = new WebSocket(
       `wss://${window.ft_transcendence_host}/ws/pong/${e.data}/2/${
         !match_id ? "" : match_id + "/"

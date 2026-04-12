@@ -18,7 +18,7 @@ class PlayerMatchSerializer(serializers.ModelSerializer):
         player = Player.objects.get(id=playerMatch.playerId.id)
         serializer = PlayerSerializer(player)
         return serializer.data
-    
+
 class MatchSerializer(serializers.ModelSerializer):
     players = serializers.SerializerMethodField()
     current = serializers.SerializerMethodField()
@@ -33,7 +33,7 @@ class MatchSerializer(serializers.ModelSerializer):
             return False
         current = PlayerMatch.objects.filter(matchId=match, playerId=player).exists()
         return current
-    
+
     def getPlayers(self, match):
         playerMatchs = PlayerMatch.objects.filter(matchId=match)
         serializer = PlayerMatchSerializer(playerMatchs, many=True)
@@ -52,7 +52,7 @@ class TournamentSerializer(serializers.ModelSerializer):
         matches = Match.objects.filter(tournament=tournament)
         serializer = MatchSerializer(matches, context={"player": self.context.get("player")}, many=True)
         return serializer.data
-    
+
     def  getPlayers(self, tournament):
         playerTournaments = PlayerTournament.objects.filter(tournamentId=tournament)
         players = []
@@ -60,15 +60,15 @@ class TournamentSerializer(serializers.ModelSerializer):
             players.append(Player.objects.get(id=playerTournament.playerId.id))
         serializer = PlayerSerializer(instance=players, many=True)
         return serializer.data
-    
+
     def getPlayerCount(self, tournament):
         playerTournaments = PlayerTournament.objects.filter(tournamentId=tournament)
         return playerTournaments.count()
-    
+
     def getCreator(self, tournament):
         player = self.context.get("player")
         return PlayerTournament.objects.filter(tournamentId=tournament, playerId=player, creator=True).exists()
-    
+
     def playerInTournament(self, player):
         tournament = Tournament.objects.filter(
             Q(playertournament__playerId=player) &
@@ -76,3 +76,9 @@ class TournamentSerializer(serializers.ModelSerializer):
             Q(status=Tournament.StatusChoices.PROGRESS.value))
         ).first()
         return tournament
+
+    def is_player_in_tournament(self, player):
+        return self.playerInTournament(player) is not None
+
+    def get_players_count(self, tournament):
+        return self.getPlayerCount(tournament)

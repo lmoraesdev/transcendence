@@ -1,13 +1,14 @@
 import os
 import urllib.parse
 from .serializers import PlayerInfoSerializer
-from .models import  Friendship, Player, PlayerMatch, PlayerTournament 
+from .models import Friendship, Player, PlayerMatch, PlayerTournament
 from .decorators import jwtCookieRequired
 from django.db.models import Q
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.utils.decorators import method_decorator
+from django.utils.text import get_valid_filename
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -17,86 +18,61 @@ class PlayerInfo(APIView):
     def get(self, request):
         try:
             username = request.query_params.get('username')
-            if username:
-                player = Player.objects.filter(username=username)
-                if not player.exists():
-                    raise Player.DoesNotExist
-                serializer = PlayerInfoSerializer(player, many=True)
-                return Response({
-                    "status": 200,
-                    "players": serializer.data,
-                    "message": "User found successfully"
-                })
+            if username is not None:
+                username = username.strip()
+                if username == "":
+                    return Response({"status": 400, "message": "Invalid username filter"})
+                players = Player.objects.filter(username__iexact=username)
+                if not players.exists():
+                    return Response({"status": 404, "message": "User not found"})
+                serializer = PlayerInfoSerializer(players, many=True)
+                return Response({"status": 200, "players": serializer.data, "message": "Users found successfully"})
             player = Player.objects.get(id=request.decoded_token['id'])
             serializer = PlayerInfoSerializer(player)
-            return Response({
-                "status": 200,
-                "player": serializer.data
-            })
+            return Response({"status": 200, "player": serializer.data})
         except Player.DoesNotExist:
-            return Response({
-                "status": 404,
-                "message": "User not found",
-            })
+            return Response({"status": 404, "message": "User not found"})
         except Exception as e:
-            return Response({
-                "status": 500,
-                "message": str(e),
-            })
+            return Response({"status": 500, "message": str(e)})
 
     @method_decorator(jwtCookieRequired)
     def post(self, request):
         try:
             changed = False
-            id = request.decoded_token['id']
-            playerData = request.data.get('player')
-            player = Player.objects.get(id=id)
+            player_id = request.decoded_token['id']
+            playerData = request.data.get('player') or {}
+            if not isinstance(playerData, dict):
+                return Response({"status": 400, "message": "Invalid payload"})
+            player = Player.objects.get(id=player_id)
             if "username" in playerData:
-                username = ' '.join(playerData["username"].split())
-                if not username or len(playerData['username']) > 8 :
-                    return Response({
-                        "status": 400,
-                        "message": "Invalid username",
-                    })
+                username = ' '.join(str(playerData["username"]).split())
+                if not username or len(username) > 20:
+                    return Response({"status": 400, "message": "Invalid username"})
                 player.username = username
                 changed = True
             if "firstName" in playerData:
-                firstName = ' '.join(playerData['firstName'].split())
-                if not firstName or len(firstName) > 20 :
-                    return Response({
-                        "status": 400,
-                        "message": "Invali first name",
-                    })
+                firstName = ' '.join(str(playerData['firstName']).split())
+                if not firstName or len(firstName) > 20:
+                    return Response({"status": 400, "message": "Invalid first name"})
                 player.firstName = firstName
                 changed = True
             if "lastName" in playerData:
-                lastName = ' '.join(playerData['lastName'].split())
-                if not lastName or len(lastName) > 20 :
-                    return Response({
-                        "status": 400,
-                        "message": "Invalid last name",
-                    })
+                lastName = ' '.join(str(playerData['lastName']).split())
+                if not lastName or len(lastName) > 20:
+                    return Response({"status": 400, "message": "Invalid last name"})
                 player.lastName = lastName
                 changed = True
             if "twoFactor" in playerData and playerData['twoFactor'] is False:
-                player.twoFactor = playerData['twoFactor']
+                player.twoFactor = False
                 changed = True
-            player.save()
+            if changed:
+                player.save()
             message = "User updated successfully" if changed else "No changes detected"
-            return Response({
-                "status": 200,
-                "message": message,
-            })
+            return Response({"status": 200, "message": message})
         except Player.DoesNotExist:
-            return Response({
-                "status": 404,
-                "message": "User not found",
-            })
+            return Response({"status": 404, "message": "User not found"})
         except Exception as e:
-            return Response({
-                "status": 500,
-                "message": str(e),
-            })
+            return Response({"status": 500, "message": str(e)})
 
 
 class PlayerAvatarUpload(APIView):
@@ -104,28 +80,21 @@ class PlayerAvatarUpload(APIView):
     @method_decorator(jwtCookieRequired)
     def post(self, request):
         try:
-            id = request.decoded_token['id']
+            player_id = request.decoded_token['id']
+            if 'avatar' not in request.FILES:
+                return Response({"status": 400, "message": "Avatar file is required"})
             file = request.FILES['avatar']
-            filePath = os.path.join(settings.MEDIA_ROOT, file.name)
-            default_storage.save(filePath, ContentFile(file.read()))
-            fileUrl = urllib.parse.urljoin(settings.PUBLIC_PLAYER_URL, os.path.join(settings.MEDIA_URL, file.name))
-            player = Player.objects.get(id=id)
+            safe_name = get_valid_filename(file.name)
+            saved_path = default_storage.save(f"avatars/{player_id}_{safe_name}", ContentFile(file.read()))
+            fileUrl = f"{settings.PUBLIC_PLAYER_URL.rstrip('/')}{settings.MEDIA_URL}{saved_path.lstrip('/')}"
+            player = Player.objects.get(id=player_id)
             player.avatar = fileUrl
             player.save()
-            return Response({
-                "status": 200,
-                "message": "Avatar updated successfully",
-            })
+            return Response({"status": 200, "message": "Avatar updated successfully", "avatar": player.avatar})
         except Player.DoesNotExist:
-            return Response({
-                "status": 404,
-                "message": "User not found",
-            })
+            return Response({"status": 404, "message": "User not found"})
         except Exception as e:
-            return Response({
-                "status": 500,
-                "message": str(e),
-            })
+            return Response({"status": 500, "message": str(e)})
 
 
 class PlayerFriendship(APIView):
@@ -185,74 +154,45 @@ class PlayerFriendship(APIView):
             try:
                 sender = Player.objects.get(id=id)
                 receiverId = request.data.get('target_id')
+                if not receiverId:
+                    return Response({"status": 400, "message": "target_id is required"})
                 if receiverId == id:
-                    return Response({
-                        "status": 400,
-                        "message": "You can't send a friend request to yourself",
-                    })
+                    return Response({"status": 400, "message": "You can't send a friend request to yourself"})
                 receiver = Player.objects.get(id=receiverId)
                 if Friendship.objects.filter(sender=sender, receiver=receiver).exists():
-                    return Response({
-                        "status": 400,
-                        "message": "Friend request already sent",
-                    })
-                elif Friendship.objects.filter(sender=receiver, receiver=sender).exists():
+                    return Response({"status": 400, "message": "Friend request already sent"})
+                if Friendship.objects.filter(sender=receiver, receiver=sender).exists():
                     friendships = Friendship.objects.filter(sender=receiver, receiver=sender)
                     friendships.update(status='AC')
-                    return Response({
-                    "status": 200,
-                    "message": "Friend requests accepted successfully"
-                    })
-                else:
-                    friendship = Friendship.objects.create(sender=sender, receiver=receiver, status='PN')
-                    friendship.save()
-                    return Response({
-                        "status": 200,
-                        "message": "Friend request sent successfully"
-                    })
+                    return Response({"status": 200, "message": "Friend request accepted successfully"})
+                Friendship.objects.create(sender=sender, receiver=receiver, status='PN')
+                return Response({"status": 200, "message": "Friend request sent successfully"})
             except Player.DoesNotExist:
-                return Response({
-                    "status": 404,
-                    "message": "User not found",
-                })
-            except Friendship.DoesNotExist:
-                    return Response({
-                        "status": 404,
-                        "message": "Friend request not found",
-                    })
+                return Response({"status": 404, "message": "User not found"})
             except Exception as e:
-                    return Response({
-                        "status": 500,
-                        "message": str(e),
-                    })
+                return Response({"status": 500, "message": str(e)})
 
         @method_decorator(jwtCookieRequired)
         def delete(self, request):
             try:
                 senderId = request.decoded_token['id']
                 receiverId = request.data.get('target_id')
+                if not receiverId:
+                    return Response({"status": 400, "message": "target_id is required"})
                 sender = Player.objects.get(id=senderId)
                 receiver = Player.objects.get(id=receiverId)
                 try:
                     friendship = Friendship.objects.get(sender=sender, receiver=receiver)
                 except Friendship.DoesNotExist:
                     friendship = Friendship.objects.get(sender=receiver, receiver=sender)
-                if friendship:
-                    friendship.delete()
-                    return Response({
-                        "status": 204,
-                        "message": 'Friendship deleted successfully'
-                    })
-                else:
-                    return Response({
-                        "status": 404,
-                        "message": "Friend request not found",
-                    })
+                friendship.delete()
+                return Response({"status": 204, "message": 'Friendship deleted successfully'})
+            except Player.DoesNotExist:
+                return Response({"status": 404, "message": "User not found"})
+            except Friendship.DoesNotExist:
+                return Response({"status": 404, "message": "Friend request not found"})
             except Exception as e:
-                return Response({
-                    "status": 500,
-                    "message": str(e),
-                })
+                return Response({"status": 500, "message": str(e)})
 
 
 class MatchesHistory(APIView):

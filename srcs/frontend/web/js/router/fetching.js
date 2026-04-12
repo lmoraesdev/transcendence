@@ -10,7 +10,5 @@ export default async function fetching(
         headers: headers,
     });
     const json = await res.json();
-    console.log(resource, json);
     return json;
 }
-  

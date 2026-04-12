@@ -24,17 +24,77 @@
   --color-font-black: #1a1a1a;
 }
 
+body {
+  min-height: 100vh;
+  margin: 0;
+  background-color: #07111d;
+  background-image:
+    radial-gradient(circle at 10% 10%, rgba(248, 236, 144, 0.20), transparent 16%),
+    radial-gradient(circle at 85% 15%, rgba(44, 172, 255, 0.18), transparent 18%),
+    radial-gradient(circle at 50% 85%, rgba(248, 236, 144, 0.09), transparent 25%);
+  color: var(--color-font-white);
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.25));
+  pointer-events: none;
+}
+
 #root {
   min-height: 100vh;
-  /* background: linear-gradient(var(--color-font-white) 75%, var(--color-primary)); */
+  padding: 1.5rem 1rem 2rem;
 }
 
 .my-page {
-  height: min-content;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(18px);
+}
+
+details {
+  width: 100%;
+}
+
+details summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+details summary::-webkit-details-marker {
+  display: none;
+}
+
+details summary::after {
+  content: "+";
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary-light);
+}
+
+details[open] summary::after {
+  content: "-";
+}
+
+details .section-body {
+  padding: 1rem 1.25rem 1.5rem;
 }
 
 img {

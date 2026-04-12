@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from qr_code.qrcode.maker import make_qr_code_image
 from qr_code.qrcode.utils import QRCodeOptions
 from .models import Player
-from .services import decodeGooleToken, generateJwt, check2FACode, get2FACode, jwtCookieRequired, createPlayer
+from .services import decodeGoogleToken, generateJwt, check2FACode, get2FACode, jwtCookieRequired, createPlayer
 
 logger = logging.getLogger('custom_logger')
 
@@ -50,7 +50,7 @@ def intraCallbackOAuth(request):
     )
     if not userToken.ok:
         return Response({"statusCode": 401, "detail": "No access token in the token response"})
-    
+
     logger.debug("playerData -> %s", userToken.json())
     playerData = {
         "email": userToken.json()['email'],
@@ -61,9 +61,9 @@ def intraCallbackOAuth(request):
     }
     player = createPlayer(playerData)
     if player is None:
-        return redirect(f"https://{settings.BASE_URL}/login/", permanent=True)
+        return redirect(f"{settings.BASE_URL}/login/", permanent=True)
     jwtToken = generateJwt(player.id, player.twoFactor)
-    response = redirect(f"https://{settings.BASE_URL}/{'twofa' if player.twoFactor else 'home'}/", permanent=True)
+    response = redirect(f"{settings.BASE_URL}/{'twofa' if player.twoFactor else 'home'}/", permanent=True)
     response.set_cookie("jwt_token", value=jwtToken, httponly=True, secure=True)
     return response
 
@@ -72,12 +72,12 @@ def intraCallbackOAuth(request):
 def loggoutUser(request):
     if request.token is not None:
         cache.set(request.token, True, timeout=None)
-        response = redirect(f"https://{settings.BASE_URL}/login/", permanent=True)
+        response = redirect(f"{settings.BASE_URL}/login/", permanent=True)
         response.delete_cookie("jwt_token")
         return response
     else:
         return Response({"statusCode": 400, "detail": "No valid access token found"})
-    
+
 @api_view(['GET'])
 def OAuthGoogle(request):
     SCOPES = [
@@ -121,7 +121,7 @@ def googleCallbackOAuth(request):
     if tokens["access_token"] is None:
         return Response({"statusCode": 401, "error": "AccessToken is invalid"})
     token = tokens["id_token"]
-    tokenDecoded = decodeGooleToken(token)
+    tokenDecoded = decodeGoogleToken(token)
     playerData = {
         "email": tokenDecoded['email'],
         "username": tokenDecoded['name'],
@@ -131,9 +131,9 @@ def googleCallbackOAuth(request):
     }
     player = createPlayer(playerData)
     if player is None:
-        return redirect(f"https://{settings.BASE_URL}/login/", permanent=True)
+        return redirect(f"{settings.BASE_URL}/login/", permanent=True)
     jwtToken = generateJwt(player.id, player.twoFactor)
-    response = redirect(f"https://{settings.BASE_URL}/{'twofa' if player.twoFactor else 'home'}/", permanent=True)
+    response = redirect(f"{settings.BASE_URL}/{'twofa' if player.twoFactor else 'home'}/", permanent=True)
     response.set_cookie("jwt_token", value=jwtToken, httponly=True, secure=True)
     return response
 

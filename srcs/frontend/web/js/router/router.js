@@ -1,6 +1,6 @@
 import fetching from "./fetching.js";
 import { wsTwo } from "./pongTwo.js";
-import { wsFour } from "./pongFour.js"; 
+import { wsFour } from "./pongFour.js";
 
 const routes = {
   "/game/": "game-page",
@@ -14,20 +14,21 @@ const routes = {
 
 const router = {
   init: () => {
-    console.log("start")
     addEventListener("popstate", (event) => {
       if (wsTwo)
         wsTwo.close(1000);
       if (wsFour)
         wsFour.close(1000);
-      router.go(event.state.route, event.state.query, "navigation");
+      const route = event.state?.route ?? "/home/";
+      const query = event.state?.query ?? "";
+      router.go(route, query, "navigation");
     });
 
     let pathname = location.pathname;
-    if (pathname === "/") pathname = "/home/";
-    console.log("path: " + pathname, location);
+    if (pathname === "/") pathname = "/login/";
+    router.go(pathname, window.location.search, "replace");
+
     const ws = new WebSocket(`wss://${window.ft_transcendence_host}/authentication/ws/login/`);
-    console.log('ws', ws);
     ws.onmessage = (event) => {
       const message = event.data;
       if (message === "Valid") {
@@ -54,6 +55,17 @@ const router = {
           pathname = "/login/";
       }
       router.go(pathname, window.location.search, "replace");
+    };
+
+    ws.onerror = () => {
+      if (pathname !== "/login/" && pathname !== "/twofa/") {
+        router.go("/login/", window.location.search, "replace");
+      }
+    };
+    ws.onclose = () => {
+      if (pathname !== "/login/" && pathname !== "/twofa/") {
+        router.go("/login/", window.location.search, "replace");
+      }
     };
   },
 

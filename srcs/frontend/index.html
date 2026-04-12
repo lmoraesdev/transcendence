@@ -7,11 +7,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Favicon -->
-  <link rel="shortcut icon" href="/web/images/" type="image/x-icon" />
+  <link rel="shortcut icon" href="/web/images/pong_favicon.png" type="image/png" />
 
   <!-- Bootstrap -->
-  <link rel="stylesheet" href="/web/bootstrap-5.3.2-dist/css/bootstrap.min.css" />
-  <script defer src="/web/bootstrap-5.3.2-dist/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="/web/bootstrap-5.2.3-dist/css/bootstrap.min.css" />
+  <script defer src="/web/bootstrap-5.2.3-dist/js/bootstrap.min.js"></script>
 
   <!-- CSS -->
   <link rel="stylesheet" href="/web/css/style.css" />
@@ -140,40 +140,52 @@
       <h1 class="setting-header py-5 rounded-5 text-center display-1 fw-bold">
         SETTINGS
       </h1>
-      <div class="setting-data d-flex flex-wrap justify-content-around align-items-center gap-2 p-2 rounded-5">
-        <h2 class="text-center fw-bold m-0 px-4 py-2">Change avatar</h2>
-        <div class="setting-avatar d-flex justify-content-center align-items-center gap-1">
-          <img class="avatar rounded-5 border border-1 border-white" alt="avatar" referrerpolicy="no-referrer">
-          <input type="file" id="input-avatar" accept="image/jpeg, image/png, image/jpg">
-          <label class="change-avatar d-flex justify-content-center align-items-center rounded-5 border border-1 border-white" for="input-avatar">
-            <img src="/web/images/image-edit.svg" alt="image edit" referrerpolicy="no-referrer">
-          </label>
+      <details class="setting-data d-flex flex-wrap justify-content-around align-items-center gap-2 p-2 rounded-5 open glass-card">
+        <summary class="section-summary w-100">
+          <h2 class="text-center fw-bold m-0 px-4 py-2">Change avatar</h2>
+        </summary>
+        <div class="section-body d-flex justify-content-center align-items-center gap-1">
+          <div class="setting-avatar d-flex justify-content-center align-items-center position-relative">
+            <img class="avatar rounded-5 border border-1 border-white" alt="avatar" referrerpolicy="no-referrer">
+            <input type="file" id="input-avatar" accept="image/jpeg, image/png, image/jpg">
+            <label class="change-avatar d-flex justify-content-center align-items-center rounded-5 border border-1 border-white" for="input-avatar">
+              <img src="/web/images/image-edit.svg" alt="image edit" referrerpolicy="no-referrer">
+            </label>
+          </div>
         </div>
-      </div>
-      <div class="setting-data d-flex flex-wrap justify-content-around align-items-center gap-2 p-2 rounded-5">
-        <h2 class="text-center fw-bold m-0 px-3 py-2">Change Username</h2>
-        <div class="setting-username d-flex flex-wrap justify-content-center align-items-center gap-1">
+      </details>
+      <details class="setting-data d-flex flex-wrap justify-content-around align-items-center gap-2 p-2 rounded-5 open glass-card">
+        <summary class="section-summary w-100">
+          <h2 class="text-center fw-bold m-0 px-3 py-2">Change Username</h2>
+        </summary>
+        <div class="section-body setting-username d-flex flex-wrap justify-content-center align-items-center gap-1">
           <input type="text" class="input-username rounded-5 p-3 fs-5">
           <button class="btn button-username rounded-5 p-3">Submit</button>
         </div>
-      </div>
-      <div class="setting-data d-flex flex-wrap justify-content-around align-items-center gap-2 p-2 rounded-5">
-        <h2 class="text-center fw-bold m-0 px-3 py-2">Change First Name</h2>
-        <div class="setting-first-name d-flex flex-wrap justify-content-center align-items-center gap-1">
+      </details>
+      <details class="setting-data d-flex flex-wrap justify-content-around align-items-center gap-2 p-2 rounded-5 open glass-card">
+        <summary class="section-summary w-100">
+          <h2 class="text-center fw-bold m-0 px-3 py-2">Change First Name</h2>
+        </summary>
+        <div class="section-body setting-first-name d-flex flex-wrap justify-content-center align-items-center gap-1">
           <input type="text" class="input-first-name rounded-5 p-3 fs-5">
           <button class="btn button-first-name rounded-5 p-3">Submit</button>
         </div>
-      </div>
-      <div class="setting-data d-flex flex-wrap justify-content-around align-items-center gap-2 p-2 rounded-5">
-        <h2 class="text-center fw-bold m-0 px-3 py-2">Change Last Name</h2>
-        <div class="setting-last-name d-flex flex-wrap justify-content-center align-items-center gap-1">
+      </details>
+      <details class="setting-data d-flex flex-wrap justify-content-around align-items-center gap-2 p-2 rounded-5 open glass-card">
+        <summary class="section-summary w-100">
+          <h2 class="text-center fw-bold m-0 px-3 py-2">Change Last Name</h2>
+        </summary>
+        <div class="section-body setting-last-name d-flex flex-wrap justify-content-center align-items-center gap-1">
           <input type="text" class="input-last-name rounded-5 p-3 fs-5">
           <button class="btn button-last-name rounded-5 p-3">Submit</button>
         </div>
-      </div>
-      <div class="setting-data d-flex flex-wrap justify-content-around align-items-center gap-2 p-2 rounded-5">
-        <h2 class="text-center fw-bold m-0 px-3 py-2">Two Factor Authentication</h2>
-        <div class="setting-twofa p-2 rounded-5">
+      </details>
+      <details class="setting-data d-flex flex-wrap justify-content-around align-items-center gap-2 p-2 rounded-5 open glass-card">
+        <summary class="section-summary w-100">
+          <h2 class="text-center fw-bold m-0 px-3 py-2">Two Factor Authentication</h2>
+        </summary>
+        <div class="section-body setting-twofa p-2 rounded-5">
           <label class="switch">
             <input type="checkbox">
             <span class="slider round rounded-5"></span>
@@ -188,7 +200,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </details>
     </main>
     <my-footer></my-footer>
   </template>
@@ -207,11 +219,15 @@
           <div class="tournament-list d-flex flex-wrap justify-content-center align-items-center gap-1"></div>
         </div>
       </section>
-      <section class="tournament-current d-none flex-column p-5 rounded-5">
-        <h1 class="text-center fw-bold rounded-5 py-5 mb-5">CURRENT TOURNAMENT</h1>
-        <tournament-players></tournament-players>
-        <tournament-matches></tournament-matches>
-      </section>
+      <details class="tournament-current d-none flex-column p-5 rounded-5 open">
+        <summary class="section-summary w-100">
+          <h1 class="text-center fw-bold rounded-5 py-5 mb-5">CURRENT TOURNAMENT</h1>
+        </summary>
+        <div class="section-body d-flex flex-column gap-4 p-0">
+          <tournament-players></tournament-players>
+          <tournament-matches></tournament-matches>
+        </div>
+      </details>
     </main>
     <my-footer></my-footer>
   </template>
@@ -370,9 +386,8 @@
 
   <!-- TOURNAMENT CARD -->
   <template id="tournament-card">
-    <h3 class="tournament-name">
-      </h1>
-      <h4 class="size">8 / 1</h2>
+    <h3 class="tournament-name"></h3>
+    <h4 class="size">8 / 1</h4>
   </template>
 
   <!-- TOURNAMENT PLAYERS -->

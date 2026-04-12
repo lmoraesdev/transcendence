@@ -22,72 +22,38 @@ def createRoom(matchId, playerId, channelName, capacity):
     return rooms[len(rooms) - 1]
 
 def getRoom(matchId, playerId, channelName, capacity):
-    # logger.debug("------------getRoom------------")
-    # logger.debug("matchId -> %s", matchId)
-    # logger.debug("playerId -> %s", playerId)
-    # logger.debug("channelName -> %s", channelName)
-    # logger.debug("capacity -> %s", capacity)
-    # logger.debug("rooms %s", rooms)
     for room in rooms:
-        # logger.debug("room -> %s", room)
-        if (len(room["players"]) < capacity and 
-                room["capacity"] == capacity and
-                room["matchId"] == matchId):
-            # logger.debug("append")
+        if room["matchId"] == matchId and room["capacity"] == capacity and len(room["players"]) < capacity:
             room["players"].append({playerId: channelName})
-            async_to_sync(get_channel_layer().group_add)(room["id"], channelName)
-        elif (len(room["players"]) == capacity):
-            # logger.debug("remove")
-            async_to_sync(get_channel_layer().group_send)(room["id"], {
-                "type": "chat.message",
-                "text": room["id"]
-            })
-            rooms.remove(room)
-        # logger.debug("------------------------")
-        return room
-    # logger.debug("------------------------")
+            return room
     return createRoom(matchId, playerId, channelName, capacity)
 
+
 def findChannelsRoom(playerId, channelName):
-    # logger.debug("------------findChannelsRoom------------")
-    # logger.debug("playerId -> %s", playerId)
-    # logger.debug("channelName -> %s", channelName)
-    # logger.debug("find rooms -> %s", rooms)
     for room in rooms:
-        # logger.debug("  find room -> %s", room)
-        # logger.debug("  find room player -> %s", room['players'])
         for player in room["players"]:
-            # logger.debug("      find player -> %s", player)
-            if (playerId in player):
-                # logger.debug("      playerId -> %s", playerId)
-                # logger.debug("      player[playerId] -> %s", player[playerId])
-                # logger.debug("      %s", player[playerId])
-                # logger.debug("      %s", channelName)
-                if (player[playerId] == channelName):
-                    # logger.debug("removendoooo")
+            if playerId in player:
+                if player[playerId] == channelName:
                     room["players"].remove(player)
-                # logger.debug("retorando room [%s]", room)
-                # logger.debug("------------------------")
                 return room
-    # logger.debug("vai retornar None")
-    # logger.debug("------------------------")
     return None
-                
+
 
 def matchPlayed(matchId):
-    match = Match.objects.get(id=matchId)
-    if (match.status == "PL"):
-        return True
-    else:
+    if not matchId:
+        return False
+    try:
+        match = Match.objects.get(id=matchId)
+        return match.status == "PL"
+    except Match.DoesNotExist:
         return False
 
 class Matchmaking(WebsocketConsumer):
     def receive(self, textData):
-        print(textData)
-        
+        pass
+
     def chatMessage(self, event):
         self.send(text_data=event["text"])
-
 
     def connect(self):
         # logger.debug("-------------------------------------------------")
@@ -97,25 +63,29 @@ class Matchmaking(WebsocketConsumer):
         matchId = self.scope['url_route']['kwargs'].get('matchId')
         # logger.debug("id: %s", matchId)
         self.accept()
-        if (matchId is not None and matchPlayed(matchId)):
-            # logger.debug("Ta jogando")
+        if matchId is not None and matchPlayed(matchId):
             self.send("Already Played")
             return
-        if (findChannelsRoom(self.scope['payload']['id'], self.channel_name)):
-            # logger.debug("Esta na partida")
+        if findChannelsRoom(self.scope['payload']['id'], self.channel_name):
             self.send("Already in Game")
             return
-        room = getRoom(matchId, self.scope['payload']['id'], self.channel_name,self.scope['url_route']['kwargs']['capacity'])
-        # logger.debug("room -> %s", room)
+
+        room = getRoom(
+            matchId,
+            self.scope['payload']['id'],
+            self.channel_name,
+            self.scope['url_route']['kwargs']['capacity'],
+        )
         if not room:
-            # logger.debug("Not room return")
             return
-        # logger.debug("async")
-        # logger.debug("self.channel_layer.group_add -> %s", self.channel_layer.group_add)
-        # logger.debug("room['id'] -> %s", room['id'])
-        # logger.debug("self.channel_name -> %s", self.channel_name)
+
         async_to_sync(self.channel_layer.group_add)(room['id'], self.channel_name)
-        # logger.debug("Connected to room: %s", room['id'])
+        if len(room['players']) == room['capacity']:
+            async_to_sync(self.channel_layer.group_send)(room['id'], {
+                'type': 'chat.message',
+                'text': room['id'],
+            })
+
         self.send(text_data=json.dumps({
             'room_id': room['id']
         }))

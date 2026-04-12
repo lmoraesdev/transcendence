@@ -50,7 +50,6 @@ export default class TournamentPopup extends HTMLElement {
             "Content-Type": "application/json",
           },
         ).then((data) => {
-          console.log("status code", data.statusCode);
           if (data.statusCode === 200) window.location.reload();
           else alert(data.message);
         });
@@ -73,7 +72,6 @@ export default class TournamentPopup extends HTMLElement {
             "Content-Type": "application/json",
           },
         ).then((data) => {
-          console.log("status code", data.statusCode);
           if (data.statusCode === 200) window.location.reload();
           else alert(data.message);
         });

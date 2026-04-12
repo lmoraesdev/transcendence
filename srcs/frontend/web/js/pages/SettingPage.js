@@ -34,10 +34,23 @@ export default class SettingPage extends HTMLElement {
 
     input_avatar.onchange = function () {
       const avatarImage = input_avatar.files[0];
+      if (!avatarImage) {
+        return;
+      }
       avatar.src = URL.createObjectURL(avatarImage);
       const formData = new FormData();
       formData.append("avatar", avatarImage);
-      fetching(`https://${window.ft_transcendence_host}/player/avatar/`, "POST", formData);
+      fetching(`https://${window.ft_transcendence_host}/player/avatar/`, "POST", formData)
+        .then((res) => {
+          if (res.status !== 200) {
+            alert(res.message || "Failed to upload avatar.");
+            return;
+          }
+          alert(res.message);
+        })
+        .catch(() => {
+          alert("Avatar upload failed.");
+        });
     };
     button_username.onclick = (event) => {
       player_post_changes("username", input_username);
