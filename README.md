@@ -83,7 +83,4 @@ O projeto principal está em `srcs/`.
 - [x] Bola do jogo ajustada
 - [x] Documentação atualizada
 
-## Próximo passo
-
-A aplicação está pronta para testes manuais no navegador. Verifique especialmente os jogos `Pong` e o fluxo de upload de avatar na página de configurações.
 
