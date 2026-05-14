@@ -1,4 +1,4 @@
-*This project was created as part of the 42 curriculum by lmoraes, [login2], [login3], [login4], [login5]. I was responsible for the entire backend.*
+*This project was created as part of the 42 curriculum by lbatista, lucperei, gmachado, mvavasso, ekaik-ne. I was responsible for the entire backend.*
 
 # Transcendence
 
